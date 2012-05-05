@@ -18,11 +18,17 @@ namespace deadlock
 			protected:
 
 				/// The string of obfuscated bytes
-				std::string obfuscated_string;
+				std::string obfuscated_data;
+
+				static obfuscated_string empty_obfuscated_string;
 
 			public:
 
+				/// Creates a new string given the already obfuscated data
+				obfuscated_string(const std::string& string_of_obfuscated_bytes);
 
+				/// Returns the empty obfuscated string
+				static const obfuscated_string& empty();
 			};
 		}
 	}

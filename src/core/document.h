@@ -5,6 +5,8 @@
 #include <ostream>
 
 #include "version.h"
+#include "circular_buffer.h"
+#include "data/entry_collection.h"
 
 #include "win32_export.h"
 
@@ -18,6 +20,12 @@ namespace deadlock
 		class _export document
 		{
 		protected:
+
+			/// A buffer of 512 bits used to obfuscate/de-obfuscate data
+			circular_buffer<64> secret;
+
+			/// The collection of entries that the document stores
+			data::entry_collection entries;
 
 		public:
 
