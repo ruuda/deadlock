@@ -1,1 +1,1 @@
-subdirs(command_line)
+add_subdirectory(command_line)

@@ -6,6 +6,8 @@
 
 #include "version.h"
 
+#include "win32_export.h"
+
 namespace deadlock
 {
 	namespace core
@@ -13,7 +15,7 @@ namespace deadlock
 		/// Represents one document of passwords
 		/// The document contains the collection of passwords,
 		/// properties, and can be written and loaded.
-		class document
+		class _export document
 		{
 		protected:
 
