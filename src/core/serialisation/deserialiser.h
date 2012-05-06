@@ -86,7 +86,7 @@ namespace deadllock
 					}
 
 					/// Reads one hexadecimal character
-					char read_hex()
+					char read_hexadecimal()
 					{
 						require_next();
 						switch (c)
@@ -115,13 +115,14 @@ namespace deadllock
 						case 'F': return 0xF;
 						}
 
-						throw ill_formed_source_error("The data source is ill-formed: hex-value is invalid.");
+						throw ill_formed_source_error("The data source is ill-formed: hexadecimal-value is invalid.");
 					}
 
 					/// Reads four hexadecimal characters and returns the UTF-8 representation
 					std::string read_codepoint()
 					{
-						return std::string() + static_cast<char>((read_hex() << 4) | read_hex()) + static_cast<char>((read_hex() << 4) | read_hex());
+						// TODO: is a code point always 2 characters?
+						return std::string() + static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal()) + static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal());
 					}
 
 					/// Reads a string escape sequence

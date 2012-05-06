@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "../win32_export.h"
+
 namespace deadlock
 {
 	namespace core
@@ -13,7 +15,7 @@ namespace deadlock
 			/// In this manner the actual string does not have to be in memory (or on a disk);
 			/// The string can be passed around without a human discovering the password.
 			/// Of course, since the string can be obfuscated, it can always be de-obfuscated and be made visible.
-			class obfuscated_string
+			class _export obfuscated_string
 			{
 			protected:
 

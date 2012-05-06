@@ -35,3 +35,31 @@ version::operator std::int32_t ()
 		static_cast<std::int32_t>(build)
 	);
 }
+
+bool operator<(version v1, version v2)
+{
+	if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
+	if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
+	if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
+	if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
+
+	// Equality is not less-than
+	return false;
+}
+
+bool operator<=(version v1, version v2)
+{
+	if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
+	if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
+	if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
+	if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
+
+	// Equality is less-than or equal
+	return true;
+}
+
+std::ostream& operator<<(std::ostream& ostr, const version& v)
+{
+	ostr << v.major << "." << v.minor << "." << v.revision << "." << v.build;
+	return ostr;
+}

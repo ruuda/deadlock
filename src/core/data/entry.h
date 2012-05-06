@@ -2,7 +2,10 @@
 #define _DEADLOCK_CORE_DATA_ENTRY_H_
 
 #include <vector>
+
 #include "password.h"
+
+#include "../win32_export.h"
 
 namespace deadlock
 {
@@ -14,7 +17,7 @@ namespace deadlock
 			/// This contains one single item for the collection (identified by a key),
 			/// A collection of passwords associated with it,
 			/// a username and additional data
-			class entry
+			class _export entry
 			{
 			public:
 

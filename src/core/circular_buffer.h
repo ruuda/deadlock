@@ -3,13 +3,15 @@
 
 #include <cstdint>
 
+#include "win32_export.h"
+
 namespace deadlock
 {
 	namespace core
 	{
 		/// Holds a certain amount of bytes, and provides bytes on request.
 		/// When the last byte is read, it starts again at the beginning.
-		template <size_t size> class circular_buffer
+		template <size_t size> class _export circular_buffer
 		{
 		protected:
 

@@ -2,6 +2,10 @@
 #define _DEADLOCK_CORE_VERSION_H_
 
 #include <cstdint>
+#include <ostream>
+#include <istream>
+
+#include "win32_export.h"
 
 namespace deadlock
 {
@@ -10,7 +14,7 @@ namespace deadlock
 		/// Represents a version as a 32-bit integer
 		/// 8-bits are reserved for the major number, minor number, revision and build number.
 		/// (That means there should not be more than 255 builds of one revision)
-		struct version
+		struct _export version
 		{
 			std::int8_t major;
 
@@ -31,7 +35,19 @@ namespace deadlock
 
 			/// Returns the version as an integer
 			operator std::int32_t ();
+
+			/// Compares two versions
+			static friend bool operator<(version v1, version v2);
+
+			/// Compares two versions
+			static friend bool operator<=(version v1, version v2);
 		};
+
+		/// Writes a version to a stream
+		std::ostream& operator<<(std::ostream& ostr, version v);
+
+		/// Reads a version from a stream
+		std::istream& operator>>(std::istream& istr, version& v);
 	}
 }
 

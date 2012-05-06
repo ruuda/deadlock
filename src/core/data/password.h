@@ -5,6 +5,8 @@
 
 #include "obfuscated_string.h"
 
+#include "../win32_export.h"
+
 namespace deadlock
 {
 	namespace core
@@ -12,7 +14,7 @@ namespace deadlock
 		namespace data
 		{
 			/// Keeps a password (obfuscated) and the date-time it was stored
-			class password
+			class _export password
 			{
 			protected:
 
@@ -21,6 +23,8 @@ namespace deadlock
 
 				/// The actual password data
 				obfuscated_string obfuscated_password;
+
+				static password empty_password;
 
 			public:
 
@@ -37,6 +41,9 @@ namespace deadlock
 
 				/// Returns the (obfuscated) password
 				inline const obfuscated_string& get_password() const { return obfuscated_password; }
+
+				/// Returns the empty obfuscated password
+				static const password& empty();
 			};
 		}
 	}

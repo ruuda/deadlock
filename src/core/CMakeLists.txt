@@ -1,5 +1,3 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 file(GLOB DEADLOCK_CORE_FILES *.h *.cpp)
 source_group("core" FILES ${DEADLOCK_CORE_FILES})
 

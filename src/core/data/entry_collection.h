@@ -5,6 +5,8 @@
 
 #include "entry.h"
 
+#include "../win32_export.h"
+
 namespace deadlock
 {
 	namespace core
@@ -14,7 +16,7 @@ namespace deadlock
 			/// A container that stores all entries.
 			/// It also contains an acceleration structure, used to do fast searches,
 			/// and it handles finding possible matches for a given search string.
-			class entry_collection
+			class _export entry_collection
 			{
 			protected:
 
