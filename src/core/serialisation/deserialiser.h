@@ -3,9 +3,12 @@
 
 #include <istream>
 #include <stdexcept>
+
 #include "value.h"
 
-namespace deadllock
+#include "../win32_export.h"
+
+namespace deadlock
 {
 	namespace core
 	{
@@ -50,12 +53,12 @@ namespace deadllock
 				/// next character will be relevant. Therefore, you should make
 				/// sure that you append one whitespace character to your source,
 				/// or just let the stream fail (due to an end-of-file, for example).
-				template <typename value_t> class deserialiser
+				class deserialiser
 				{
 				protected:
 			
 					/// The value on which the serialiserr acts.
-					value_t& main_value;
+					json_value& main_value;
 
 					/// The current character
 					char c;
@@ -162,9 +165,9 @@ namespace deadllock
 					}
 
 					/// Reads a string and returns it as a value
-					value_t read_string()
+					json_value read_string()
 					{
-						return value_t(read_string_raw());
+						return json_value(read_string_raw());
 					}
 
 					/// Reads the exponent part of a number
@@ -304,9 +307,9 @@ namespace deadllock
 					}
 
 					/// Reads a number from the stream
-					value_t read_number()
+					json_value read_number()
 					{
-						value_t v;
+						json_value v;
 						v.type = value_type::number;
 						v.value = new std::string(read_number_raw());
 						return v;
@@ -315,13 +318,13 @@ namespace deadllock
 					/// Reads true fron the stream
 					/// Ill-formed JSON will fail here.
 					/// To improve performance, validation has been omitted.
-					value_t read_true()
+					json_value read_true()
 					{
 						read_next(); // skip 't'
 						read_next(); // skip 'r'
 						read_next(); // skip 'u'
 						read_next(); // skip 'e'
-						value_t v;
+						json_value v;
 						v.type = value_type::c_true;
 						return v;
 					}
@@ -329,14 +332,14 @@ namespace deadllock
 					/// Reads false fron the stream
 					/// Ill-formed JSON will fail here.
 					/// To improve performance, validation has been omitted.
-					value_t read_false()
+					json_value read_false()
 					{
 						read_next(); // skip 'f'
 						read_next(); // skip 'a'
 						read_next(); // skip 'l'
 						read_next(); // skip 's'
 						read_next(); // skip 'e'
-						value_t v;
+						json_value v;
 						v.type = value_type::c_false;
 						return v;
 					}
@@ -344,23 +347,23 @@ namespace deadllock
 					/// Reads null fron the stream
 					/// Ill-formed JSON will fail here.
 					/// To improve performance, validation has been omitted.
-					value_t read_null()
+					json_value read_null()
 					{
 						read_next(); // skip 'n'
 						read_next(); // skip 'u'
 						read_next(); // skip 'l'
 						read_next(); // skip 'l'
-						value_t v;
+						json_value v;
 						v.type = value_type::c_null;
 						return v;
 					}
 
 					/// Reads an object from the stream
-					value_t read_object()
+					json_value read_object()
 					{
 						require_next(); // skip '{'
 					
-						typename value_t::object_t map;
+						json_value::object_t map;
 
 						while (c != '}')
 						{
@@ -377,15 +380,15 @@ namespace deadllock
 						}
 						read_next(); // skip '}'
 
-						return value_t(map);
+						return json_value(map);
 					}
 
 					/// Reads an array from the stream
-					value_t read_array()
+					json_value read_array()
 					{
 						require_next(); // skip '['
 					
-						typename value_t::array_t arr;
+						json_value::array_t arr;
 
 						while (c != ']')
 						{
@@ -400,7 +403,7 @@ namespace deadllock
 						}
 						read_next(); // skip ']'
 
-						return value_t(arr);
+						return json_value(arr);
 					}
 
 					/// Tests whether the current character is a valid value character
@@ -417,9 +420,9 @@ namespace deadllock
 					}
 
 					/// Reads a value from the stream
-					value_t read_value()
+					json_value read_value()
 					{
-						value_t value;
+						json_value value;
 
 						do
 						{
@@ -468,7 +471,7 @@ namespace deadllock
 
 					/// Constructor
 					/// Takes a reference to the value to use
-					deserialiser(value_t& v, std::istream& is) : main_value(v), c('\0'), istr(is) {}
+					deserialiser(json_value& v, std::istream& is) : main_value(v), c('\0'), istr(is) {}
 
 					/// Reads the valure from the stream
 					void read()
@@ -480,13 +483,10 @@ namespace deadllock
 			}
 
 			/// Deserialises a value from a stream
-			template <
-				template <typename, typename> class t_object_t,
-				template <typename> class t_array_t
-				>
-			std::istream& operator>>(std::istream& istr, generic_value<t_object_t, t_array_t>& value)
+			// TODO: use cpp files
+			inline _export std::istream& operator>>(std::istream& istr, json_value& value)
 			{
-				detail::deserialiser<generic_value<t_object_t, t_array_t> >(value, istr).read();
+				detail::deserialiser(value, istr).read();
 				return istr;
 			}
 		}

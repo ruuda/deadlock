@@ -5,5 +5,6 @@ file(GLOB_RECURSE DEADLOCK_INTERFACE_COMMAND_LINE_HEADERS *.h)
 file(GLOB_RECURSE DEADLOCK_INTERFACE_COMMAND_LINE_SOURCES *.cpp)
 
 add_executable(deadlock_cli ${DEADLOCK_INTERFACE_COMMAND_LINE_HEADERS} ${DEADLOCK_INTERFACE_COMMAND_LINE_SOURCES})
-target_link_libraries(deadlock_cli deadlock)
+target_link_libraries(deadlock_cli libdeadlock)
+# ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_LIBRARIES})
 set_target_properties(deadlock_cli PROPERTIES OUTPUT_NAME deadlock)

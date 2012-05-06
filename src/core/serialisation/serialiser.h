@@ -210,7 +210,7 @@ namespace deadlock
 				}
 
 				/// Writes a number
-				template <typename T> write_number(T number)
+				template <typename T> void write_number(T number)
 				{
 					#ifdef _DEBUG
 					// Useless arithmetic that cause the template to fail for non-number types (in most cases)

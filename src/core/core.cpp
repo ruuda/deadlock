@@ -2,4 +2,8 @@
 
 using namespace deadlock::core;
 
-version deadlock_core_version = version(1, 0, 0, 0);
+
+version assembly_information::get_version()
+{
+	return version(1, 0, 0, 0);
+}

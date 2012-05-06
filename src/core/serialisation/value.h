@@ -25,39 +25,27 @@ namespace deadlock
 
 			namespace detail
 			{
-				/// Use std::map as object type
-				template <typename key_t, typename value_t> struct std_map_object { typedef std::map<key_t, value_t> type; };
-
-				/// Use std::vector as array type
-				template <typename value_t> struct std_vector_array { typedef std::vector<value_t> type; };
-
-				template<typename> class serialiser;
-				template<typename> class deserialiser;
+				class deserialiser;
 			}
 
 			/// Represents a JSON value
 			/// \todo better documentation
-			template <
-				template <typename, typename> class t_object_t,
-				template <typename> class t_array_t
-				>
-			class generic_value
+			class json_value
 			{
-				template<typename> friend class detail::serialiser;
-				template<typename> friend class detail::deserialiser;
+				friend class detail::deserialiser;
 
 			public:
 
 				/// The map container
-				typedef typename t_object_t<std::string, generic_value>::type object_t;
+				typedef std::map<std::string, json_value> object_t;
 
 				/// The list/array container
-				typedef typename t_array_t<generic_value>::type array_t;
+				typedef std::vector<json_value> array_t;
 
 			protected:
 
 				/// Type of this class
-				typedef generic_value<t_object_t, t_array_t> self_type;
+				typedef json_value self_type;
 
 				/// What this value actually is
 				value_type type;
@@ -78,14 +66,14 @@ namespace deadlock
 
 				/// Default constructor
 				/// Initialises a null value
-				generic_value()
+				json_value()
 				{
 					type = value_type::c_null;
 					value = nullptr;
 				}
 
 				/// Copy constructor
-				generic_value(const self_type& other)
+				json_value(const self_type& other)
 				{
 					if (&other == this) return;
 
@@ -115,7 +103,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (string)
-				generic_value(const std::string& v)
+				json_value(const std::string& v)
 				{
 					type = value_type::string;
 					value = new std::string(std::move(v));
@@ -139,7 +127,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (const char*)
-				generic_value(const char* v)
+				json_value(const char* v)
 				{
 					type = value_type::string;
 					value = new std::string(v);
@@ -155,7 +143,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (short)
-				generic_value(short v)
+				json_value(short v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -179,7 +167,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (unsigned short)
-				generic_value(unsigned short v)
+				json_value(unsigned short v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -203,7 +191,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (int)
-				generic_value(int v)
+				json_value(int v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -227,7 +215,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (unsigned int)
-				generic_value(unsigned int v)
+				json_value(unsigned int v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -251,7 +239,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (long int)
-				generic_value(long int v)
+				json_value(long int v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -275,7 +263,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (unsigned long int)
-				generic_value(unsigned long int v)
+				json_value(unsigned long int v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -299,7 +287,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (long long)
-				generic_value(long long v)
+				json_value(long long v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -323,7 +311,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (unsigned long long)
-				generic_value(unsigned long long v)
+				json_value(unsigned long long v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -347,7 +335,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (float)
-				generic_value(float v)
+				json_value(float v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -371,7 +359,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (double)
-				generic_value(double v)
+				json_value(double v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -395,7 +383,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (long double)
-				generic_value(long double v)
+				json_value(long double v)
 				{
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -419,7 +407,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (object)
-				generic_value(const object_t& v)
+				json_value(const object_t& v)
 				{
 					type = value_type::object;
 					value = new object_t(std::move(v));
@@ -443,7 +431,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (array)
-				generic_value(const array_t& v)
+				json_value(const array_t& v)
 				{
 					type = value_type::array;
 					value = new array_t(std::move(v));
@@ -467,7 +455,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (bool)
-				generic_value(bool v)
+				json_value(bool v)
 				{
 					type = v ? value_type::c_true : value_type::c_false;
 					value = nullptr;
@@ -496,7 +484,7 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (null)
-				generic_value(std::nullptr_t v)
+				json_value(std::nullptr_t v)
 				{
 					type = value_type::c_null;
 					value = nullptr;
@@ -514,14 +502,14 @@ namespace deadlock
 				/// Conversion operator (null)
 				operator std::nullptr_t () const
 				{
-					if (type = value_type::c_null)
+					if (type == value_type::c_null)
 						return nullptr;
 					throw std::runtime_error("The stored value is not null.");
 				}
 
 				/// Destructor
 				/// Deletes the stored value
-				~generic_value()
+				~json_value()
 				{
 					if (value) delete_value();
 				}
@@ -530,7 +518,7 @@ namespace deadlock
 				const self_type& operator[](const std::string& index) const
 				{
 					if (type == value_type::object)
-						return (*static_cast<const object_t*>(value))[index];
+						return (*static_cast<object_t*>(value))[index];
 					throw std::runtime_error("The stored value is not an object.");
 				}
 
@@ -547,7 +535,7 @@ namespace deadlock
 				const self_type& operator[](const char* index) const
 				{
 					if (type == value_type::object)
-						return (*static_cast<const object_t*>(value))[std::string(index)];
+						return (*static_cast<object_t*>(value))[std::string(index)];
 					throw std::runtime_error("The stored value is not an object.");
 				}
 
@@ -576,9 +564,6 @@ namespace deadlock
 					return type;
 				}
 			};
-
-			/// Normal value
-			typedef generic_value<detail::std_map_object, detail::std_vector_array> value;
 		}
 	}
 }

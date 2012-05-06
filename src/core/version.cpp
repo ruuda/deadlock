@@ -57,9 +57,3 @@ bool operator<=(version v1, version v2)
 	// Equality is less-than or equal
 	return true;
 }
-
-std::ostream& operator<<(std::ostream& ostr, const version& v)
-{
-	ostr << v.major << "." << v.minor << "." << v.revision << "." << v.build;
-	return ostr;
-}

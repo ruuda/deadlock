@@ -41,13 +41,21 @@ namespace deadlock
 
 			/// Compares two versions
 			static friend bool operator<=(version v1, version v2);
+
+			/// Writes a version to a stream
+			static inline friend std::ostream& operator<<(std::ostream& ostr, version v)
+			{
+				ostr << v.major << "." << v.minor << "." << v.revision << "." << v.build;
+				return ostr;
+			}
+
+			/// Reads a version from a stream
+			static inline friend std::istream& operator>>(std::istream& istr, version& v)
+			{
+				// TODO;
+				return istr;
+			}
 		};
-
-		/// Writes a version to a stream
-		std::ostream& operator<<(std::ostream& ostr, version v);
-
-		/// Reads a version from a stream
-		std::istream& operator>>(std::istream& istr, version& v);
 	}
 }
 

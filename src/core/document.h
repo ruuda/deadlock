@@ -30,7 +30,7 @@ namespace deadlock
 			data::entry_collection entries;
 
 			/// Reconstructs the document given the JSON data
-			void deserialise(const serialisation::value& json_data);
+			void deserialise(const serialisation::json_value::object_t& json_data);
 
 			/// Writes the document to the serialiser
 			/// If no_obfuscation is true, it will de-obfuscate the strings before writing them,
@@ -38,12 +38,12 @@ namespace deadlock
 			void serialise(serialisation::serialiser& serialiser, bool no_obfuscation);
 
 			/// Reads the password collection from a stream of JSON
-			void import_json(std::istream& json_stream);
+			void deserialise(std::istream& json_stream);
 
 			/// This exports the most recent version of the Deadlock JSON structure.
 			/// If no_obfuscation is true, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
-			void export_json(std::ostream& json_stream, bool no_obfuscation);
+			void serialise(std::ostream& json_stream, bool no_obfuscation, bool human_readable);
 
 		public:
 

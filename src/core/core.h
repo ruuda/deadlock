@@ -3,12 +3,20 @@
 
 #include "document.h"
 
+#include "win32_export.h"
+
 namespace deadlock
 {
 	namespace core
 	{
-		/// The current version of the Deadlock core library
-		_export version deadlock_core_version;
+		/// Provides information about Deadlock
+		class _export assembly_information
+		{
+		public:
+
+			/// Returns the Deadlock core (libdeadlock) version
+			static version get_version();
+		};
 	}
 }
 

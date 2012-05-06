@@ -1,4 +1,6 @@
 #include <iostream>
+
+#define BOOST_ALL_STATIC_LINK
 #include <boost/program_options.hpp>
 
 #include "../../core/core.h"
@@ -9,7 +11,7 @@ using namespace deadlock::core;
 int main(int argc, char** argv)
 {
 	// Declare the supported options
-	po::options_description desc("Supported commands");
+	po::options_description desc("Supported commands", 80, 40);
 	desc.add_options()
 		("help,h", "produce help message")
 		("version", "show Deadlock version")
@@ -43,14 +45,14 @@ int main(int argc, char** argv)
 	if (vm.count("version"))
 	{
 		std::cout << "Deadlock command-line interface (deadlock_cli)" << std::endl;
-		std::cout << "Using libdeadlock " << deadlock::core::deadlock_core_version << std::endl;
+		std::cout << "Using libdeadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 		return 0;
 	}
 
 	/// The document that will be used throughout this session
 	document archive;
 
-	std::cout << "Deadlock " << deadlock::core::deadlock_core_version << std::endl;
+	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 
 	return 0;
 }
