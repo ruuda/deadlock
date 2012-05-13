@@ -34,7 +34,17 @@ void document::deserialise(const serialisation::json_value::object_t& json_data)
 
 void document::serialise(serialisation::serialiser& serialiser, bool no_obfuscation)
 {
+	// Root is an object
+	serialiser.write_begin_object();
+	{
+		// Write version
+		serialiser.write_object_key("version");
+		std::stringstream str_stream; str_stream << assembly_information::get_version();
+		serialiser.write_string(str_stream.str());
 
+
+	}
+	serialiser.write_end_object();
 }
 
 void document::deserialise(std::istream& json_stream)

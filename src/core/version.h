@@ -32,13 +32,13 @@ namespace deadlock
 		/// (That means there should not be more than 255 builds of one revision)
 		struct _export version
 		{
-			std::int8_t major;
+			std::uint8_t major;
 
-			std::int8_t minor;
+			std::uint8_t minor;
 
-			std::int8_t revision;
+			std::uint8_t revision;
 
-			std::int8_t build;
+			std::uint8_t build;
 
 			/// Empty constructor creates version 1
 			version();
@@ -61,7 +61,8 @@ namespace deadlock
 			/// Writes a version to a stream
 			static inline friend std::ostream& operator<<(std::ostream& ostr, version v)
 			{
-				ostr << v.major << "." << v.minor << "." << v.revision << "." << v.build;
+				ostr << static_cast<int>(v.major) << "." << static_cast<int>(v.minor) << "."
+					 << static_cast<int>(v.revision) << "." << static_cast<int>(v.build);
 				return ostr;
 			}
 

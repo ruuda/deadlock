@@ -298,8 +298,6 @@ namespace deadlock
 				/// Writes the key for an object member
 				void write_object_key(std::string key)
 				{
-					write_begin_value();
-
 					write_string(key);
 
 					ostr << ":";

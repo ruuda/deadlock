@@ -68,6 +68,8 @@ int main(int argc, char** argv)
 	/// The document that will be used throughout this session
 	document archive;
 
+	archive.export_json("test.json", false);
+
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 
 	return 0;
