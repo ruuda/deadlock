@@ -11,5 +11,10 @@
 *.la
 *.a
 
-#CMake build directory
+# Visual Studio garbadge
+*.suo
+*.sdf
+*.user
+
+# CMake build directory
 build
