@@ -42,7 +42,19 @@ void document::serialise(serialisation::serialiser& serialiser, bool no_obfuscat
 		std::stringstream str_stream; str_stream << assembly_information::get_version();
 		serialiser.write_string(str_stream.str());
 
-
+		// If obfuscated, write the obfuscation buffer as an array of bytes
+		if (!no_obfuscation)
+		{
+			serialiser.write_object_key("obfuscation_buffer");
+			serialiser.write_begin_array();
+			{
+				for (size_t i = 0; i < obfuscation_buffer.size(); i++)
+				{
+					serialiser.write_number(obfuscation_buffer[i]);
+				}
+			}
+			serialiser.write_end_array();
+		}
 	}
 	serialiser.write_end_object();
 }

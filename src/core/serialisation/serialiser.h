@@ -87,6 +87,7 @@ namespace deadlock
 				/// Writes the byte as two characters (hexadecimal representation)
 				void write_hexadecimal(std::uint8_t byte)
 				{
+					// TODO this can be done better with stream manipulators
 					ostr << get_hexadecimal_nibble((byte >> 4) & 0xf) << get_hexadecimal_nibble(byte & 0xf);
 				}
 
@@ -179,25 +180,6 @@ namespace deadlock
 					ostr << "\"";
 				}
 
-				/// Writes the string, where every character is replaced by a hexadecimal escape sequence
-				void write_hexadecimal_string(const std::string& str)
-				{
-					write_begin_value();
-
-					ostr << "\"";
-
-					size_t sz = str.size();
-					for (size_t i = 0; i < sz; i++)
-					{
-						// TODO: code point size?
-						char c = str[i];
-						ostr << "\\u00";
-						write_hexadecimal(c);
-					}
-
-					ostr << "\"";
-				}
-
 				// Writes "true"
 				void write_true()
 				{
@@ -237,6 +219,22 @@ namespace deadlock
 					write_begin_value();
 					// TODO: will this always be formatted correctly?
 					ostr << number;
+				}
+
+				/// Writes a byte
+				template <> void write_number<std::uint8_t>(std::uint8_t number)
+				{
+					write_begin_value();
+
+					ostr << (int)number;
+				}
+
+				/// Writes a byte
+				template <> void write_number<std::int8_t>(std::int8_t number)
+				{
+					write_begin_value();
+
+					ostr << (int)number;
 				}
 
 				/// Writes the start of an array
