@@ -18,6 +18,8 @@
 #define _DEADLOCK_CORE_CIRCULAR_BUFFER_H_
 
 #include <cstdint>
+#include <random>
+#include <ctime>
 
 #include "win32_export.h"
 
@@ -27,7 +29,7 @@ namespace deadlock
 	{
 		/// Holds a certain amount of bytes, and provides bytes on request.
 		/// When the last byte is read, it starts again at the beginning.
-		template <size_t buffer_size> class _export circular_buffer
+		template <size_t buffer_size> class circular_buffer
 		{
 		protected:
 
@@ -46,17 +48,18 @@ namespace deadlock
 				cursor = 0;
 			}
 
-			/// Initialises the buffer by copying the given bytes
-			/// The provided array must have enough bytes to fill the buffer
-			circular_buffer(std::uint8_t* buffer_to_copy)
+			/// Fills the buffer with random bytes
+			inline void fill_random()
 			{
+				// TODO: read from /dev/urandom where possible, or maybe use other system-provided entropy on other platforms
+				std::mt19937 random_engine;
+				random_engine.seed(std::time(nullptr));
+				std::uniform_int_distribution<std::uint8_t> random_byte(0x00, 0xff);
+
 				for (size_t i = 0; i < buffer_size; i++)
 				{
-					buffer[i] = buffer_to_copy[i];
+					buffer[i] = random_byte(random_engine);
 				}
-
-				/// Start reading at the first byte
-				cursor = 0;
 			}
 
 			/// Returns the buffer size

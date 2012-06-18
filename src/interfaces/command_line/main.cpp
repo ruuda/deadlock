@@ -74,6 +74,7 @@ int main(int argc, char** argv)
 
 	/// Testing obfuscation buffer
 	deadlock::core::circular_buffer_512 obfs_buffer;
+	obfs_buffer.fill_random();
 
 	std::vector<std::uint8_t> obfs;
 	obfs.push_back('a' ^ obfs_buffer.next());
