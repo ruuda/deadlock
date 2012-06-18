@@ -73,11 +73,14 @@ namespace deadlock
 				}
 
 				/// Written before every type of value
-				void write_begin_value()
+				/// If newline is true, it will emit a newline and indentation after an object key, otherwise a simple space.
+				/// Of course whitespace will only be written to human readable streams.
+				void write_begin_value(bool newline = false)
 				{
 					if (states.top() == state_after_key)
 					{
-						if (write_whitespace) ostr << " ";
+						if (write_whitespace && !newline) ostr << " ";
+						else if (write_whitespace) write_indentation();
 						states.pop();
 					}
 					else if (states.top() == state_begin_list)
@@ -207,10 +210,7 @@ namespace deadlock
 				/// Writes the start of an array
 				void write_begin_array()
 				{
-					write_begin_value();
-
-					// Newline and indentation
-					write_indentation();
+					write_begin_value(true);
 
 					ostr << "[";
 
@@ -235,10 +235,7 @@ namespace deadlock
 				/// Writes the start of an object
 				void write_begin_object()
 				{
-					write_begin_value();
-
-					// Newline and indentation
-					write_indentation();
+					write_begin_value(true);
 
 					ostr << "{";
 
