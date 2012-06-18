@@ -17,7 +17,8 @@
 #ifndef _DEADLOCK_CORE_DATA_OBFUSCATED_STRING_H_
 #define _DEADLOCK_CORE_DATA_OBFUSCATED_STRING_H_
 
-#include <string>
+#include <vector>
+#include <cstdint>
 
 #include "../win32_export.h"
 
@@ -36,14 +37,15 @@ namespace deadlock
 			protected:
 
 				/// The string of obfuscated bytes
-				std::string obfuscated_data;
+				std::vector<std::uint8_t> obfuscated_data;
 
+				/// A static instance of the empty string
 				static obfuscated_string empty_obfuscated_string;
 
 			public:
 
 				/// Creates a new string given the already obfuscated data
-				obfuscated_string(const std::string& string_of_obfuscated_bytes);
+				obfuscated_string(const std::vector<std::uint8_t>& buffer_of_obfuscated_bytes);
 
 				/// Returns the empty obfuscated string
 				static const obfuscated_string& empty();

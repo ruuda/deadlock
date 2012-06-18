@@ -21,7 +21,7 @@
 using namespace deadlock::core::data;
 
 // Initialise empty obfuscated string here to avoid static initialisation fiasco
-obfuscated_string obfuscated_string::empty_obfuscated_string = obfuscated_string("");
+obfuscated_string obfuscated_string::empty_obfuscated_string = obfuscated_string(std::vector<std::uint8_t>());
 password password::empty_password = password(obfuscated_string::empty(), 0x0);
 
 password::password(obfuscated_string password_data, std::int64_t stored_time) :

@@ -20,8 +20,8 @@ using namespace deadlock::core::data;
 
 // <see password.cpp for implementation of the empty obfuscated string>
 
-obfuscated_string::obfuscated_string(const std::string& string_of_obfuscated_bytes) :
-	obfuscated_data(string_of_obfuscated_bytes)
+obfuscated_string::obfuscated_string(const std::vector<std::uint8_t>& buffer_of_obfuscated_bytes) :
+	obfuscated_data(buffer_of_obfuscated_bytes.begin(), buffer_of_obfuscated_bytes.end())
 {
 
 }

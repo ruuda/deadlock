@@ -47,7 +47,6 @@ namespace deadlock
 				/// Re-constructs a password based on the given data
 				/// Should be used for loading only
 				password(obfuscated_string password_data, std::int64_t stored_time);
-				
 
 				/// Constructs a new password with its store_time set to the current time
 				password(obfuscated_string password_data);
