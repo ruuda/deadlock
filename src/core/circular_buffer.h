@@ -83,18 +83,6 @@ namespace deadlock
 				return byte;
 			}
 
-			/// Returns the byte at the specified position
-			std::uint8_t operator[](size_t index) const
-			{
-				return buffer[index];
-			}
-
-			/// Returns the byte at the specified position
-			std::uint8_t& operator[](size_t index)
-			{
-				return buffer[index];
-			}
-
 			/// Returns a hexadecimal representation of the buffer
 			std::string get_hexadecimal_string() const
 			{
