@@ -72,5 +72,24 @@ int main(int argc, char** argv)
 
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 
+	/// Testing obfuscation buffer
+	deadlock::core::circular_buffer_512 obfs_buffer;
+
+	std::vector<std::uint8_t> obfs;
+	obfs.push_back('a' ^ obfs_buffer.next());
+	obfs.push_back('b' ^ obfs_buffer.next());
+	obfs.push_back('c' ^ obfs_buffer.next());
+	deadlock::core::data::obfuscated_string obfs_str(obfs);
+	const char* cstring;
+	{
+		auto deobfs_str = obfs_str.deobfuscate(obfs_buffer);
+		cstring = deobfs_str.c_str();
+		std::cout << std::endl << cstring << std::endl;
+	}
+
+	// This should fail, or cause an access violation
+	std::cout << std::endl << cstring << std::endl;
+
+
 	return 0;
 }

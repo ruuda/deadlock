@@ -43,7 +43,7 @@ namespace deadlock
 			/// Does not initialise the buffer, instantiates it with undefined content
 			circular_buffer()
 			{
-
+				cursor = 0;
 			}
 
 			/// Initialises the buffer by copying the given bytes
@@ -90,6 +90,9 @@ namespace deadlock
 				return buffer[index];
 			}
 		};
+
+		/// A 512-bit circular buffer
+		typedef circular_buffer<64> circular_buffer_512;
 	}
 }
 

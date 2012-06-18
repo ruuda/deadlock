@@ -21,6 +21,8 @@
 #include <cstdint>
 
 #include "../win32_export.h"
+#include "../circular_buffer.h"
+#include "deobfuscated_string.h"
 
 namespace deadlock
 {
@@ -49,6 +51,13 @@ namespace deadlock
 
 				/// Returns the empty obfuscated string
 				static const obfuscated_string& empty();
+
+				/// Creates a deobfuscated string that contains the same data as this string,
+				/// but not obfuscated this time
+				inline deobfuscated_string deobfuscate(circular_buffer_512& obfuscation_buffer) const
+				{
+					return deadlock::core::data::deobfuscated_string(obfuscated_data, obfuscation_buffer);
+				}
 			};
 		}
 	}
