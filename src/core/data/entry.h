@@ -22,6 +22,9 @@
 #include "password.h"
 
 #include "../win32_export.h"
+#include "../circular_buffer.h"
+#include "../serialisation/value.h"
+#include "../serialisation/serialiser.h"
 
 namespace deadlock
 {
@@ -56,6 +59,13 @@ namespace deadlock
 				/// Can be used to store additional information with the key
 				std::string additional_data;
 
+				/// Serialises all values common to obfuscated and de-obfuscated serialisation
+				/// This does not write the enclosing object
+				void serialise_common(serialisation::serialiser& serialiser);
+
+				/// Deserialises all values common to obfuscated and de-obfuscated serialisation
+				void deserialise_common(const serialisation::json_value::object_t& json_data);
+
 			public:
 
 				/// Returns the key associated with this entry
@@ -87,6 +97,21 @@ namespace deadlock
 
 				/// Modifies additional data associated with the key
 				inline void set_additional_data(const std::string& new_data) { additional_data = new_data; }
+
+				/// Reconstructs the entries given the JSON data, assuming obfuscated data
+				void deserialise_obfuscated(const serialisation::json_value::object_t& json_data);
+
+				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
+				/// The data will then be stored in an obfuscated way using the provided buffer
+				void deserialise_deobfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& obfuscation_buffer);
+
+				/// Writes the entries to the serialiser as an array of objects
+				/// This will write the passwords as hexadecimal strings of the obfuscated data
+				void serialise_obfuscated(serialisation::serialiser& serialiser);
+
+				/// Writes the entries to the serialiser as an array of objects
+				/// This will write the passwords "as-is", after deobfuscation with the buffer
+				void serialise_deobfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
 			};
 		}
 	}

@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <string>
 
 #include "../win32_export.h"
 #include "../circular_buffer.h"
@@ -49,8 +50,14 @@ namespace deadlock
 				/// Creates a new string given the already obfuscated data
 				obfuscated_string(const std::vector<std::uint8_t>& buffer_of_obfuscated_bytes);
 
+				/// Creates a new string given the already obfuscated data in hexadecimal form
+				obfuscated_string(const std::string& hexadecimal_string);
+
 				/// Returns the empty obfuscated string
 				static const obfuscated_string& empty();
+
+				/// Returns the hexadecimal representation of the obfuscated data
+				std::string get_hexadecimal_string() const;
 
 				/// Creates a deobfuscated string that contains the same data as this string,
 				/// but not obfuscated this time

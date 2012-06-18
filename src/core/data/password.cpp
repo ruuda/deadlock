@@ -34,6 +34,7 @@ password::password(obfuscated_string password_data) :
 	obfuscated_password(password_data)
 {
 	// Store with the current time
+	// TODO: make sure this is GMT time, independent of the local time (for portability)
 	store_time = std::time(nullptr);
 }
 

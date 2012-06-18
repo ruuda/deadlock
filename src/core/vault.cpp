@@ -17,6 +17,7 @@
 #include "vault.h"
 
 #include <fstream>
+#include <iomanip>
 
 #include "core.h"
 
@@ -24,7 +25,25 @@ using namespace deadlock::core;
 
 vault::vault()
 {
+	// TODO: this is for testing purposes only, remove / create unit tests
+	data::entry entr1, entr2, entr3;
 
+	entr1.set_key("ky");
+	entr1.set_username("usr");
+	entr1.set_additional_data("dta");
+	entr1.set_password(data::obfuscated_string("ff118c"));
+	entries.push_back(entr1);
+
+	entr2.set_key("ky2");
+	entr2.set_username("usr2");
+	entr2.set_password(data::obfuscated_string("0123456789abcdef"));
+	entries.push_back(entr2);
+
+	entr3.set_key("ky3");
+	entr3.set_additional_data("dta2");
+	entr3.set_password(data::obfuscated_string("00"));
+	entr3.set_password(data::obfuscated_string("11"));
+	entries.push_back(entr3);
 }
 
 void vault::deserialise(const serialisation::json_value::object_t& json_data)
@@ -53,10 +72,21 @@ void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 			// Output each character to the stream
 			for (size_t i = 0; i < obfuscation_buffer.size(); i++)
 			{
-				hex_string << std::hex << static_cast<int>(obfuscation_buffer[i]);
+				hex_string << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(obfuscation_buffer[i]);
 			}
 			
 			serialiser.write_string(hex_string.str());
+		}
+
+		// Write the entries
+		serialiser.write_object_key("entries");
+		if (obfuscation)
+		{
+			entries.serialise_obfuscated(serialiser);
+		}
+		else
+		{
+			entries.serialise_deobfuscated(serialiser, obfuscation_buffer);
 		}
 	}
 	serialiser.write_end_object();
