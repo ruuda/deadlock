@@ -32,7 +32,7 @@ void document::deserialise(const serialisation::json_value::object_t& json_data)
 
 }
 
-void document::serialise(serialisation::serialiser& serialiser, bool no_obfuscation)
+void document::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 {
 	// Root is an object
 	serialiser.write_begin_object();
@@ -43,17 +43,20 @@ void document::serialise(serialisation::serialiser& serialiser, bool no_obfuscat
 		serialiser.write_string(str_stream.str());
 
 		// If obfuscated, write the obfuscation buffer as an array of bytes
-		if (!no_obfuscation)
+		if (obfuscation)
 		{
 			serialiser.write_object_key("obfuscation_buffer");
-			serialiser.write_begin_array();
+
+			// Convert the buffer to a string, using hexadecimal representation
+			std::stringstream hex_string;
+			
+			// Output each character to the stream
+			for (size_t i = 0; i < obfuscation_buffer.size(); i++)
 			{
-				for (size_t i = 0; i < obfuscation_buffer.size(); i++)
-				{
-					serialiser.write_number(obfuscation_buffer[i]);
-				}
+				hex_string << std::hex << static_cast<int>(obfuscation_buffer[i]);
 			}
-			serialiser.write_end_array();
+			
+			serialiser.write_string(hex_string.str());
 		}
 	}
 	serialiser.write_end_object();
@@ -70,13 +73,13 @@ void document::deserialise(std::istream& json_stream)
 	deserialise(document_root);
 }
 
-void document::serialise(std::ostream& json_stream, bool no_obfuscation, bool human_readable)
+void document::serialise(std::ostream& json_stream, bool obfuscation, bool human_readable)
 {
 	// Construct a serialiser that writes to the stream
 	serialisation::serialiser serialiser(json_stream, human_readable);
 
 	// Serialise to the stream
-	serialise(serialiser, no_obfuscation);
+	serialise(serialiser, obfuscation);
 }
 
 void document::import_json(const std::string& filename)
@@ -104,7 +107,7 @@ void document::import_json(const std::string& filename)
 	}
 }
 
-void document::export_json(const std::string& filename, bool no_obfuscation)
+void document::export_json(const std::string& filename, bool obfuscation)
 {
 	// TODO binary mode?
 	std::ofstream file(filename);
@@ -112,7 +115,7 @@ void document::export_json(const std::string& filename, bool no_obfuscation)
 	if (file.good())
 	{
 		// Export as human-readable JSON
-		serialise(file, no_obfuscation, true);
+		serialise(file, obfuscation, true);
 	}
 	else
 	{

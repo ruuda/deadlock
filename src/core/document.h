@@ -49,17 +49,17 @@ namespace deadlock
 			void deserialise(const serialisation::json_value::object_t& json_data);
 
 			/// Writes the document to the serialiser
-			/// If no_obfuscation is true, it will de-obfuscate the strings before writing them,
+			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
-			void serialise(serialisation::serialiser& serialiser, bool no_obfuscation);
+			void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 
 			/// Reads the password collection from a stream of JSON
 			void deserialise(std::istream& json_stream);
 
 			/// This exports the most recent version of the Deadlock JSON structure.
-			/// If no_obfuscation is true, it will de-obfuscate the strings before writing them,
+			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
-			void serialise(std::ostream& json_stream, bool no_obfuscation, bool human_readable);
+			void serialise(std::ostream& json_stream, bool obfuscation, bool human_readable);
 
 		public:
 
@@ -71,9 +71,9 @@ namespace deadlock
 
 			/// Writes the password collection as JSON to a file
 			/// This always writes the most recent version of the Deadlock JSON structure.
-			/// If no_obfuscation is true, it will de-obfuscate the strings before writing them,
+			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
-			void export_json(const std::string& filename, bool no_obfuscation);
+			void export_json(const std::string& filename, bool obfuscation);
 		};
 	}
 }

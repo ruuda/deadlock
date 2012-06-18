@@ -58,39 +58,6 @@ namespace deadlock
 
 				std::stack<serialisation_state> states;
 
-				/// Returns four bits as one character (hexadecimal representation)
-				char get_hexadecimal_nibble(std::uint8_t nibble)
-				{
-					switch (nibble)
-					{
-					case 0x0: return '0';
-					case 0x1: return '1';
-					case 0x2: return '2';
-					case 0x3: return '3';
-					case 0x4: return '4';
-					case 0x5: return '5';
-					case 0x6: return '6';
-					case 0x7: return '7';
-					case 0x8: return '8';
-					case 0x9: return '9';
-					case 0xa: return 'a';
-					case 0xb: return 'b';
-					case 0xc: return 'c';
-					case 0xd: return 'd';
-					case 0xe: return 'e';
-					case 0xf: return 'f';
-					}
-
-					throw std::runtime_error("Invalid nibble, it must be in the range 0x0 -- 0xf");
-				}
-
-				/// Writes the byte as two characters (hexadecimal representation)
-				void write_hexadecimal(std::uint8_t byte)
-				{
-					// TODO this can be done better with stream manipulators
-					ostr << get_hexadecimal_nibble((byte >> 4) & 0xf) << get_hexadecimal_nibble(byte & 0xf);
-				}
-
 				/// Writes a newline and indentation characters (if whitespace is enabled)
 				void write_indentation()
 				{
