@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "document.h"
+#include "vault.h"
 
 #include <fstream>
 
@@ -22,17 +22,17 @@
 
 using namespace deadlock::core;
 
-document::document()
+vault::vault()
 {
 
 }
 
-void document::deserialise(const serialisation::json_value::object_t& json_data)
+void vault::deserialise(const serialisation::json_value::object_t& json_data)
 {
 
 }
 
-void document::serialise(serialisation::serialiser& serialiser, bool obfuscation)
+void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 {
 	// Root is an object
 	serialiser.write_begin_object();
@@ -62,18 +62,18 @@ void document::serialise(serialisation::serialiser& serialiser, bool obfuscation
 	serialiser.write_end_object();
 }
 
-void document::deserialise(std::istream& json_stream)
+void vault::deserialise(std::istream& json_stream)
 {
-	serialisation::json_value document_root;
+	serialisation::json_value vault_root;
 
 	// Deserialise JSON from stream
-	json_stream >> document_root;
+	json_stream >> vault_root;
 
 	// Read the JSON structure
-	deserialise(document_root);
+	deserialise(vault_root);
 }
 
-void document::serialise(std::ostream& json_stream, bool obfuscation, bool human_readable)
+void vault::serialise(std::ostream& json_stream, bool obfuscation, bool human_readable)
 {
 	// Construct a serialiser that writes to the stream
 	serialisation::serialiser serialiser(json_stream, human_readable);
@@ -82,7 +82,7 @@ void document::serialise(std::ostream& json_stream, bool obfuscation, bool human
 	serialise(serialiser, obfuscation);
 }
 
-void document::import_json(const std::string& filename)
+void vault::import_json(const std::string& filename)
 {
 	// TODO binary mode?
 	std::ifstream file(filename);
@@ -107,7 +107,7 @@ void document::import_json(const std::string& filename)
 	}
 }
 
-void document::export_json(const std::string& filename, bool obfuscation)
+void vault::export_json(const std::string& filename, bool obfuscation)
 {
 	// TODO binary mode?
 	std::ofstream file(filename);

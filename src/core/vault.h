@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DEADLOCK_CORE_DOCUMENT_H_
-#define _DEADLOCK_CORE_DOCUMENT_H_
+#ifndef _DEADLOCK_CORE_VAULT_H_
+#define _DEADLOCK_CORE_VAULT_H_
 
 #include <istream>
 #include <ostream>
@@ -32,23 +32,23 @@ namespace deadlock
 {
 	namespace core
 	{
-		/// Represents one document of passwords
-		/// The document contains the collection of passwords,
+		/// Represents one 'vault' of passwords
+		/// The vault contains the collection of passwords,
 		/// properties, and can be written and loaded.
-		class _export document
+		class _export vault
 		{
 		protected:
 
 			/// A buffer of 512 bits used to obfuscate/de-obfuscate data
 			circular_buffer<64> obfuscation_buffer;
 
-			/// The collection of entries that the document stores
+			/// The collection of entries that the vault stores
 			data::entry_collection entries;
 
-			/// Reconstructs the document given the JSON data
+			/// Reconstructs the vault given the JSON data
 			void deserialise(const serialisation::json_value::object_t& json_data);
 
-			/// Writes the document to the serialiser
+			/// Writes the vault to the serialiser
 			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
 			void serialise(serialisation::serialiser& serialiser, bool obfuscation);
@@ -63,8 +63,8 @@ namespace deadlock
 
 		public:
 
-			/// Creates an empty document
-			document();
+			/// Creates an empty vault
+			vault();
 
 			/// Reads the password collection from a file
 			void import_json(const std::string& filename);

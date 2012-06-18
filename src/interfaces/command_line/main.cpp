@@ -65,8 +65,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	/// The document that will be used throughout this session
-	document archive;
+	/// The vault that will be used throughout this session
+	vault archive;
 
 	archive.export_json("test.json", true);
 

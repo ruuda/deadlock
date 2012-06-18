@@ -17,7 +17,7 @@
 #ifndef _DEADLOCK_CORE_H_
 #define _DEADLOCK_CORE_H_
 
-#include "document.h"
+#include "vault.h"
 
 #include "win32_export.h"
 
