@@ -99,7 +99,7 @@ namespace deadlock
 				inline void set_additional_data(const std::string& new_data) { additional_data = new_data; }
 
 				/// Reconstructs the entries given the JSON data, assuming obfuscated data
-				void deserialise_obfuscated(const serialisation::json_value::object_t& json_data);
+				void deserialise_obfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& tranformation_buffer);
 
 				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
 				/// The data will then be stored in an obfuscated way using the provided buffer

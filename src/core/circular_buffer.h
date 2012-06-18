@@ -64,6 +64,19 @@ namespace deadlock
 				}
 			}
 
+			/// Turns the buffer into a transformation buffer that transforms from its current content to the other buffer
+			inline void transform(circular_buffer<buffer_size>& other)
+			{
+				// Reset other, so beginnings line up
+				other.reset();
+
+				// Loop through the bytes and apply xor
+				for (size_t i = 0; i < buffer_size; i++)
+				{
+					buffer[i] ^= other.next();
+				}
+			}
+
 			/// Returns the buffer size
 			size_t size() const { return buffer_size; }
 

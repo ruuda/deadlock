@@ -27,8 +27,6 @@ using namespace deadlock::core;
 
 vault::vault()
 {
-	// TODO: only fill obfuscation buffer when it should not be loaded from a file
-	
 	// Generate a random buffer to obfuscate passwords
 	obfuscation_buffer.fill_random();
 }
@@ -63,16 +61,20 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 	// First, check whether the file uses obfuscation or not
 	bool obfuscation = (json_data.find("obfuscation_buffer") != json_data.end());
 
-	// If obfuscated, read the obfuscation buffer
+	// If obfuscated, read with obfuscation
 	if (obfuscation)
 	{
-		// Parse the stored hexadecimal string into the obfuscation buffer
-		obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
+		// Retrieve the obfuscation buffer stored in the file
+		circular_buffer_512 file_obfuscation_buffer;
+		file_obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
 
-		// Deserialise the obfuscated entries; they are obfuscated with the buffer just read
-		entries.deserialise_obfuscated(json_data.at("entries"));
+		// Transform the file buffer to convert between the file buffer and the current obfuscation buffer
+		file_obfuscation_buffer.transform(obfuscation_buffer);
+
+		// Deserialise the obfuscated entries
+		entries.deserialise_obfuscated(json_data.at("entries"), file_obfuscation_buffer);
 	}
-	else
+	else // Otherwise read plain passwords
 	{
 		// Deserialise plain passwords, and immediately store them obfuscated using the obfuscation buffer
 		entries.deserialise_deobfuscated(json_data.at("entries"), obfuscation_buffer);

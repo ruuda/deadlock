@@ -58,7 +58,7 @@ void entry::deserialise_common(const serialisation::json_value::object_t& json_d
 	}
 }
 
-void entry::deserialise_obfuscated(const serialisation::json_value::object_t& json_data)
+void entry::deserialise_obfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& transformation_buffer)
 {
 	// First, read common values
 	// This will also make sure a password array is present
@@ -74,8 +74,13 @@ void entry::deserialise_obfuscated(const serialisation::json_value::object_t& js
 		if (psswd.find("obfuscated_password") == psswd.end()) throw format_error("No obfuscated password data present in password.");
 		if (psswd.find("store_time") == psswd.end()) throw format_error("No timestamp present in password.");
 
+		// Read the obfuscated string and transform it to the new obfuscation buffer
+		obfuscated_string obfs_psswd(password_array[i]["obfuscated_password"]);
+		obfs_psswd.transform(transformation_buffer);
+
 		// Add the password to the list, using obfuscated data and the timestamp
-		passwords.push_back(password(obfuscated_string(password_array[i]["obfuscated_password"]), psswd.at("store_time")));
+		passwords.push_back(password(obfs_psswd, psswd.at("store_time")));
+
 	}
 }
 

@@ -69,7 +69,8 @@ int main(int argc, char** argv)
 	vault archive;
 
 	archive.import_json("test.json");
-	archive.export_json("test.json", false);
+	archive.import_json("test2.json");
+	archive.export_json("test3.json", false);
 
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 

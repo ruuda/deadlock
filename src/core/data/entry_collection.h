@@ -44,7 +44,7 @@ namespace deadlock
 			public:
 
 				/// Reconstructs the entries given the JSON data, assuming obfuscated data
-				void deserialise_obfuscated(const serialisation::json_value::array_t& json_data);
+				void deserialise_obfuscated(const serialisation::json_value::array_t& json_data, circular_buffer_512& transformation_buffer);
 
 				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
 				/// The data will then be stored in an obfuscated way using the provided buffer

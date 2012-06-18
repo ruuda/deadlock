@@ -26,7 +26,7 @@ void entry_collection::push_back(const entry& new_entry)
 	// TODO: update acceleration structure
 }
 
-void entry_collection::deserialise_obfuscated(const serialisation::json_value::array_t& json_data)
+void entry_collection::deserialise_obfuscated(const serialisation::json_value::array_t& json_data, circular_buffer_512& transformation_buffer)
 {
 	// Loop through the data and read entries
 	for (size_t i = 0; i < json_data.size(); i++)
@@ -34,7 +34,7 @@ void entry_collection::deserialise_obfuscated(const serialisation::json_value::a
 		// Add a new, blank entry to the collection
 		entries.push_back(entry());
 		// Load the correct data into it
-		entries.back().deserialise_obfuscated(json_data[i]);
+		entries.back().deserialise_obfuscated(json_data[i], transformation_buffer);
 	}
 
 	// TODO: generate acceleration structure

@@ -83,3 +83,15 @@ std::string obfuscated_string::get_hexadecimal_string() const
 
 	return hex_string.str();
 }
+
+void obfuscated_string::transform(circular_buffer_512& transformation_buffer)
+{
+	// Beginnings must line up, so reset the buffer
+	transformation_buffer.reset();
+
+	// Apply xor to every byte in the buffer
+	for (size_t i = 0; i < obfuscated_data.size(); i++)
+	{
+		obfuscated_data[i] ^= transformation_buffer.next();
+	}
+}

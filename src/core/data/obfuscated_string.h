@@ -69,6 +69,10 @@ namespace deadlock
 				{
 					return deadlock::core::data::deobfuscated_string(obfuscated_data, obfuscation_buffer);
 				}
+
+				/// Applies xor to the data, using the provided buffer
+				/// This can be used to switch from one obfuscation buffer to another.
+				void transform(circular_buffer_512& transformation_buffer);
 			};
 		}
 	}
