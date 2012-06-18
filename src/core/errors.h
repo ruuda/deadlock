@@ -29,6 +29,12 @@ namespace deadlock
 			public:
 				format_error(std::string const& msg) : std::runtime_error(msg) {}
 		};
+
+		class _export version_error: public std::runtime_error
+		{
+		public:
+			version_error(std::string const& msg) : std::runtime_error(msg) {}
+		};
 	}
 }
 

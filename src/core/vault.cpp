@@ -27,6 +27,11 @@ using namespace deadlock::core;
 
 vault::vault()
 {
+	// TODO: only fill obfuscation buffer when it should not be loaded from a file
+	
+	// Generate a random buffer to obfuscate passwords
+	obfuscation_buffer.fill_random();
+
 	// TODO: this is for testing purposes only, remove / create unit tests
 	data::entry entr1, entr2, entr3;
 
@@ -51,12 +56,35 @@ vault::vault()
 void vault::deserialise(const serialisation::json_value::object_t& json_data)
 {
 	// At least, the data must contain version information
-	if (json_data.find("version") == json_data.end()) throw format_error("No version information present.");
+	if (json_data.find("version") == json_data.end())
+	{
+		throw format_error("No version information present.");
+	}
 
 	// Read the version
 	std::stringstream version_string(static_cast<std::string>(json_data.at("version")));
 	version file_version;
 	version_string >> file_version;
+	version application_version = assembly_information::get_version();
+
+	// Version checks could be added here to parse old versions
+	// For now, there is only one version, so it does not matter
+	// Forward compatibility is assumed per major version
+	if (file_version > application_version && file_version.major > application_version.major)
+	{
+		throw version_error("The file was created with a newer version of the application.");
+	}
+
+	// Now parse the actual data
+	// First, check whether the file uses obfuscation or not
+	bool obfuscation = (json_data.find("obfuscation_buffer") != json_data.end());
+
+	// If obfuscated, read the obfuscation buffer
+	if (obfuscation)
+	{
+		// Parse the stored hexadecimal string into the obfuscation buffer
+		obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
+	}
 }
 
 void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
@@ -73,17 +101,7 @@ void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 		if (obfuscation)
 		{
 			serialiser.write_object_key("obfuscation_buffer");
-
-			// Convert the buffer to a string, using hexadecimal representation
-			std::stringstream hex_string;
-			
-			// Output each character to the stream
-			for (size_t i = 0; i < obfuscation_buffer.size(); i++)
-			{
-				hex_string << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(obfuscation_buffer[i]);
-			}
-			
-			serialiser.write_string(hex_string.str());
+			serialiser.write_string(obfuscation_buffer.get_hexadecimal_string());
 		}
 
 		// Write the entries
