@@ -31,7 +31,7 @@ namespace deadlock
 		namespace serialisation
 		{
 			/// Indicates a problem with deserialisation
-			class deserialisation_error: public std::runtime_error
+			class _export deserialisation_error: public std::runtime_error
 			{
 				public:
 					deserialisation_error(std::string const& msg) : std::runtime_error(msg) {}
@@ -40,7 +40,7 @@ namespace deadlock
 			/// Indicates a problem with the data source: it is ill-formed.
 			/// The syntax of the data source is wrong: it is ill-formed.
 			/// Therefore, the deserialiser cannot correctly parse the source, and throws this exception.
-			class ill_formed_source_error: public deserialisation_error
+			class _export ill_formed_source_error: public deserialisation_error
 			{
 				public:
 					ill_formed_source_error(std::string const& msg) : deserialisation_error(msg) {}
@@ -51,7 +51,7 @@ namespace deadlock
 			/// ended, or due to an other stream failure.
 			/// Therefore, the deserialiser has not enough information to reconstruct the data,
 			/// and throws this exception.
-			class bad_stream_error: public deserialisation_error
+			class _export bad_stream_error: public deserialisation_error
 			{
 				public:
 					bad_stream_error(std::string const& msg) : deserialisation_error(msg) {}

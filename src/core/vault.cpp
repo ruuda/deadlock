@@ -18,8 +18,10 @@
 
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 
 #include "core.h"
+#include "errors.h"
 
 using namespace deadlock::core;
 
@@ -48,7 +50,13 @@ vault::vault()
 
 void vault::deserialise(const serialisation::json_value::object_t& json_data)
 {
+	// At least, the data must contain version information
+	if (json_data.find("version") == json_data.end()) throw format_error("No version information present.");
 
+	// Read the version
+	std::stringstream version_string(static_cast<std::string>(json_data.at("version")));
+	version file_version;
+	version_string >> file_version;
 }
 
 void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)

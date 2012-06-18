@@ -69,7 +69,11 @@ namespace deadlock
 			/// Reads a version from a stream
 			static inline friend std::istream& operator>>(std::istream& istr, version& v)
 			{
-				// TODO;
+				// Read numbers, skip dots in between
+				istr >> v.major; istr.get();
+				istr >> v.minor; istr.get();
+				istr >> v.revision; istr.get();
+				istr >> v.build;
 				return istr;
 			}
 		};
