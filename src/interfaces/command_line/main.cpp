@@ -68,8 +68,8 @@ int main(int argc, char** argv)
 	/// The vault that will be used throughout this session
 	vault archive;
 
-	//archive.export_json("test.json", true);
 	archive.import_json("test.json");
+	archive.export_json("test.json", false);
 
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 

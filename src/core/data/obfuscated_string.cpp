@@ -19,7 +19,10 @@
 #include <sstream>
 #include <iomanip>
 
+#include "../circular_buffer.h"
+
 using namespace deadlock::core::data;
+using deadlock::core::circular_buffer_512;
 
 // <see password.cpp for implementation of the empty obfuscated string>
 
@@ -43,6 +46,23 @@ obfuscated_string::obfuscated_string(const std::string& hexadecimal_string)
 		// Read the integer value
 		int byte; byte_stream >> std::hex >> byte;
 		obfuscated_data.push_back(static_cast<std::uint8_t>(byte));
+	}
+}
+
+obfuscated_string::obfuscated_string(const std::string& unobfuscated_string, circular_buffer_512& obfuscation_buffer)
+{
+	// Allocate enough bytes to store the string
+	obfuscated_data.reserve(unobfuscated_string.size());
+
+	// Reset the buffer, because starting positions must align
+	obfuscation_buffer.reset();
+
+	// Loop through the characters and store them
+	for (size_t i = 0; i < unobfuscated_string.size(); i++)
+	{
+		// Obfuscate using (original_char xor buffer_byte)
+		// This is a simple and reversible method of obfuscating
+		obfuscated_data.push_back(unobfuscated_string[i] ^ obfuscation_buffer.next());
 	}
 }
 

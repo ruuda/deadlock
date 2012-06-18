@@ -53,6 +53,10 @@ namespace deadlock
 				/// Creates a new string given the already obfuscated data in hexadecimal form
 				obfuscated_string(const std::string& hexadecimal_string);
 
+				/// Creates a new obfuscated string that represents the unobfusated string,
+				/// obfuscated with the provided obfuscation buffer
+				obfuscated_string(const std::string& unobfuscated_string, circular_buffer_512& obfuscation_buffer);
+
 				/// Returns the empty obfuscated string
 				static const obfuscated_string& empty();
 

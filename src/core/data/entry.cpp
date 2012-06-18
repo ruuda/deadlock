@@ -16,6 +16,8 @@
 
 #include "entry.h"
 
+#include "../errors.h"
+
 using namespace deadlock::core;
 using namespace deadlock::core::data;
 
@@ -36,17 +38,68 @@ void entry::set_password(const obfuscated_string& new_password)
 
 void entry::deserialise_common(const serialisation::json_value::object_t& json_data)
 {
-	// TODO
+	// At least, a key and passwords should be present
+	if (json_data.find("key") == json_data.end()) throw format_error("No key present for entry.");
+	if (json_data.find("passwords") == json_data.end()) throw format_error("No passwords present in entry.");
+
+	// Read the key
+	key = json_data.at("key");
+
+	// Read the username (if present)
+	if (json_data.find("username") != json_data.end())
+	{
+		username = json_data.at("username");
+	}
+
+	// Read additional data (if present)
+	if (json_data.find("additional_data") != json_data.end())
+	{
+		additional_data = json_data.at("additional_data");
+	}
 }
 
 void entry::deserialise_obfuscated(const serialisation::json_value::object_t& json_data)
 {
-	// TODO
+	// First, read common values
+	// This will also make sure a password array is present
+	deserialise_common(json_data);
+
+	// Loop through the obfuscated passwords and add them
+	const serialisation::json_value::array_t& password_array = json_data.at("passwords");
+	for (size_t i = 0; i < password_array.size(); i++)
+	{
+		const serialisation::json_value::object_t& psswd = password_array[i];
+
+		// Make sure password and timestamp are present
+		if (psswd.find("obfuscated_password") == psswd.end()) throw format_error("No obfuscated password data present in password.");
+		if (psswd.find("store_time") == psswd.end()) throw format_error("No timestamp present in password.");
+
+		// Add the password to the list, using obfuscated data and the timestamp
+		passwords.push_back(password(obfuscated_string(password_array[i]["obfuscated_password"]), psswd.at("store_time")));
+	}
 }
 
 void entry::deserialise_deobfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& obfuscation_buffer)
 {
-	// TODO
+	// First, read common values
+	// This will also make sure a password array is present
+	deserialise_common(json_data);
+
+	// Loop through the unobfuscated passwords and add them
+	const serialisation::json_value::array_t& password_array = json_data.at("passwords");
+	for (size_t i = 0; i < password_array.size(); i++)
+	{
+		const serialisation::json_value::object_t& psswd = password_array[i];
+
+		// Make sure password and timestamp are present
+		if (psswd.find("password") == psswd.end()) throw format_error("No password data present in password.");
+		if (psswd.find("store_time") == psswd.end()) throw format_error("No timestamp present in password.");
+
+		// Add the password to the list, using obfuscated data and the timestamp
+		// Note that passwords are present in memory during deserialisation, and the memory is not explicitly cleared either.
+		// The passwords were not stored obfuscated in the first place, so that should not be a problem in this case.
+		passwords.push_back(password(obfuscated_string(password_array[i]["password"], obfuscation_buffer), psswd.at("store_time")));
+	}
 }
 
 void entry::serialise_common(serialisation::serialiser& serialiser)

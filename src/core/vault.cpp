@@ -31,34 +31,18 @@ vault::vault()
 	
 	// Generate a random buffer to obfuscate passwords
 	obfuscation_buffer.fill_random();
-
-	// TODO: this is for testing purposes only, remove / create unit tests
-	data::entry entr1, entr2, entr3;
-
-	entr1.set_key("ky");
-	entr1.set_username("usr");
-	entr1.set_additional_data("dta");
-	entr1.set_password(data::obfuscated_string("ff118c"));
-	entries.push_back(entr1);
-
-	entr2.set_key("ky2");
-	entr2.set_username("usr2");
-	entr2.set_password(data::obfuscated_string("0123456789abcdef"));
-	entries.push_back(entr2);
-
-	entr3.set_key("ky3");
-	entr3.set_additional_data("dta2");
-	entr3.set_password(data::obfuscated_string("00"));
-	entr3.set_password(data::obfuscated_string("11"));
-	entries.push_back(entr3);
 }
 
 void vault::deserialise(const serialisation::json_value::object_t& json_data)
 {
-	// At least, the data must contain version information
+	// At least, the data must contain version information and entries
 	if (json_data.find("version") == json_data.end())
 	{
 		throw format_error("No version information present.");
+	}
+	if (json_data.find("entries") == json_data.end())
+	{
+		throw format_error("No entries present.");
 	}
 
 	// Read the version
@@ -84,6 +68,14 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 	{
 		// Parse the stored hexadecimal string into the obfuscation buffer
 		obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
+
+		// Deserialise the obfuscated entries; they are obfuscated with the buffer just read
+		entries.deserialise_obfuscated(json_data.at("entries"));
+	}
+	else
+	{
+		// Deserialise plain passwords, and immediately store them obfuscated using the obfuscation buffer
+		entries.deserialise_deobfuscated(json_data.at("entries"), obfuscation_buffer);
 	}
 }
 
