@@ -54,6 +54,7 @@ namespace deadlock
 			inline void fill_random()
 			{
 				// TODO: read from /dev/urandom where possible, or maybe use other system-provided entropy on other platforms
+				// TODO: get a better random seed, or at least share with the key generator
 				std::mt19937 random_engine;
 				random_engine.seed(std::time(nullptr));
 				std::uniform_int_distribution<std::uint8_t> random_byte(0x00, 0xff);

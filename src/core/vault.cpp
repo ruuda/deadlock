@@ -23,6 +23,7 @@
 #include "core.h"
 #include "errors.h"
 #include "endianness.h"
+#include "cryptography/key_generator.h"
 
 using namespace deadlock::core;
 
@@ -177,7 +178,7 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 	file.close();
 }
 
-void vault::load(const std::string& filename)
+void vault::load(const std::string& filename, cryptography::key_generator& key, const std::string& passphrase)
 {
 	// Open the file
 	std::ifstream file(filename, std::ios::binary);
@@ -212,6 +213,20 @@ void vault::load(const std::string& filename)
 			std::uint32_t iterations;
 			file.read(reinterpret_cast<char*>(&iterations), 4);
 			iterations = portable_to_internal(iterations);
+
+			// Followed by the 32 bytes of salt that were used to generate the key
+			for (size_t i = 0; i < key.salt_size; i++)
+			{
+				key.get_salt()[i] = file.get();
+			}
+
+			// Now generate the key
+			key.generate_key(passphrase, iterations);
+
+			// TODO: decrypt
+
+			// Obfuscate the key in memory while unused
+			key.obfuscate_key(obfuscation_buffer);
 		}
 		catch (...)
 		{
@@ -227,7 +242,7 @@ void vault::load(const std::string& filename)
 	}
 }
 
-void vault::save(const std::string& filename)
+void vault::save(const std::string& filename, cryptography::key_generator& key)
 {
 	// Open the file
 	std::ofstream file(filename, std::ios::binary);
@@ -244,13 +259,24 @@ void vault::save(const std::string& filename)
 		file.put(file_version.revision); file.put(file_version.build);
 
 		// Now for the current version, write the number of PBKDF2 iterations (as a big-endian 32-bit integer)
-		// TODO: handle this properly
-		std::uint32_t iterations = 18542;
+		std::uint32_t iterations = key.get_iterations();
 		iterations = internal_to_portable(iterations);
 		file.write(reinterpret_cast<char*>(&iterations), 4);
 
+		// Followed by the 32 bytes of salt that were used to generate the key
+		for (size_t i = 0; i < key.salt_size; i++)
+		{
+			file.put(key.get_salt()[i]);
+		}
+
+		// De-obfuscate the in-memory key
+		key.deobfuscate_key(obfuscation_buffer);
+
 		// Write the obfuscated JSON (for now)
 		serialise(file, true, false);
+
+		// Obfuscate the key again
+		key.obfuscate_key(obfuscation_buffer);
 	}
 	else
 	{

@@ -71,10 +71,17 @@ int main(int argc, char** argv)
 	archive.import_json("test.json");
 	archive.import_json("test2.json");
 	archive.export_json("test3.json", false);
-	archive.save("test3.dlk");
+
+	cryptography::key_generator key;
+	key.set_salt_random();
+	int iter_count = key.get_required_iterations(4, 2.0);
+	key.generate_key("henk", iter_count);
+	archive.obfuscate_key(key);
+
+	archive.save("test3.dlk", key);
 
 	vault archive2;
-	archive2.load("test3.dlk");
+	archive2.load("test3.dlk", key, "henk");
 
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 

@@ -50,6 +50,8 @@ namespace deadlock
 		/// On little-endian systems, this swaps around the bytes.
 		inline std::uint32_t internal_to_portable(std::uint32_t internal_integer)
 		{
+			// TODO: can the run-time check be replaced with compile-time macros?
+			// Optionally integrate with Crypto++ endianness detection as well
 			union
 			{
 				std::uint32_t i;
@@ -67,6 +69,8 @@ namespace deadlock
 		/// On little-endian systems, this swaps around the bytes.
 		inline std::uint32_t portable_to_internal(std::uint32_t portable_integer)
 		{
+			// TODO: can the run-time check be replaced with compile-time macros?
+			// Optionally integrate with Crypto++ endianness detection as well
 			union
 			{
 				std::uint32_t i;

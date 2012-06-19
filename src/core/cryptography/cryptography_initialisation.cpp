@@ -14,36 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DEADLOCK_CORE_ERRORS_H_
-#define _DEADLOCK_CORE_ERRORS_H_
+#include "cryptography_initialisation.h"
 
-#include <stdexcept>
-
-#include "win32_export.h"
-
-namespace deadlock
+extern "C"
 {
-	namespace core
-	{
-		/// Indicates a problem with reading a vault
-		class _export format_error: public std::runtime_error
-		{
-		public:
-			format_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
-
-		class _export version_error: public std::runtime_error
-		{
-		public:
-			version_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
-
-		class _export key_error: public std::runtime_error
-		{
-		public:
-			key_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
-	}
+	#include <tomcrypt.h>
 }
 
-#endif
+#include "../errors.h"
+
+using deadlock::core::cryptography::detail::_initialisation;
+
+// The static instance that will be constructed when the program starts
+_initialisation _initialisation::_instance = _initialisation();
+
+int _initialisation::sha256_index = -1;
+
+_initialisation::_initialisation()
+{
+	// Register the SHA-256 hash
+	sha256_index = register_hash(&sha256_desc);
+}
+
+_initialisation::~_initialisation()
+{
+	unregister_hash(&sha256_desc);
+}

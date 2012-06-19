@@ -25,6 +25,7 @@
 #include "data/entry_collection.h"
 #include "serialisation/deserialiser.h"
 #include "serialisation/serialiser.h"
+#include "cryptography/key_generator.h"
 
 #include "win32_export.h"
 
@@ -66,6 +67,9 @@ namespace deadlock
 			/// Creates an empty vault
 			vault();
 
+			/// Obfuscates the key with the current obfuscation buffer
+			inline void obfuscate_key(cryptography::key_generator& key) { key.obfuscate_key(obfuscation_buffer); }
+
 			/// Reads the password collection from a file
 			void import_json(const std::string& filename);
 
@@ -76,10 +80,10 @@ namespace deadlock
 			void export_json(const std::string& filename, bool obfuscation);
 
 			/// Saves the vault encrypted to a binary file
-			void save(const std::string& filename);
+			void save(const std::string& filename, cryptography::key_generator& key);
 
 			/// Loads an encrypted binary vault from a file
-			void load(const std::string& filename);
+			void load(const std::string& filename, cryptography::key_generator& key, const std::string& passphrase);
 		};
 	}
 }

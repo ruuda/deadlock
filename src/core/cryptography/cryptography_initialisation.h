@@ -14,35 +14,39 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DEADLOCK_CORE_ERRORS_H_
-#define _DEADLOCK_CORE_ERRORS_H_
-
-#include <stdexcept>
-
-#include "win32_export.h"
+#ifndef _DEADLOCK_CORE_CRYPTOGRAPHY_INITIALISATION_H_
+#define _DEADLOCK_CORE_CRYPTOGRAPHY_INITIALISATION_H_
 
 namespace deadlock
 {
 	namespace core
 	{
-		/// Indicates a problem with reading a vault
-		class _export format_error: public std::runtime_error
+		namespace cryptography
 		{
-		public:
-			format_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
+			namespace detail
+			{
+				/// Registers the hash and cypher functions used by LibTomCrypt upon construction
+				class _initialisation
+				{
+				private:
 
-		class _export version_error: public std::runtime_error
-		{
-		public:
-			version_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
+					/// Registers the required LibTomCrypt hashes and cyphers
+					/// Private because there should be one single instance, also contained within this class
+					_initialisation();
 
-		class _export key_error: public std::runtime_error
-		{
-		public:
-			key_error(std::string const& msg) : std::runtime_error(msg) {}
-		};
+					/// A static instance to make sure the constructor gets called once
+					static _initialisation _instance;
+
+				public:
+
+					/// Unregisters the LibTomCrypt hashes and cyphers
+					~_initialisation();
+
+					/// The LibTomCrypt index for the SHA-256 hash
+					static int sha256_index;
+				};
+			}
+		}
 	}
 }
 
