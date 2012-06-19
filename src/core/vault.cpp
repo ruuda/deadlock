@@ -22,6 +22,7 @@
 
 #include "core.h"
 #include "errors.h"
+#include "endianness.h"
 
 using namespace deadlock::core;
 
@@ -51,8 +52,8 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 
 	// Version checks could be added here to parse old versions
 	// For now, there is only one version, so it does not matter
-	// Forward compatibility is assumed per major version
-	if (file_version > application_version && file_version.major > application_version.major)
+	// Forward compatibility is not assumed, reading a newer version is an error.
+	if (application_version < file_version)
 	{
 		throw version_error("The file was created with a newer version of the application.");
 	}
@@ -166,6 +167,90 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 	{
 		// Export as human-readable JSON
 		serialise(file, obfuscation, true);
+	}
+	else
+	{
+		file.close();
+		throw std::runtime_error("Could not open file for writing.");
+	}
+
+	file.close();
+}
+
+void vault::load(const std::string& filename)
+{
+	// Open the file
+	std::ifstream file(filename, std::ios::binary);
+
+	if (file.good())
+	{
+		try
+		{
+			// Validate the header
+			char d, l, c, k;
+			file >> d; file >> l; file >> c; file >> k;
+			if (d != 'D' || l != 'L' || c != 'C' || k != 'K')
+			{
+				throw format_error("The file is not a valid Deadlock vault; the header is incorrect.");
+			}
+
+			// Now read the version
+			version file_version;
+			version application_version = assembly_information::get_version();
+			file_version.major = file.get(); file_version.minor = file.get();
+			file_version.revision = file.get(); file_version.build = file.get();
+
+			// Version checks could be added here to parse old versions
+			// For now, there is only one version, so it does not matter
+			// Forward compatibility is not assumed, reading a newer version is an error.
+			if (application_version < file_version)
+			{
+				throw version_error("The file was created with a newer version of the application.");
+			}
+
+			// Read the number of PBKDF2 iterations (stored as a big-endian 32-bit integer)
+			std::uint32_t iterations;
+			file.read(reinterpret_cast<char*>(&iterations), 4);
+			iterations = portable_to_internal(iterations);
+		}
+		catch (...)
+		{
+			file.close();
+			throw;
+		}
+		file.close();
+	}
+	else
+	{
+		file.close();
+		throw std::runtime_error("Could not open file.");
+	}
+}
+
+void vault::save(const std::string& filename)
+{
+	// Open the file
+	std::ofstream file(filename, std::ios::binary);
+
+	if (file.good())
+	{
+		// First, write the header structure
+		// In this case, it is "DLCK", followed by four bytes for the version
+		// The version is written to allow future extensions / reading legacy formats
+		file.put('D'); file.put('L'); file.put('C'); file.put('K');
+		version file_version = assembly_information::get_version();
+		// Write the version bytes independently to avoid endianness issues
+		file.put(file_version.major); file.put(file_version.minor);
+		file.put(file_version.revision); file.put(file_version.build);
+
+		// Now for the current version, write the number of PBKDF2 iterations (as a big-endian 32-bit integer)
+		// TODO: handle this properly
+		std::uint32_t iterations = 18542;
+		iterations = internal_to_portable(iterations);
+		file.write(reinterpret_cast<char*>(&iterations), 4);
+
+		// Write the obfuscated JSON (for now)
+		serialise(file, true, false);
 	}
 	else
 	{

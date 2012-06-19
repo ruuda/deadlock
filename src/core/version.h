@@ -46,18 +46,6 @@ namespace deadlock
 			/// Creates a fully specified version
 			version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number);
 
-			/// Constructs a version from an integer
-			version(std::int32_t int32);
-
-			/// Returns the version as an integer
-			operator std::int32_t ();
-
-			/// Compares two versions
-			static friend bool operator<(version v1, version v2);
-
-			/// Compares two versions
-			static friend bool operator<=(version v1, version v2);
-
 			/// Writes a version to a stream
 			static inline friend std::ostream& operator<<(std::ostream& ostr, version v)
 			{
@@ -86,6 +74,12 @@ namespace deadlock
 				return istr;
 			}
 		};
+
+		/// Compares two versions
+		_export bool operator<(version v1, version v2);
+
+		/// Compares two versions
+		_export bool operator<=(version v1, version v2);
 	}
 }
 

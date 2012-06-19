@@ -74,6 +74,12 @@ namespace deadlock
 			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
 			void export_json(const std::string& filename, bool obfuscation);
+
+			/// Saves the vault encrypted to a binary file
+			void save(const std::string& filename);
+
+			/// Loads an encrypted binary vault from a file
+			void load(const std::string& filename);
 		};
 	}
 }
