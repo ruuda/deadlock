@@ -188,9 +188,9 @@ void vault::load(const std::string& filename, cryptography::key_generator& key, 
 		try
 		{
 			// Validate the header
-			char d, l, c, k;
-			file >> d; file >> l; file >> c; file >> k;
-			if (d != 'D' || l != 'L' || c != 'C' || k != 'K')
+			char d, l, k, zero;
+			file >> d; file >> l; file >> k; file >> zero;
+			if (d != 'D' || l != 'L' || k != 'K' || zero != 0)
 			{
 				throw format_error("The file is not a valid Deadlock vault; the header is incorrect.");
 			}
@@ -250,9 +250,9 @@ void vault::save(const std::string& filename, cryptography::key_generator& key)
 	if (file.good())
 	{
 		// First, write the header structure
-		// In this case, it is "DLCK", followed by four bytes for the version
+		// In this case, it is "DLK\0", followed by four bytes for the version
 		// The version is written to allow future extensions / reading legacy formats
-		file.put('D'); file.put('L'); file.put('C'); file.put('K');
+		file.put('D'); file.put('L'); file.put('K'); file.put(0);
 		version file_version = assembly_information::get_version();
 		// Write the version bytes independently to avoid endianness issues
 		file.put(file_version.major); file.put(file_version.minor);

@@ -16,7 +16,9 @@
 
 #include <iostream>
 
+#ifdef _WIN32
 #define BOOST_ALL_STATIC_LINK
+#endif
 #include <boost/program_options.hpp>
 
 #include "../../core/core.h"
