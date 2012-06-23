@@ -47,7 +47,7 @@ namespace deadlock
 			version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number);
 
 			/// Writes a version to a stream
-			static inline friend std::ostream& operator<<(std::ostream& ostr, version v)
+			inline friend std::ostream& operator<<(std::ostream& ostr, version v)
 			{
 				ostr << static_cast<int>(v.major) << "." << static_cast<int>(v.minor) << "."
 					 << static_cast<int>(v.revision) << "." << static_cast<int>(v.build);
@@ -55,7 +55,7 @@ namespace deadlock
 			}
 
 			/// Reads a version from a stream
-			static inline friend std::istream& operator>>(std::istream& istr, version& v)
+			inline friend std::istream& operator>>(std::istream& istr, version& v)
 			{
 				// Store in int, because we should not deserialise characters, but integers
 				int mjr, mnr, rev, bld;

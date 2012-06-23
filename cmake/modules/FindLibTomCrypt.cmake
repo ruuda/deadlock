@@ -4,7 +4,7 @@
 # LibTomCrypt_INCLUDE_DIRS - The LibTomCrypt include directories
 # LibTomCrypt_LIBRARIES - The libraries needed to use LibTomCrypt
 
-find_path(LibTomCrypt_INCLUDE_DIR "src/headers/tomcrypt.h")
+find_path(LibTomCrypt_INCLUDE_DIR "tomcrypt.h")
 find_library(LibTomCrypt_LIBRARY tomcrypt)
 
 set(LibTomCrypt_LIBRARIES ${LibTomCrypt_LIBRARY})

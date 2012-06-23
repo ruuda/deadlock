@@ -207,10 +207,8 @@ namespace deadlock
 								return std::string(1, d);
 							}
 						}
-						else
-						{
-							return "";
-						}
+
+						return "";
 					}
 
 					/// Reads the part of a number after and including the decimal separator

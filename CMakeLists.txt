@@ -21,4 +21,13 @@ link_directories(${LibTomCrypt_LIBRARY_DIRS})
 
 SET(liblist boost_program_options)
 
+# Deadlock requires C++11 support
+if (CMAKE_COMPILER_IS_GNUCXX)
+add_definitions(-std=c++11)
+endif()
+
+if (CMAKE_C_COMPILER MATCHES clang)
+add_definitions(-std=c++11)
+endif()
+
 add_subdirectory(src)

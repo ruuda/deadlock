@@ -43,18 +43,18 @@ void entry::deserialise_common(const serialisation::json_value::object_t& json_d
 	if (json_data.find("passwords") == json_data.end()) throw format_error("No passwords present in entry.");
 
 	// Read the key
-	key = json_data.at("key");
+	key = static_cast<std::string&>(json_data.at("key"));
 
 	// Read the username (if present)
 	if (json_data.find("username") != json_data.end())
 	{
-		username = json_data.at("username");
+		username = static_cast<std::string&>(json_data.at("username"));
 	}
 
 	// Read additional data (if present)
 	if (json_data.find("additional_data") != json_data.end())
 	{
-		additional_data = json_data.at("additional_data");
+		additional_data = static_cast<std::string&>(json_data.at("additional_data"));
 	}
 }
 

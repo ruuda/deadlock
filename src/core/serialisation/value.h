@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <stdexcept>
 #include <boost/lexical_cast.hpp>
 
 namespace deadlock
@@ -135,7 +136,7 @@ namespace deadlock
 				}
 
 				/// Conversion operator (string)
-				operator std::string () const
+				operator std::string& () const
 				{
 					if (type == value_type::string)
 						return *static_cast<std::string*>(value);

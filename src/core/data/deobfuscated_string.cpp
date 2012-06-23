@@ -16,6 +16,8 @@
 
 #include "deobfuscated_string.h"
 
+#include <cstring>
+
 using deadlock::core::circular_buffer_512;
 using namespace deadlock::core::data;
 
@@ -64,6 +66,8 @@ deobfuscated_string& deobfuscated_string::operator=(const deobfuscated_string& o
 
 	// Copy the string
 	std::strcpy(deobfuscated_data, other.deobfuscated_data);
+
+	return *this;
 }
 
 deobfuscated_string::~deobfuscated_string()
