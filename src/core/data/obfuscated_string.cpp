@@ -66,6 +66,14 @@ obfuscated_string::obfuscated_string(const std::string& unobfuscated_string, cir
 	}
 }
 
+obfuscated_string::~obfuscated_string()
+{
+	for (size_t i = 0; i < obfuscated_data.size(); i++)
+	{
+		obfuscated_data[i] = 0;
+	}
+}
+
 const obfuscated_string& obfuscated_string::empty()
 {
 	return empty_obfuscated_string;

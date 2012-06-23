@@ -70,6 +70,15 @@ namespace deadlock
 			/// Obfuscates the key with the current obfuscation buffer
 			inline void obfuscate_key(cryptography::key_generator& key) { key.obfuscate_key(obfuscation_buffer); }
 
+			/// Returns an obfuscated string for the given unobfuscated string
+			inline data::obfuscated_string obfuscate_string(const std::string& unobfuscated_string)
+			{
+				return data::obfuscated_string(unobfuscated_string, obfuscation_buffer);
+			}
+
+			/// Adds a new entry to the collection
+			void add_entry(const data::entry& tr);
+
 			/// Reads the password collection from a file
 			void import_json(const std::string& filename);
 

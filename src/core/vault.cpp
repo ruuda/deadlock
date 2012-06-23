@@ -33,6 +33,11 @@ vault::vault()
 	obfuscation_buffer.fill_random();
 }
 
+void vault::add_entry(const data::entry& tr)
+{
+	entries.push_back(tr);
+}
+
 void vault::deserialise(const serialisation::json_value::object_t& json_data)
 {
 	// At least, the data must contain version information and entries

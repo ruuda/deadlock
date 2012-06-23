@@ -57,6 +57,9 @@ namespace deadlock
 				/// obfuscated with the provided obfuscation buffer
 				obfuscated_string(const std::string& unobfuscated_string, circular_buffer_512& obfuscation_buffer);
 
+				/// Zeroes the used memory
+				~obfuscated_string();
+
 				/// Returns the empty obfuscated string
 				static const obfuscated_string& empty();
 
