@@ -19,6 +19,10 @@ find_package(LibTomCrypt REQUIRED)
 include_directories(${LibTomCrypt_INCLUDE_DIR})
 link_directories(${LibTomCrypt_LIBRARY_DIRS})
 
+find_package(LIBLZMA REQUIRED)
+include_directories(${LIBLZMA_INCLUDE_DIR})
+link_directories(${LIBLZMA_LIBRARY_DIRS})
+
 SET(liblist boost_program_options)
 
 # Deadlock requires C++11 support

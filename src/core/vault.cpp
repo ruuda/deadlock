@@ -139,6 +139,13 @@ void vault::serialise(std::ostream& json_stream, bool obfuscation, bool human_re
 	serialise(serialiser, obfuscation);
 }
 
+void vault::import_json(std::istream& input_stream)
+{
+	// Simply deserialise from the stream
+	deserialise(input_stream);
+}
+
+
 void vault::import_json(const std::string& filename)
 {
 	// TODO binary mode?
@@ -148,7 +155,7 @@ void vault::import_json(const std::string& filename)
 	{
 		try
 		{
-			deserialise(file);
+			import_json(file);
 		}
 		catch (...)
 		{
@@ -164,6 +171,12 @@ void vault::import_json(const std::string& filename)
 	}
 }
 
+void vault::export_json(std::ostream& output_stream, bool obfuscation)
+{
+	// Export as human-readable JSON
+	serialise(output_stream, obfuscation, true);
+}
+
 void vault::export_json(const std::string& filename, bool obfuscation)
 {
 	// TODO binary mode?
@@ -171,8 +184,8 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 
 	if (file.good())
 	{
-		// Export as human-readable JSON
-		serialise(file, obfuscation, true);
+		// Export to the file stream
+		export_json(file, obfuscation);
 	}
 	else
 	{

@@ -82,11 +82,20 @@ namespace deadlock
 			/// Reads the password collection from a file
 			void import_json(const std::string& filename);
 
+			/// Reads the password collection from a stream
+			void import_json(std::istream& input_stream);
+
 			/// Writes the password collection as JSON to a file
 			/// This always writes the most recent version of the Deadlock JSON structure.
 			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
 			/// and it will not write the obfuscation buffer.
 			void export_json(const std::string& filename, bool obfuscation);
+
+			/// Writes the password collection as JSON to a stream
+			/// This always writes the most recent version of the Deadlock JSON structure.
+			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
+			/// and it will not write the obfuscation buffer.
+			void export_json(std::ostream& output_stream, bool obfuscation);
 
 			/// Saves the vault encrypted to a binary file
 			void save(const std::string& filename, cryptography::key_generator& key);

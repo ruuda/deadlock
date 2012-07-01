@@ -19,6 +19,7 @@
 
 #include "test.h"
 #include "import_export_test.h"
+#include "compression_stream_test.h"
 
 using namespace deadlock::tests;
 
@@ -27,7 +28,8 @@ int main(int, char**)
 	// Create a list of things to test
 	test* unit_tests[] =
 	{
-		new import_export_test()
+		new import_export_test(),
+		new compression_stream_test()
 	};
 
 	const size_t number_of_tests = sizeof(unit_tests) / sizeof(test*);
