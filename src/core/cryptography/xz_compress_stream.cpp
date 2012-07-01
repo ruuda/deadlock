@@ -17,6 +17,7 @@
 #include "xz_compress_stream.h"
 
 using namespace deadlock::core::cryptography;
+using namespace deadlock::core::cryptography::detail;
 
 xz_compress_streambuffer::xz_compress_streambuffer(std::basic_ostream<char>& ostr, int compression_level)
 	: output_stream(ostr)

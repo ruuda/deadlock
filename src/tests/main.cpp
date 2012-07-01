@@ -63,7 +63,7 @@ int main(int, char**)
 
 	if (failed_tests)
 	{
-		std::cout << failed_tests << "/" << number_of_tests << "failed" << std::endl;
+		std::cout << failed_tests << "/" << number_of_tests << " failed" << std::endl;
 	}
 	else
 	{

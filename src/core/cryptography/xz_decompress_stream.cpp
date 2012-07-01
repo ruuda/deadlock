@@ -17,6 +17,7 @@
 #include "xz_decompress_stream.h"
 
 using namespace deadlock::core::cryptography;
+using namespace deadlock::core::cryptography::detail;
 
 xz_decompress_streambuffer::xz_decompress_streambuffer(std::basic_istream<char>& istr)
 	: input_stream(istr)

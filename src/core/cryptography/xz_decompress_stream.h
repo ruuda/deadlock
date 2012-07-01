@@ -29,65 +29,69 @@ namespace deadlock
 	{
 		namespace cryptography
 		{
-			/// The XZ streambuffer that decompresses data
-			class _export xz_decompress_streambuffer : public std::basic_streambuf<char>
+			namespace detail
 			{
-			protected:
 
-				/// The stream to read the compressed data from
-				std::basic_istream<char>& input_stream;
+				/// The XZ streambuffer that decompresses data
+				class _export xz_decompress_streambuffer : public std::basic_streambuf<char>
+				{
+				protected:
 
-				/// The size of the temporary buffers for decommpression (4 kiB)
-				static const size_t buffer_size = 4096;
+					/// The stream to read the compressed data from
+					std::basic_istream<char>& input_stream;
 
-				/// Buffer for compressed data
-				char in_buffer[buffer_size];
+					/// The size of the temporary buffers for decommpression (4 kiB)
+					static const size_t buffer_size = 4096;
+
+					/// Buffer for compressed data
+					char in_buffer[buffer_size];
 	
-				/// Buffer for uncompressed data
-				char out_buffer[buffer_size];
+					/// Buffer for uncompressed data
+					char out_buffer[buffer_size];
 
-				/// Number of bytes of the input buffer that are used
-				size_t in_length;
+					/// Number of bytes of the input buffer that are used
+					size_t in_length;
 
-				/// Number of bytes of the output buffer that are used
-				size_t out_length;
+					/// Number of bytes of the output buffer that are used
+					size_t out_length;
 
-				/// Whether an eof is encountered on the input stream
-				bool input_done;
+					/// Whether an eof is encountered on the input stream
+					bool input_done;
 
-				/// Whether all output has been read
-				bool output_done;
+					/// Whether all output has been read
+					bool output_done;
 
-				/// The return value for XZ
-				lzma_ret xz_result;
+					/// The return value for XZ
+					lzma_ret xz_result;
 
-				/// What the decompressor should do
-				lzma_action xz_action;
+					/// What the decompressor should do
+					lzma_action xz_action;
 
-				/// The actual decompressor
-				lzma_stream xz_stream; 
+					/// The actual decompressor
+					lzma_stream xz_stream; 
 
-			public:
+				public:
 
-				/// Creates a streambuffer that reads compressed data from the given stream
-				xz_decompress_streambuffer(std::basic_istream<char>& istr);
+					/// Creates a streambuffer that reads compressed data from the given stream
+					xz_decompress_streambuffer(std::basic_istream<char>& istr);
 
-				/// Cleans the lzma compressor and zeroes the buffers
-				virtual ~xz_decompress_streambuffer();
+					/// Cleans the lzma compressor and zeroes the buffers
+					virtual ~xz_decompress_streambuffer();
 
-			protected:
+				protected:
 
-				/// If the input buffer is empty, decompress some more
-				virtual int_type underflow();
-			};
+					/// If the input buffer is empty, decompress some more
+					virtual int_type underflow();
+				};
+			}
 
 			/// A stream that reads compressed data from the underlying stream, and provides the decompressed data
-			class xz_decompress_stream : public std::basic_istream<char>
+			class _export xz_decompress_stream : public std::basic_istream<char>
 			{
 			protected:
 
 				/// The streambuffer responsible for the actual decompression
-				xz_decompress_streambuffer streambuffer;
+				detail::xz_decompress_streambuffer streambuffer;
 
 			public:
 

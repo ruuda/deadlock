@@ -16,6 +16,8 @@
 
 #include "compression_stream_test.h"
 #include "../core/core.h"
+#include "../core/cryptography/xz_compress_stream.h"
+#include "../core/cryptography/xz_decompress_stream.h"
 
 #include <stdexcept>
 #include <sstream>
@@ -48,19 +50,25 @@ void compression_stream_test::run()
 	first.add_entry(etr2);
 
 	// A stream to hold the compressed data
-	std::stringstream compressed_stream;
-	// TODO
+	std::stringstream compressed_data_stream;
+	
+	// A stream that compresses data
+	cryptography::xz_compress_stream compression_stream(compressed_data_stream, 6);
 
 	// Export and compress
 	// stringstream << compression_stream << vault
-	first.export_json(compressed_stream, true);
+	first.export_json(compression_stream, true);
+	compression_stream.flush();
 
 	// Seek to the beginning of the compressed data
-	compressed_stream.seekg(0, std::ios_base::beg);
+	compressed_data_stream.seekg(0, std::ios_base::beg);
+
+	// A stream that decompresses data
+	cryptography::xz_decompress_stream decompression_stream(compressed_data_stream);
 
 	// Decompress and import
 	// stringstream >> compression_stream >> vault
-	second.import_json(compressed_stream);
+	second.import_json(decompression_stream);
 
 	// TODO: validate the data in the second vault
 }
