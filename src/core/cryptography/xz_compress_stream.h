@@ -35,25 +35,8 @@ namespace deadlock
 	{
 		namespace cryptography
 		{
-			/// A problem related to compression or decompression
-			class _export xz_error : public std::runtime_error
-			{
-			public:
-
-				/// The XZ return value
-				lzma_ret error_code;
-
-				inline xz_error(const std::string& msg) : std::runtime_error(msg) {}
-
-				inline xz_error(const std::string& msg, lzma_ret err) : std::runtime_error(msg)
-				{
-					error_code = err;
-				}
-			};
-
 			namespace detail
 			{
-
 				/// The XZ streamuffer that compresses data
 				class _export xz_compress_streambuffer : public std::basic_streambuf<char>
 				{
@@ -63,7 +46,7 @@ namespace deadlock
 					std::basic_ostream<char>& output_stream;
 
 					/// The size of the temporary buffers for commpression (4 kiB)
-					static const size_t buffer_size = 16;
+					static const size_t buffer_size = 4096;
 
 					/// Buffer for data that is received (data to be compressed)
 					char in_buffer[buffer_size];
