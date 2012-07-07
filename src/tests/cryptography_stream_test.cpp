@@ -17,7 +17,7 @@
 #include "cryptography_stream_test.h"
 #include "../core/core.h"
 #include "../core/cryptography/aes_cbc_encrypt_stream.h"
-//#include "../core/cryptography/xz_decompress_stream.h"
+#include "../core/cryptography/aes_cbc_decrypt_stream.h"
 
 #include <stdexcept>
 #include <sstream>
@@ -42,45 +42,71 @@ void cryptography_stream_test::run()
 	// Pass 1: 16 bytes IV + 8 characters + 8 bytes padding
 	{
 		// The output stream
-		std::stringstream strstream;
-		// The cryptostream
-		cryptography::aes_cbc_encrypt_stream enc_stream(strstream, key);
+		std::stringstream encrypted_data_stream;
+		// The encrypt cryptostream
+		cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
 		// Write some data
 		enc_stream << "12345678";
 		enc_stream.flush();
 
 		// Validate length
-		std::string ciphertext = strstream.str();
+		std::string ciphertext = encrypted_data_stream.str();
 		if (ciphertext.length() != 32)
-			throw std::runtime_error("Unexpected output size; should be 32.");
+			throw std::runtime_error("Unexpected encrypted size; should be 32.");
 
-		// TODO: decrypt, validate content
+		// Seek to the beginning of the encrypted data
+		encrypted_data_stream.seekg(0, std::ios_base::beg);
+		// The decrypt cryptostream
+		cryptography::aes_cbc_decrypt_stream dec_stream(encrypted_data_stream, key);
+		// Read some data
+		std::string plaintext; dec_stream >> plaintext;
+
+		// Validate length
+		if (plaintext.length() != 8)
+			throw std::runtime_error("Unexpected decrypted size; should be 8.");
+
+		// Validate text
+		if (plaintext != "12345678")
+			throw std::runtime_error("Data was not decrypted correctly.");
 	}
 	
 	// Pass 2: 16 bytes IV + 16 characters + 16 bytes padding
 	{
 		// The output stream
-		std::stringstream strstream;
+		std::stringstream encrypted_data_stream;
 		// The cryptostream
-		cryptography::aes_cbc_encrypt_stream enc_stream(strstream, key);
+		cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
 		// Write some data
 		enc_stream << "abcdefghijklmnop";
 		enc_stream.flush();
 
 		// Validate length
-		std::string ciphertext = strstream.str();
+		std::string ciphertext = encrypted_data_stream.str();
 		if (ciphertext.length() != 48)
-			throw std::runtime_error("Unexpected output size; should be 48.");
+			throw std::runtime_error("Unexpected encrypted size; should be 48.");
 
-		// TODO: decrypt, validate content
+		// Seek to the beginning of the encrypted data
+		encrypted_data_stream.seekg(0, std::ios_base::beg);
+		// The decrypt cryptostream
+		cryptography::aes_cbc_decrypt_stream dec_stream(encrypted_data_stream, key);
+		// Read some data
+		std::string plaintext; dec_stream >> plaintext;
+
+		// Validate length
+		if (plaintext.length() != 16)
+			throw std::runtime_error("Unexpected decrypted size; should be 16.");
+
+		// Validate text
+		if (plaintext != "abcdefghijklmnop")
+			throw std::runtime_error("Data was not decrypted correctly.");
 	}
 
 	// Pass 3: 16 bytes IV + 250 characters + 6 bytes padding
 	{
 		// The output stream
-		std::stringstream strstream;
+		std::stringstream encrypted_data_stream;
 		// The cryptostream
-		cryptography::aes_cbc_encrypt_stream enc_stream(strstream, key);
+		cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
 		// Write some data
 		for (std::uint8_t i = 0; i < 250; i++)
 		{
@@ -89,10 +115,26 @@ void cryptography_stream_test::run()
 		enc_stream.flush();
 
 		// Validate length
-		std::string ciphertext = strstream.str();
+		std::string ciphertext = encrypted_data_stream.str();
 		if (ciphertext.length() != 272)
-			throw std::runtime_error("Unexpected output size; should be 272.");
+			throw std::runtime_error("Unexpected encrypted size; should be 272.");
 
-		// TODO: decrypt, validate content
+		// Seek to the beginning of the compressed data
+		encrypted_data_stream.seekg(0, std::ios_base::beg);
+		// The decrypt cryptostream
+		cryptography::aes_cbc_decrypt_stream dec_stream(encrypted_data_stream, key);
+		
+		// Read bytes until the stream ends
+		size_t n = 0;
+		char j;
+		while (dec_stream.get(j))
+		{
+			std::uint8_t i = j;
+			if (i != n) throw std::runtime_error("Data was not decrypted correctly.");
+			n++;
+		}
+
+		if (n != 250)
+			throw std::runtime_error("Unexpected decrypted size; should be 250.");
 	}
 }

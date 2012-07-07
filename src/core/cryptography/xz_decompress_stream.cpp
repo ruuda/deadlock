@@ -103,7 +103,7 @@ xz_decompress_streambuffer::int_type xz_decompress_streambuffer::underflow()
 			// Get how many bytes of the buffer were filled
 			out_length = buffer_size - xz_stream.avail_out;
 
-			// Set the get pointer (note that the next pointer is out_buffer + 1, because the first character is returned)
+			// Set the get pointer
 			setg(out_buffer, out_buffer + 0, out_buffer + out_length);
 
 			// Move data that was not consumed to the beginning of the buffer
