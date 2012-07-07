@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DEADLOCK_CORE_CRYPTOGRAPHY_AES_ENCRYPT_STREAM_H_
-#define _DEADLOCK_CORE_CRYPTOGRAPHY_AES_ENCRYPT_STREAM_H_
+#ifndef _DEADLOCK_CORE_CRYPTOGRAPHY_AES_CBC_ENCRYPT_STREAM_H_
+#define _DEADLOCK_CORE_CRYPTOGRAPHY_AES_CBC_ENCRYPT_STREAM_H_
 
 #include <cstdint>
 #include <stdexcept>
@@ -24,7 +24,7 @@
 
 extern "C"
 {
-
+	#include <tomcrypt.h>
 }
 
 #include "key_generator.h"
@@ -39,7 +39,7 @@ namespace deadlock
 			namespace detail
 			{
 				/// The encryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
-				class _export aes_encrypt_streambuffer : public std::basic_streambuf<char>
+				class _export aes_cbc_encrypt_streambuffer : public std::basic_streambuf<char>
 				{
 				protected:
 
@@ -62,14 +62,17 @@ namespace deadlock
 					/// Whether the initialisation vector has been written already
 					bool iv_written;
 
+					/// The LibTomCrypt scheduled key
+					symmetric_key skey;
+
 				public:
 
 					/// Creates a streambuffer that streams its output to the given stream,
 					/// and encrypts with the given key and initialisation vector
-					aes_encrypt_streambuffer(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
+					aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
 
 					/// Zeroes the buffers
-					virtual ~aes_encrypt_streambuffer();
+					virtual ~aes_cbc_encrypt_streambuffer();
 
 					/// Adds padding to the current block and encrypts and writes that block
 					virtual void finalise();
@@ -83,23 +86,23 @@ namespace deadlock
 
 			/// A stream that encrypts the data written to it, and writes that data to the underlying stream
 			/// The stream uses 256-bit key AES in CBC mode with a random initialisation vector
-			class _export aes_encrypt_stream : public std::basic_ostream<char>
+			class _export aes_cbc_encrypt_stream : public std::basic_ostream<char>
 			{
 			protected:
 
 				/// The streambuffer responsible for the actual encryption
-				detail::aes_encrypt_streambuffer streambuffer;
+				detail::aes_cbc_encrypt_streambuffer streambuffer;
 
 			public:
 
 				/// Creates a compression stream that streams its output to the given stream,
 				/// with the given key. The key should be deobfuscated.
-				aes_encrypt_stream(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
+				aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
 
-				~aes_encrypt_stream();
+				~aes_cbc_encrypt_stream();
 
 				/// Adds padding, and flushes the remaining block(s)
-				aes_encrypt_stream& flush();
+				aes_cbc_encrypt_stream& flush();
 			};
 		}
 	}

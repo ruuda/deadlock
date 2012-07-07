@@ -29,14 +29,20 @@ using deadlock::core::cryptography::detail::_initialisation;
 _initialisation _initialisation::_instance = _initialisation();
 
 int _initialisation::sha256_index = -1;
+int _initialisation::aes_index = -1;
 
 _initialisation::_initialisation()
 {
 	// Register the SHA-256 hash
 	sha256_index = register_hash(&sha256_desc);
+
+	// Register the AES cipher
+	aes_index = register_cipher(&aes_desc);
 }
 
 _initialisation::~_initialisation()
 {
+	// Cleanup
 	unregister_hash(&sha256_desc);
+	unregister_cipher(&aes_desc);
 }

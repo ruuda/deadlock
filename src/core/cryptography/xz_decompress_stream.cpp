@@ -15,9 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xz_decompress_stream.h"
+#include "../errors.h"
 
 using namespace deadlock::core::cryptography;
 using namespace deadlock::core::cryptography::detail;
+using deadlock::core::xz_error;
 
 xz_decompress_streambuffer::xz_decompress_streambuffer(std::basic_istream<char>& istr)
 	: input_stream(istr)

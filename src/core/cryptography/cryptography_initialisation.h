@@ -25,12 +25,12 @@ namespace deadlock
 		{
 			namespace detail
 			{
-				/// Registers the hash and cypher functions used by LibTomCrypt upon construction
+				/// Registers the hash and cipher functions used by LibTomCrypt upon construction
 				class _initialisation
 				{
 				private:
 
-					/// Registers the required LibTomCrypt hashes and cyphers
+					/// Registers the required LibTomCrypt hashes and ciphers
 					/// Private because there should be one single instance, also contained within this class
 					_initialisation();
 
@@ -39,11 +39,14 @@ namespace deadlock
 
 				public:
 
-					/// Unregisters the LibTomCrypt hashes and cyphers
+					/// Unregisters the LibTomCrypt hashes and ciphers
 					~_initialisation();
 
 					/// The LibTomCrypt index for the SHA-256 hash
 					static int sha256_index;
+
+					/// The LibTomCrypt index for the AES cipher
+					static int aes_index;
 				};
 			}
 		}
