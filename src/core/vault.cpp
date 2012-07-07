@@ -24,6 +24,10 @@
 #include "errors.h"
 #include "endianness.h"
 #include "cryptography/key_generator.h"
+#include "cryptography/aes_cbc_decrypt_stream.h"
+#include "cryptography/aes_cbc_encrypt_stream.h"
+#include "cryptography/xz_compress_stream.h"
+#include "cryptography/xz_decompress_stream.h"
 
 using namespace deadlock::core;
 
@@ -241,7 +245,13 @@ void vault::load(const std::string& filename, cryptography::key_generator& key, 
 			// Now generate the key
 			key.generate_key(passphrase, iterations);
 
-			// TODO: decrypt
+			// Create a decryption stream that reads encrypted data
+			cryptography::aes_cbc_decrypt_stream decrypt_stream(file, key);
+			// And a decompression stream that decompresses data
+			cryptography::xz_decompress_stream decompress_stream(decrypt_stream);
+
+			// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
+			deserialise(decompress_stream);
 
 			// Obfuscate the key in memory while unused
 			key.obfuscate_key(obfuscation_buffer);
@@ -290,8 +300,16 @@ void vault::save(const std::string& filename, cryptography::key_generator& key)
 		// De-obfuscate the in-memory key
 		key.deobfuscate_key(obfuscation_buffer);
 
-		// Write the obfuscated JSON (for now)
-		serialise(file, true, false);
+		// Create an encryption stream that saves data encrypted
+		cryptography::aes_cbc_encrypt_stream encrypt_stream(file, key);
+		// And a compression stream that compresses data
+		cryptography::xz_compress_stream compress_stream(encrypt_stream, 6);
+
+		// Write the obfuscated JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
+		serialise(compress_stream, true, false);
+		compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
+		encrypt_stream.flush();
+		file.flush();
 
 		// Obfuscate the key again
 		key.obfuscate_key(obfuscation_buffer);

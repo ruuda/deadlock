@@ -66,7 +66,8 @@ aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()
 	}
 
 	// Read one block to the buffer
-	bool read_last_block = !input_stream.read(buffer, block_size);
+	input_stream.read(buffer, block_size);
+	bool read_last_block = !input_stream.good();
 
 	//  Decrypt one block
 	int err;
