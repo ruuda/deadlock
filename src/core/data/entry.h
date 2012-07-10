@@ -47,17 +47,17 @@ namespace deadlock
 
 				/// The key used to identify this entry.
 				/// This will be the name of a website or service in most cases
-				std::string key;
+				secure_string_ptr key;
 
 				/// A list of passwords associated with the key
 				/// The most recent one is the "best" passwords, but older passwords are stored by means of a backup
 				password_collection passwords;
 
 				/// The username associated with the password
-				std::string username;
+				secure_string_ptr username;
 
 				/// Can be used to store additional information with the key
-				std::string additional_data;
+				secure_string_ptr additional_data;
 
 				/// Serialises all values common to obfuscated and de-obfuscated serialisation
 				/// This does not write the enclosing object
@@ -69,10 +69,10 @@ namespace deadlock
 			public:
 
 				/// Returns the key associated with this entry
-				inline const std::string& get_key() const { return key; }
+				inline const secure_string& get_key() const { return *key; }
 
 				/// Modifies the key associated with this entry
-				inline void set_key(const std::string& new_key) { key = new_key; }
+				inline void set_key(const secure_string& new_key) { key = make_secure_string(new_key); }
 
 				/// Returns an iterator to the first password
 				inline password_iterator passwords_begin() const { return passwords.begin(); }
@@ -84,34 +84,33 @@ namespace deadlock
 				inline const password& get_password() const;
 
 				/// Appends a new password to the list of passwords, making it the current password
-				void set_password(const obfuscated_string& new_password);
+				void set_password(const secure_string& new_password);
 
 				/// Returns the username associated with the key
-				inline const std::string& get_username() const { return username; }
+				inline const secure_string& get_username() const { return *username; }
 
 				/// Mofifies the username associated with the key
-				inline void set_username(const std::string& new_username) { username = new_username; }
+				inline void set_username(const secure_string& new_username) { username = make_secure_string(new_username); }
 
 				/// Returns additional data associated with the key
-				inline const std::string& get_additional_data() const { return additional_data; }
+				inline const secure_string& get_additional_data() const { return *additional_data; }
 
 				/// Modifies additional data associated with the key
-				inline void set_additional_data(const std::string& new_data) { additional_data = new_data; }
+				inline void set_additional_data(const secure_string& new_data) { additional_data = make_secure_string(new_data); }
 
 				/// Reconstructs the entries given the JSON data, assuming obfuscated data
 				void deserialise_obfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& tranformation_buffer);
 
 				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
-				/// The data will then be stored in an obfuscated way using the provided buffer
-				void deserialise_deobfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& obfuscation_buffer);
+				void deserialise_unobfuscated(const serialisation::json_value::object_t& json_data);
 
 				/// Writes the entries to the serialiser as an array of objects
 				/// This will write the passwords as hexadecimal strings of the obfuscated data
-				void serialise_obfuscated(serialisation::serialiser& serialiser);
+				void serialise_obfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
 
 				/// Writes the entries to the serialiser as an array of objects
-				/// This will write the passwords "as-is", after deobfuscation with the buffer
-				void serialise_deobfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
+				/// This will write the passwords "as-is", without obfuscation
+				void serialise_unobfuscated(serialisation::serialiser& serialiser);
 			};
 		}
 	}

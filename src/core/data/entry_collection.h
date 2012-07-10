@@ -47,16 +47,16 @@ namespace deadlock
 				void deserialise_obfuscated(const serialisation::json_value::array_t& json_data, circular_buffer_512& transformation_buffer);
 
 				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
-				/// The data will then be stored in an obfuscated way using the provided buffer
-				void deserialise_deobfuscated(const serialisation::json_value::array_t& json_data, circular_buffer_512& obfuscation_buffer);
+				void deserialise_unobfuscated(const serialisation::json_value::array_t& json_data);
 
 				/// Writes the entries to the serialiser as an array of objects
-				/// This will write the passwords as hexadecimal strings of the obfuscated data
-				void serialise_obfuscated(serialisation::serialiser& serialiser);
+				/// This will write the passwords as hexadecimal strings of the obfuscated data,
+				/// obfuscated with the given obfuscation buffer.
+				void serialise_obfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
 
 				/// Writes the entries to the serialiser as an array of objects
-				/// This will write the passwords "as-is", after deobfuscation with the buffer
-				void serialise_deobfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
+				/// This will write the passwords unobfuscated
+				void serialise_unobfuscated(serialisation::serialiser& serialiser);
 
 				/// Adds a new entry to the collection
 				void push_back(const entry& new_entry);

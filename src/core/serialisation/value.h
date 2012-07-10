@@ -18,7 +18,7 @@
 #define _DEADLOCK_CORE_SERIALISATION_VALUE_H_
 
 #include <map>
-#include <string>
+#include "../data/secure_string.h"
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
 
@@ -54,10 +54,12 @@ namespace deadlock
 			public:
 
 				/// The map container
-				typedef std::map<std::string, json_value> object_t;
+				/// TODO: could small-string optimisations impose a security risk here?
+				typedef std::map<data::secure_string, json_value, std::less<data::secure_string>,
+					data::detail::secure_allocator<std::pair<const data::secure_string, json_value>>> object_t;
 
 				/// The list/array container
-				typedef std::vector<json_value> array_t;
+				typedef std::vector<json_value, data::detail::secure_allocator<json_value>> array_t;
 
 			protected:
 
@@ -73,8 +75,8 @@ namespace deadlock
 				/// Deletes the stored value the right way
 				void delete_value()
 				{
-					if (type == value_type::string) delete static_cast<std::string*>(value);
-					else if (type == value_type::number) delete static_cast<std::string*>(value);
+					if (type == value_type::string) delete static_cast<data::secure_string_ptr*>(value);
+					else if (type == value_type::number) delete static_cast<data::secure_string_ptr*>(value);
 					else if (type == value_type::object) delete static_cast<object_t*>(value);
 					else if (type == value_type::array) delete static_cast<array_t*>(value);
 				}
@@ -96,8 +98,8 @@ namespace deadlock
 
 					type = other.type;
 				
-					if (type == value_type::string) value = new std::string(*static_cast<std::string*>(other.value));
-					else if (type == value_type::number) value = new std::string(*static_cast<std::string*>(other.value));
+					if (type == value_type::string) value = new data::secure_string_ptr(*static_cast<data::secure_string_ptr*>(other.value));
+					else if (type == value_type::number) value = new data::secure_string_ptr(*static_cast<data::secure_string_ptr*>(other.value));
 					else if (type == value_type::object) value = new object_t(*static_cast<object_t*>(other.value));
 					else if (type == value_type::array) value = new array_t(*static_cast<array_t*>(other.value));
 				}
@@ -111,8 +113,8 @@ namespace deadlock
 
 					type = other.type;
 
-					if (type == value_type::string) value = new std::string(*static_cast<std::string*>(other.value));
-					else if (type == value_type::number) value = new std::string(*static_cast<std::string*>(other.value));
+					if (type == value_type::string) value = new data::secure_string_ptr(*static_cast<data::secure_string_ptr*>(other.value));
+					else if (type == value_type::number) value = new data::secure_string_ptr(*static_cast<data::secure_string_ptr*>(other.value));
 					else if (type == value_type::object) value = new object_t(*static_cast<object_t*>(other.value));
 					else if (type == value_type::array) value = new array_t(*static_cast<array_t*>(other.value));
 
@@ -120,26 +122,26 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (string)
-				json_value(const std::string& v)
+				json_value(data::secure_string_ptr v)
 				{
 					type = value_type::string;
-					value = new std::string(std::move(v));
+					value = new data::secure_string_ptr(v);
 				}
 
 				/// Assignment operator (string)
-				std::string operator=(const std::string& v)
+				const data::secure_string& operator=(const data::secure_string& v)
 				{
 					if (value) delete_value();
 					type = value_type::string;
-					value = new std::string(std::move(v));
+					value = new data::secure_string_ptr(data::make_secure_string(v));
 					return v;
 				}
 
 				/// Conversion operator (string)
-				operator std::string& () const
+				operator const data::secure_string& () const
 				{
 					if (type == value_type::string)
-						return *static_cast<std::string*>(value);
+						return **static_cast<data::secure_string_ptr*>(value);
 					throw std::runtime_error("The stored value is not a string.");
 				}
 
@@ -147,7 +149,7 @@ namespace deadlock
 				json_value(const char* v)
 				{
 					type = value_type::string;
-					value = new std::string(v);
+					value = new data::secure_string_ptr(data::make_secure_string(v));
 				}
 
 				/// Assignment operator (const char*)
@@ -155,7 +157,7 @@ namespace deadlock
 				{
 					if (value) delete_value();
 					type = value_type::string;
-					value = new std::string(v);
+					value = new data::secure_string_ptr(data::make_secure_string(v));
 					return v;
 				}
 
@@ -163,12 +165,17 @@ namespace deadlock
 				json_value(short v)
 				{
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					data::secure_stringstream_ptr strstr = data::make_secure_stringstream();
+					(*strstr) << v;
+
+					// TODO: the str() function is a potential vulnerability because of the short string optimisation
+					value = new data::secure_string_ptr(data::make_secure_string(strstr->str()));
 				}
 
 				/// Assignment operator (short)
 				short operator=(short v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -178,6 +185,7 @@ namespace deadlock
 				/// Conversion operator (short)
 				operator short () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<short>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -186,6 +194,7 @@ namespace deadlock
 				/// Assignment constructor (unsigned short)
 				json_value(unsigned short v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -193,6 +202,7 @@ namespace deadlock
 				/// Assignment operator (unsigned short)
 				unsigned short operator=(unsigned short v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -202,6 +212,7 @@ namespace deadlock
 				///Conversion operator (unsigned short)
 				operator unsigned short () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<unsigned short>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -210,6 +221,7 @@ namespace deadlock
 				/// Assignment constructor (int)
 				json_value(int v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -217,6 +229,7 @@ namespace deadlock
 				/// Assignment operator (int)
 				int operator=(int v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -226,6 +239,7 @@ namespace deadlock
 				/// Conversion operator (int)
 				operator int () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<int>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -234,6 +248,7 @@ namespace deadlock
 				/// Assignment constructor (unsigned int)
 				json_value(unsigned int v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -241,6 +256,7 @@ namespace deadlock
 				/// Assignment operator (unsigned int)
 				unsigned int operator=(unsigned int v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -250,6 +266,7 @@ namespace deadlock
 				/// Conversion operator (unsigned int)
 				operator unsigned int () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<unsigned int>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -258,6 +275,7 @@ namespace deadlock
 				/// Assignment constructor (long int)
 				json_value(long int v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -265,6 +283,7 @@ namespace deadlock
 				/// Assignment operator (long int)
 				long int operator=(long int v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -274,6 +293,7 @@ namespace deadlock
 				/// Conversion operator (long int)
 				operator long int () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<long int>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -282,6 +302,7 @@ namespace deadlock
 				/// Assignment constructor (unsigned long int)
 				json_value(unsigned long int v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -289,6 +310,7 @@ namespace deadlock
 				/// Assignment operator (unsigned long int)
 				unsigned long int operator=(unsigned long int v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -298,6 +320,7 @@ namespace deadlock
 				/// Conversion operator (unsigned long int)
 				operator unsigned long int () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<unsigned long int>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -306,6 +329,7 @@ namespace deadlock
 				/// Assignment constructor (long long)
 				json_value(long long v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -313,6 +337,7 @@ namespace deadlock
 				/// Assignment operator (long long)
 				long long operator=(long long v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -322,6 +347,7 @@ namespace deadlock
 				/// Conversion operator (long long)
 				operator long long () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<long long>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -330,6 +356,7 @@ namespace deadlock
 				/// Assignment constructor (unsigned long long)
 				json_value(unsigned long long v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -337,6 +364,7 @@ namespace deadlock
 				/// Assignment operator (unsigned long long)
 				unsigned long long operator=(unsigned long long v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -346,6 +374,7 @@ namespace deadlock
 				/// Conversion operator (unsigned long long)
 				operator unsigned long long () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<unsigned long long>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -354,6 +383,7 @@ namespace deadlock
 				/// Assignment constructor (float)
 				json_value(float v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -361,6 +391,7 @@ namespace deadlock
 				/// Assignment operator (float)
 				float operator=(float v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -370,6 +401,7 @@ namespace deadlock
 				/// Conversion operator (float)
 				operator float () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<float>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -378,6 +410,7 @@ namespace deadlock
 				/// Assignment constructor (double)
 				json_value(double v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -385,6 +418,7 @@ namespace deadlock
 				/// Assignment operator (double)
 				double operator=(double v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -394,6 +428,7 @@ namespace deadlock
 				/// Conversion operator (double)
 				operator double () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<double>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number.");
@@ -402,6 +437,7 @@ namespace deadlock
 				/// Assignment constructor (long double)
 				json_value(long double v)
 				{
+					// TODO
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
 				}
@@ -409,6 +445,7 @@ namespace deadlock
 				/// Assignment operator (long double)
 				long double operator=(long double v)
 				{
+					// TODO
 					if (value) delete_value();
 					type = value_type::number;
 					value = new std::string(boost::lexical_cast<std::string>(v));
@@ -418,6 +455,7 @@ namespace deadlock
 				/// Conversion operator (long double)
 				operator long double () const
 				{
+					// TODO
 					if (type == value_type::number)
 						return boost::lexical_cast<long double>(*static_cast<std::string*>(value));
 					throw std::runtime_error("The stored value is not a number."); //todo: derive exception
@@ -532,7 +570,7 @@ namespace deadlock
 				}
 
 				/// Object index operator
-				const self_type& operator[](const std::string& index) const
+				const self_type& operator[](const data::secure_string& index) const
 				{
 					if (type == value_type::object)
 						return (*static_cast<object_t*>(value))[index];
@@ -540,7 +578,7 @@ namespace deadlock
 				}
 
 				/// Object index operator
-				self_type& operator[](const std::string& index)
+				self_type& operator[](const data::secure_string& index)
 				{
 					if (type != value_type::object)
 						throw std::runtime_error("The stored value is not an object.");
@@ -552,7 +590,7 @@ namespace deadlock
 				const self_type& operator[](const char* index) const
 				{
 					if (type == value_type::object)
-						return (*static_cast<object_t*>(value))[std::string(index)];
+						return (*static_cast<object_t*>(value))[data::secure_string(index)]; // TODO: small-string vulnerabilities
 					throw std::runtime_error("The stored value is not an object.");
 				}
 
@@ -562,7 +600,7 @@ namespace deadlock
 					if (type != value_type::object)
 						throw std::runtime_error("The stored value is not an object.");
 
-					return (*static_cast<object_t*>(value))[std::string(index)];
+					return (*static_cast<object_t*>(value))[data::secure_string(index)]; // TODO: small-string vulnerabilities
 				}
 
 				///Push back something on the array

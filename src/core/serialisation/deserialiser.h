@@ -138,25 +138,27 @@ namespace deadlock
 					}
 
 					/// Reads four hexadecimal characters and returns the UTF-8 representation
-					std::string read_codepoint()
+					data::secure_string_ptr read_codepoint()
 					{
 						// TODO: is a code point always 2 characters?
-						return std::string() + static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal()) + static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal());
+						data::secure_string_ptr str = data::make_secure_string();
+						*str += static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal()) + static_cast<char>((read_hexadecimal() << 4) | read_hexadecimal());
+						return str;
 					}
 
 					/// Reads a string escape sequence
 					/// Assumes '\\' has been read.
-					std::string read_escape_sequence()
+					data::secure_string_ptr read_escape_sequence()
 					{
 						require_next(); //skip '\\'
-						if (c == '"') return "\"";
-						else if (c == '\\') return "\\";
-						else if (c == '/') return "/";
-						else if (c == 'b') return "\b";
-						else if (c == 'f') return "\f";
-						else if (c == 'n') return "\n";
-						else if (c == 'r') return "\r";
-						else if (c == 't') return "\t";
+						if (c == '"') return data::make_secure_string("\"");
+						else if (c == '\\') return data::make_secure_string("\\");
+						else if (c == '/') return data::make_secure_string("/");
+						else if (c == 'b') return data::make_secure_string("\b");
+						else if (c == 'f') return data::make_secure_string("\f");
+						else if (c == 'n') return data::make_secure_string("\n");
+						else if (c == 'r') return data::make_secure_string("\r");
+						else if (c == 't') return data::make_secure_string("\t");
 						else if (c == 'u') return read_codepoint();
 
 						throw ill_formed_source_error("The data source is ill-formed: escape character is invalid.");
@@ -164,15 +166,15 @@ namespace deadlock
 
 					/// Reads a raw string
 					/// Returns the string in is's raw form, not as a value.
-					std::string read_string_raw()
+					data::secure_string_ptr read_string_raw()
 					{
 						require_next(); //skip '"'
-						std::string s;
+						data::secure_string_ptr s = data::make_secure_string();
 
 						while (c != '"') //read the string
 						{
-							if (c == '\\') s += read_escape_sequence();
-							else s += c;
+							if (c == '\\') *s += *read_escape_sequence();
+							else s->push_back(c);
 							require_next();
 						}
 						read_next(); //skip '"'
@@ -187,121 +189,121 @@ namespace deadlock
 					}
 
 					/// Reads the exponent part of a number
-					std::string read_number_exponent()
+					data::secure_string_ptr read_number_exponent()
 					{
 						if (c == 'e' || c == 'E') require_next();
 						else if (c == '-')
 						{
 							require_next();
-							return '-' + read_number_exponent();
+							return data::combine_secure_string('-', read_number_exponent());
 						}
 						else if ('0' <= c && '9' >= c)
 						{
 							char d = c;
 							if (read_next())
 							{
-								return d + read_number_exponent();
+								return data::combine_secure_string(d, read_number_exponent());
 							}
 							else
 							{
-								return std::string(1, d);
+								return data::make_secure_string(d);
 							}
 						}
 
-						return "";
+						return data::make_secure_string();
 					}
 
 					/// Reads the part of a number after and including the decimal separator
-					std::string read_number_float()
+					data::secure_string_ptr read_number_float()
 					{
 						if (c == '.')
 						{
 							if (read_next())
 							{
-								return '.' + read_number_float();
+								return data::combine_secure_string('.', read_number_float());
 							}
 							else
 							{
-								return ".";
+								return data::make_secure_string('.');
 							}
 						}
 						else if (c == 'e' || c == 'E')
 						{
 							require_next();
-							return 'e' + read_number_exponent();
+							return data::combine_secure_string('e', read_number_exponent());
 						}
 						else if ('0' <= c && '9' >= c)
 						{
 							char d = c;
 							if (read_next())
 							{
-								return d + read_number_float();
+								return data::combine_secure_string(d, read_number_float());
 							}
 							else
 							{
-								return std::string(1, d);
+								return data::make_secure_string(d);
 							}
 						}
 						else
 						{
-							return "";
+							return data::make_secure_string();
 						}
 					}
 
 					/// Reads the integer part of a number
-					std::string read_number_base()
+					data::secure_string_ptr read_number_base()
 					{
 						if ('0' <= c && '9' >= c)
 						{
 							char d = c;
 							if (read_next())
 							{
-								return d + read_number_base();
+								return data::combine_secure_string(d, read_number_base());
 							}
 							else
 							{
-								return std::string(1, d);
+								return data::make_secure_string(d);
 							}
 						}
 						else if (c == '.')
 						{
 							if (read_next())
 							{
-								return '.' + read_number_float();
+								return data::combine_secure_string('.', read_number_float());
 							}
 							else
 							{
-								return ".";
+								return data::make_secure_string('.');
 							}
 						}
 						else if (c == 'e' || c == 'E')
 						{
-							return 'e' + read_number_exponent();
+							return data::combine_secure_string('e', read_number_exponent());
 						}
 						else
 						{
-							return "";
+							return data::make_secure_string();
 						}
 					}
 
 					/// Reads a raw number
 					/// Returns the raw string representation of the number.
-					std::string read_number_raw()
+					data::secure_string_ptr read_number_raw()
 					{
 						if (c == '-')
 						{
 							require_next();
-							return '-' + read_number_raw();
+							return data::combine_secure_string('-', read_number_raw());
 						}
 						else if (c == '0')
 						{
 							if (read_next())
 							{
-								return '0' + read_number_float();
+								return data::combine_secure_string('0', read_number_float());
 							}
 							else
 							{
-								return "0";
+								return data::make_secure_string('0');
 							}
 						}
 						else if ('1' <= c && '9' >= c)
@@ -309,11 +311,11 @@ namespace deadlock
 							char d = c;
 							if (read_next())
 							{
-								return d + read_number_base();
+								return data::combine_secure_string(d, read_number_base());
 							}
 							else
 							{
-								return std::string(1, d);
+								return data::make_secure_string(d);
 							}
 						}
 
@@ -325,7 +327,7 @@ namespace deadlock
 					{
 						json_value v;
 						v.type = value_type::number;
-						v.value = new std::string(read_number_raw());
+						v.value = new data::secure_string_ptr(read_number_raw());
 						return v;
 					}
 
@@ -383,9 +385,9 @@ namespace deadlock
 						{
 							if (c == '"')
 							{
-								std::string key = read_string_raw();
+								data::secure_string_ptr key = read_string_raw();
 								while (c != ':') require_next();
-								map.insert(std::make_pair(key, read_value()));
+								map.insert(std::make_pair(*key, read_value()));
 							}
 							else
 							{

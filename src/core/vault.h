@@ -40,9 +40,6 @@ namespace deadlock
 		{
 		protected:
 
-			/// A buffer of 512 bits used to obfuscate/de-obfuscate data
-			circular_buffer<64> obfuscation_buffer;
-
 			/// The collection of entries that the vault stores
 			data::entry_collection entries;
 
@@ -66,15 +63,6 @@ namespace deadlock
 
 			/// Creates an empty vault
 			vault();
-
-			/// Obfuscates the key with the current obfuscation buffer
-			inline void obfuscate_key(cryptography::key_generator& key) { key.obfuscate_key(obfuscation_buffer); }
-
-			/// Returns an obfuscated string for the given unobfuscated string
-			inline data::obfuscated_string obfuscate_string(const std::string& unobfuscated_string)
-			{
-				return data::obfuscated_string(unobfuscated_string, obfuscation_buffer);
-			}
 
 			/// Adds a new entry to the collection
 			void add_entry(const data::entry& tr);

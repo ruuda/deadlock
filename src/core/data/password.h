@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-#include "obfuscated_string.h"
+#include "secure_string.h"
 
 #include "../win32_export.h"
 
@@ -29,7 +29,7 @@ namespace deadlock
 	{
 		namespace data
 		{
-			/// Keeps a password (obfuscated) and the date-time it was stored
+			/// Keeps a password and the date-time it was stored
 			class _export password
 			{
 			protected:
@@ -38,7 +38,7 @@ namespace deadlock
 				std::int64_t store_time;
 
 				/// The actual password data
-				obfuscated_string obfuscated_password;
+				secure_string_ptr password_string;
 
 				static password empty_password;
 
@@ -46,18 +46,18 @@ namespace deadlock
 
 				/// Re-constructs a password based on the given data
 				/// Should be used for loading only
-				password(obfuscated_string password_data, std::int64_t stored_time);
+				password(const secure_string& password_data, std::int64_t stored_time);
 
 				/// Constructs a new password with its store_time set to the current time
-				password(obfuscated_string password_data);
+				password(const secure_string& password_data);
 
 				/// Returns the time at which the password was stored
 				inline std::int64_t get_stored_time() const { return store_time; }
 
-				/// Returns the (obfuscated) password
-				inline const obfuscated_string& get_password() const { return obfuscated_password; }
+				/// Returns the password
+				inline const secure_string& get_password() const { return *password_string; }
 
-				/// Returns the empty obfuscated password
+				/// Returns the empty password
 				static const password& empty();
 			};
 		}

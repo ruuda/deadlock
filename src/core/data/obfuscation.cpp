@@ -14,30 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "password.h"
-
-#include <ctime>
+#include "obfuscation.h"
 
 using namespace deadlock::core::data;
+using deadlock::core::circular_buffer_512;
 
-// Initialise empty obfuscated string here to avoid static initialisation fiasco
-password password::empty_password = password("", 0x0);
-
-password::password(const secure_string& password_str, std::int64_t stored_time) :
-	password_string(make_secure_string(password_str)), store_time(stored_time)
+void detail::xor_transform(secure_string_ptr string, circular_buffer_512& transformation_buffer)
 {
+	// Beginnings must line up, so reset the buffer
+	transformation_buffer.reset();
 
-}
-
-password::password(const secure_string& password_str) :
-	password_string(make_secure_string(password_str))
-{
-	// Store with the current time
-	// TODO: make sure this is GMT time, independent of the local time (for portability)
-	store_time = std::time(nullptr);
-}
-
-const password& password::empty()
-{
-	return empty_password;
+	// Apply xor to every byte in the buffer
+	for (size_t i = 0; i < string->size(); i++)
+	{
+		string->at(i) ^= transformation_buffer.next();
+	}
 }

@@ -115,33 +115,36 @@ namespace deadlock
 					states.push(state_none);
 				}
 
-				/// Writes the string, with a few special characters escaped to form valid JSON
-				inline void write_string(const std::string& str)
+				/// Writes the secure string, with a few special characters escaped to form valid JSON
+				inline void write_string(const data::secure_string& str)
 				{
 					write_begin_value();
 
 					ostr << "\"";
+					const char* c;
+
+					// TODO: could compiler optimisations create vulnerabilities here?
 
 					size_t sz = str.size();
 					for (size_t i = 0; i < sz; i++)
 					{
-						char c = str[i];
-						if (c == '"')
+						c = &str.at(i);
+						if (*c == '"')
 							ostr << '\\' << '"';
-						else if (c == '\\')
+						else if (*c == '\\')
 							ostr << '\\' << '\\';
-						else if (c == '\b')
+						else if (*c == '\b')
 							ostr << '\\' << 'b';
-						else if (c == '\f')
+						else if (*c == '\f')
 							ostr << '\\' << 'f';
-						else if (c == '\n')
+						else if (*c == '\n')
 							ostr << '\\' << 'n';
-						else if (c == '\r')
+						else if (*c == '\r')
 							ostr << '\\' << 'r';
-						else if (c == '\t')
+						else if (*c == '\t')
 							ostr << '\\' << 't';
 						else
-							ostr << c;
+							ostr << *c;
 					}
 
 					ostr << "\"";
@@ -239,7 +242,7 @@ namespace deadlock
 				}
 
 				/// Writes the key for an object member
-				inline void write_object_key(std::string key)
+				inline void write_object_key(const data::secure_string& key)
 				{
 					write_string(key);
 

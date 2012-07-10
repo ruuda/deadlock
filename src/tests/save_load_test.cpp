@@ -44,18 +44,18 @@ void save_load_test::run()
 	data::entry etr1;
 	etr1.set_username("Guybrush Threepwood");
 	etr1.set_key("Fictional Key 1");
-	etr1.set_password(data::obfuscated_string(first.obfuscate_string("correct horse battery staple")));
+	etr1.set_password("correct horse battery staple");
 	etr1.set_additional_data("nothing");
 	first.add_entry(etr1);
 
 	data::entry etr2;
 	etr2.set_username("Gordon Freeman");
 	etr2.set_key("Fictional Key 2");
-	etr2.set_password(data::obfuscated_string(first.obfuscate_string("the cake is a lie")));
+	etr2.set_password("the cake is a lie");
 	first.add_entry(etr2);
 
 	// Save
-	first.obfuscate_key(key);
+	//first.obfuscate_key(key);
 	first.save("test_save_load.dlk", key);
 
 	// Load

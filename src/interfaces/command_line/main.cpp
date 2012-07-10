@@ -70,42 +70,7 @@ int main(int argc, char** argv)
 	/// The vault that will be used throughout this session
 	vault archive;
 
-	archive.import_json("test.json");
-	archive.import_json("test2.json");
-	archive.export_json("test3.json", false);
-
-	cryptography::key_generator key;
-	key.set_salt_random();
-	int iter_count = key.get_required_iterations(4, 2.0);
-	key.generate_key("henk", iter_count);
-	archive.obfuscate_key(key);
-
-	archive.save("test3.dlk", key);
-
-	vault archive2;
-	archive2.load("test3.dlk", key, "henk");
-
 	std::cout << "Deadlock " << deadlock::core::assembly_information::get_version() << std::endl;
-
-	/// Testing obfuscation buffer
-	deadlock::core::circular_buffer_512 obfs_buffer;
-	obfs_buffer.fill_random();
-
-	std::vector<std::uint8_t> obfs;
-	obfs.push_back('a' ^ obfs_buffer.next());
-	obfs.push_back('b' ^ obfs_buffer.next());
-	obfs.push_back('c' ^ obfs_buffer.next());
-	deadlock::core::data::obfuscated_string obfs_str(obfs);
-	const char* cstring;
-	{
-		auto deobfs_str = obfs_str.deobfuscate(obfs_buffer);
-		cstring = deobfs_str.c_str();
-		std::cout << std::endl << cstring << std::endl;
-	}
-
-	// This should fail, or cause an access violation
-	std::cout << std::endl << cstring << std::endl;
-
 
 	return 0;
 }

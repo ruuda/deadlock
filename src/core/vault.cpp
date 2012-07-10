@@ -33,8 +33,7 @@ using namespace deadlock::core;
 
 vault::vault()
 {
-	// Generate a random buffer to obfuscate passwords
-	obfuscation_buffer.fill_random();
+
 }
 
 void vault::add_entry(const data::entry& tr)
@@ -55,9 +54,9 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 	}
 
 	// Read the version
-	std::stringstream version_string(static_cast<std::string&>(json_data.at("version")));
+	data::secure_stringstream_ptr version_string = data::make_secure_stringstream(static_cast<const data::secure_string&>(json_data.at("version")));
 	version file_version;
-	version_string >> file_version;
+	*version_string >> file_version;
 	version application_version = assembly_information::get_version();
 
 	// Version checks could be added here to parse old versions
@@ -77,10 +76,12 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 	{
 		// Retrieve the obfuscation buffer stored in the file
 		circular_buffer_512 file_obfuscation_buffer;
-		file_obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
+		// TODO: fix this
+		//file_obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
 
 		// Transform the file buffer to convert between the file buffer and the current obfuscation buffer
-		file_obfuscation_buffer.transform(obfuscation_buffer);
+		// TODO: fix this
+		//file_obfuscation_buffer.transform(obfuscation_buffer);
 
 		// Deserialise the obfuscated entries
 		entries.deserialise_obfuscated(json_data.at("entries"), file_obfuscation_buffer);
@@ -88,7 +89,7 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 	else // Otherwise read plain passwords
 	{
 		// Deserialise plain passwords, and immediately store them obfuscated using the obfuscation buffer
-		entries.deserialise_deobfuscated(json_data.at("entries"), obfuscation_buffer);
+		entries.deserialise_unobfuscated(json_data.at("entries"));
 	}
 }
 
@@ -99,25 +100,29 @@ void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 	{
 		// Write version
 		serialiser.write_object_key("version");
-		std::stringstream str_stream; str_stream << assembly_information::get_version();
-		serialiser.write_string(str_stream.str());
+		data::secure_stringstream_ptr str_stream = data::make_secure_stringstream();
+		(*str_stream) << assembly_information::get_version();
+		serialiser.write_string(str_stream->str());
+
+		circular_buffer_512 obfuscation_buffer;
 
 		// If obfuscated, write the obfuscation buffer as an array of bytes
 		if (obfuscation)
 		{
+			obfuscation_buffer.fill_random();
 			serialiser.write_object_key("obfuscation_buffer");
-			serialiser.write_string(obfuscation_buffer.get_hexadecimal_string());
+			serialiser.write_string(*obfuscation_buffer.get_hexadecimal_string());
 		}
 
 		// Write the entries
 		serialiser.write_object_key("entries");
 		if (obfuscation)
 		{
-			entries.serialise_obfuscated(serialiser);
+			entries.serialise_obfuscated(serialiser, obfuscation_buffer);
 		}
 		else
 		{
-			entries.serialise_deobfuscated(serialiser, obfuscation_buffer);
+			entries.serialise_unobfuscated(serialiser);
 		}
 	}
 	serialiser.write_end_object();
@@ -252,9 +257,6 @@ void vault::load(const std::string& filename, cryptography::key_generator& key, 
 
 			// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
 			deserialise(decompress_stream);
-
-			// Obfuscate the key in memory while unused
-			key.obfuscate_key(obfuscation_buffer);
 		}
 		catch (...)
 		{
@@ -297,9 +299,6 @@ void vault::save(const std::string& filename, cryptography::key_generator& key)
 			file.put(key.get_salt()[i]);
 		}
 
-		// De-obfuscate the in-memory key
-		key.deobfuscate_key(obfuscation_buffer);
-
 		// Create an encryption stream that saves data encrypted
 		cryptography::aes_cbc_encrypt_stream encrypt_stream(file, key);
 		// And a compression stream that compresses data
@@ -310,9 +309,6 @@ void vault::save(const std::string& filename, cryptography::key_generator& key)
 		compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
 		encrypt_stream.flush();
 		file.flush();
-
-		// Obfuscate the key again
-		key.obfuscate_key(obfuscation_buffer);
 	}
 	else
 	{

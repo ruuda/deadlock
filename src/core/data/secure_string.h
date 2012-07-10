@@ -19,6 +19,9 @@
 
 #include <memory>
 #include <string>
+#include <sstream>
+#include <istream>
+#include <ostream>
 #include "secure_allocator.h"
 
 namespace deadlock
@@ -28,10 +31,16 @@ namespace deadlock
 		namespace data
 		{
 			/// A string that zeroes its memory upon deallocation
-			typedef std::basic_string<char, std::char_traits<char>, detail::secure_allocator<char> > secure_string;
+			typedef std::basic_string<char, std::char_traits<char>, detail::secure_allocator<char>> secure_string;
+
+			/// A stringstream that zeroes its memory upon deallocation
+			typedef std::basic_stringstream<char, std::char_traits<char>, detail::secure_allocator<char>> secure_stringstream;
 
 			/// Shared pointer to a secure string
 			typedef std::shared_ptr<secure_string> secure_string_ptr;
+
+			/// Shared pointer to a secure stringstream
+			typedef std::shared_ptr<secure_stringstream> secure_stringstream_ptr;
 
 			/// Constructs an empty secure string
 			inline secure_string_ptr make_secure_string()
@@ -45,10 +54,42 @@ namespace deadlock
 				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), ptr);
 			}
 
-			/// Copies a secure string
-			inline secure_string_ptr make_secure_string(secure_string_ptr other)
+			/// Creates a shared pointer that points to a copy of the secure string
+			inline secure_string_ptr make_secure_string(const secure_string& str)
 			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), *other);
+				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str);
+			}
+
+			/// Creates a secure string that contains one character
+			inline secure_string_ptr make_secure_string(char c)
+			{
+				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), 1, c);
+			}
+
+			/// Prepends the character to the string and returns the shared pointer to the string
+			/// This modifies the stored string; it does not act on a copy
+			inline secure_string_ptr combine_secure_string(char c, secure_string_ptr str)
+			{
+				str->insert(str->begin(), c); return str;
+			}
+
+			/// Appends the character to the string and returns the shared pointer to the string
+			/// This modifies the stored string; it does not act on a copy
+			inline secure_string_ptr combine_secure_string(secure_string_ptr str, char c)
+			{
+				str->push_back(c); return str;
+			}
+
+			/// Constructs an empty secure stringstream
+			inline secure_stringstream_ptr make_secure_stringstream()
+			{
+				return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>());
+			}
+
+			/// Constructs a secure stringstream with the specified contents
+			inline secure_stringstream_ptr make_secure_stringstream(const secure_string& str)
+			{
+				return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>(), str);
 			}
 		}
 	}

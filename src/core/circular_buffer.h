@@ -20,9 +20,9 @@
 #include <cstdint>
 #include <random>
 #include <ctime>
-#include <sstream>
 #include <iomanip>
 
+#include "data/secure_string.h"
 #include "win32_export.h"
 
 namespace deadlock
@@ -98,35 +98,35 @@ namespace deadlock
 			}
 
 			/// Returns a hexadecimal representation of the buffer
-			std::string get_hexadecimal_string() const
+			data::secure_string_ptr get_hexadecimal_string() const
 			{
-				std::stringstream hex_string;
+				data::secure_stringstream_ptr hex_string = data::make_secure_stringstream();
 
 				// Write all bytes as hexadecimal characters
 				for (size_t i = 0; i < buffer_size; i++)
 				{
-					hex_string << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(buffer[i]);
+					(*hex_string) << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(buffer[i]);
 				}
 
-				return hex_string.str();
+				return data::make_secure_string(hex_string->str());
 			}
 
 			/// Fills the buffer with data from a hexadecimal string
-			void set_hexadecimal_string(const std::string& hexadecimal_string)
+			void set_hexadecimal_string(const data::secure_string& hexadecimal_string)
 			{
-				std::stringstream hex_string(hexadecimal_string);
+				data::secure_stringstream_ptr hex_string = data::make_secure_stringstream(hexadecimal_string);
 
-				std::string byte_string;
+				data::secure_string_ptr byte_string = data::make_secure_string();
 
 				size_t i = 0;
 
 				// Read two characters from the stream
-				while ((hex_string >> std::setw(2) >> byte_string) && (i < buffer_size))
+				while (((*hex_string) >> std::setw(2) >> (*byte_string)) && (i < buffer_size))
 				{
 					// Create a new stringstream with the two characters
-					std::stringstream byte_stream(byte_string);
+					data::secure_stringstream_ptr byte_stream = data::make_secure_stringstream(byte_string);
 					// Read the integer value
-					int byte; byte_stream >> std::hex >> byte;
+					int byte; (*byte_stream) >> std::hex >> byte;
 					buffer[i] = static_cast<std::uint8_t>(byte);
 					i++;
 				}
