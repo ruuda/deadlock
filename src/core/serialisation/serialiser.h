@@ -20,6 +20,7 @@
 #include <ostream>
 #include <cstdint>
 #include <stack>
+#include <iomanip>
 
 #include "value.h"
 
@@ -143,6 +144,10 @@ namespace deadlock
 							ostr << '\\' << 'r';
 						else if (*c == '\t')
 							ostr << '\\' << 't';
+						else if (*c >= 0x00 && *c <= 0x1f)
+						// TODO: what about unicode code points here? They are not properly handled at this point (or are they?)
+					    // TODO: what about character values above 127?
+							ostr << "\\u00" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*c);
 						else
 							ostr << *c;
 					}
