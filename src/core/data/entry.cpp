@@ -21,6 +21,22 @@
 using namespace deadlock::core;
 using namespace deadlock::core::data;
 
+entry::entry()
+{
+	key = make_secure_string();
+	username = make_secure_string();
+	additional_data = make_secure_string();
+}
+
+entry::entry(const entry& other)
+{
+	// Copy the values; shared pointers are only used to manage per-instance storage,
+	// not to share ownership between instances.
+	key = make_secure_string(other.get_key());
+	username = make_secure_string(other.get_username());
+	additional_data = make_secure_string(other.get_additional_data());
+}
+
 const password& entry::get_password() const
 {
 	// If the collection is empty, return a new, empty password

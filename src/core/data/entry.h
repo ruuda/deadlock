@@ -40,7 +40,7 @@ namespace deadlock
 			{
 			public:
 
-				typedef std::vector<password> password_collection;
+				typedef std::vector<password, data::detail::secure_allocator<password>> password_collection;
 				typedef password_collection::const_iterator password_iterator;
 
 			protected:
@@ -67,6 +67,12 @@ namespace deadlock
 				void deserialise_common(const serialisation::json_value::object_t& json_data);
 
 			public:
+
+				/// Constructs an entry with empty password and other values
+				entry();
+
+				/// Copy constructor
+				entry(const entry& other);
 
 				/// Returns the key associated with this entry
 				inline const secure_string& get_key() const { return *key; }
