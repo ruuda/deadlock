@@ -37,6 +37,15 @@ password::password(const secure_string& password_str) :
 	store_time = std::time(nullptr);
 }
 
+password::password(const password& other)
+	:
+	// Copy the data, because the shared_ptr is only used for secure memory erasing.
+	password_string(make_secure_string(other.get_password())),
+	store_time(other.get_stored_time())
+{
+
+}
+
 const password& password::empty()
 {
 	return empty_password;

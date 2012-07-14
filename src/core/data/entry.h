@@ -59,13 +59,6 @@ namespace deadlock
 				/// Can be used to store additional information with the key
 				secure_string_ptr additional_data;
 
-				/// Serialises all values common to obfuscated and de-obfuscated serialisation
-				/// This does not write the enclosing object
-				void serialise_common(serialisation::serialiser& serialiser);
-
-				/// Deserialises all values common to obfuscated and de-obfuscated serialisation
-				void deserialise_common(const serialisation::json_value::object_t& json_data);
-
 			public:
 
 				/// Constructs an entry with empty password and other values
@@ -104,19 +97,13 @@ namespace deadlock
 				/// Modifies additional data associated with the key
 				inline void set_additional_data(const secure_string& new_data) { additional_data = make_secure_string(new_data); }
 
-				/// Reconstructs the entries given the JSON data, assuming obfuscated data
-				void deserialise_obfuscated(const serialisation::json_value::object_t& json_data, circular_buffer_512& tranformation_buffer);
+				/// Reconstructs the entries given the JSON data
+				void deserialise(const serialisation::json_value::object_t& json_data);
 
-				/// Reconstructs the entries given the JSON data, assuming unobfuscated data
-				void deserialise_unobfuscated(const serialisation::json_value::object_t& json_data);
-
-				/// Writes the entries to the serialiser as an array of objects
-				/// This will write the passwords as hexadecimal strings of the obfuscated data
-				void serialise_obfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer);
-
-				/// Writes the entries to the serialiser as an array of objects
-				/// This will write the passwords "as-is", without obfuscation
-				void serialise_unobfuscated(serialisation::serialiser& serialiser);
+				/// Writes the entry to the serialiser as object.
+				/// If obfuscation is true, this will write the data as hexadecimal strings.
+				/// If it is false, it will write the data "as-is".
+				void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 			};
 		}
 	}

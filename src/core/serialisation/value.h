@@ -178,7 +178,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -187,7 +187,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<short>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<short>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -196,7 +196,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (unsigned short)
@@ -205,7 +205,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -214,7 +214,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<unsigned short>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<unsigned short>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -223,7 +223,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (int)
@@ -232,7 +232,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -241,7 +241,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<int>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<int>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -250,7 +250,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (unsigned int)
@@ -259,7 +259,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -268,7 +268,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<unsigned int>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<unsigned int>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -277,7 +277,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (long int)
@@ -286,7 +286,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -295,7 +295,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<long int>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<long int>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -304,7 +304,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (unsigned long int)
@@ -313,7 +313,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -322,7 +322,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<unsigned long int>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<unsigned long int>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -331,7 +331,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (long long)
@@ -340,7 +340,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -349,7 +349,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<long long>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<long long>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -358,7 +358,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (unsigned long long)
@@ -367,7 +367,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -376,7 +376,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<unsigned long long>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<unsigned long long>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -385,7 +385,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (float)
@@ -394,7 +394,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -403,7 +403,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<float>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<float>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -412,7 +412,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (double)
@@ -421,7 +421,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -430,7 +430,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<double>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<double>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number.");
 				}
 
@@ -439,7 +439,7 @@ namespace deadlock
 				{
 					// TODO
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 				}
 
 				/// Assignment operator (long double)
@@ -448,7 +448,7 @@ namespace deadlock
 					// TODO
 					if (value) delete_value();
 					type = value_type::number;
-					value = new std::string(boost::lexical_cast<std::string>(v));
+					value = new data::secure_string_ptr(data::make_secure_string(boost::lexical_cast<data::secure_string>(v)));
 					return v;
 				}
 
@@ -457,7 +457,7 @@ namespace deadlock
 				{
 					// TODO
 					if (type == value_type::number)
-						return boost::lexical_cast<long double>(*static_cast<std::string*>(value));
+						return boost::lexical_cast<long double>(**static_cast<data::secure_string_ptr*>(value));
 					throw std::runtime_error("The stored value is not a number."); //todo: derive exception
 				}
 

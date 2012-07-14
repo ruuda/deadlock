@@ -26,7 +26,7 @@ void entry_collection::push_back(const entry& new_entry)
 	// TODO: update acceleration structure
 }
 
-void entry_collection::deserialise_obfuscated(const serialisation::json_value::array_t& json_data, circular_buffer_512& transformation_buffer)
+void entry_collection::deserialise(const serialisation::json_value::array_t& json_data)
 {
 	// Loop through the data and read entries
 	for (size_t i = 0; i < json_data.size(); i++)
@@ -34,27 +34,13 @@ void entry_collection::deserialise_obfuscated(const serialisation::json_value::a
 		// Add a new, blank entry to the collection
 		entries.push_back(entry());
 		// Load the correct data into it
-		entries.back().deserialise_obfuscated(json_data[i], transformation_buffer);
+		entries.back().deserialise(json_data[i]);
 	}
 
 	// TODO: generate acceleration structure
 }
 
-void entry_collection::deserialise_unobfuscated(const serialisation::json_value::array_t& json_data)
-{
-	// Loop through the data and read entries
-	for (size_t i = 0; i < json_data.size(); i++)
-	{
-		// Add a new, blank entry to the collection
-		entries.push_back(entry());
-		// Load the correct data into it
-		entries.back().deserialise_unobfuscated(json_data[i]);
-	}
-
-	// TODO: generate acceleration structure
-}
-
-void entry_collection::serialise_obfuscated(serialisation::serialiser& serialiser, circular_buffer_512& obfuscation_buffer)
+void entry_collection::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 {
 	// Write the collection as an array
 	serialiser.write_begin_array();
@@ -62,23 +48,8 @@ void entry_collection::serialise_obfuscated(serialisation::serialiser& serialise
 		// Loop through the entries and write them
 		for (size_t i = 0; i < entries.size(); i++)
 		{
-			entries[i].serialise_obfuscated(serialiser, obfuscation_buffer);
+			entries[i].serialise(serialiser, obfuscation);
 		}
 	}
 	serialiser.write_end_array();
 }
-
-void entry_collection::serialise_unobfuscated(serialisation::serialiser& serialiser)
-{
-	// Write the collection as an array
-	serialiser.write_begin_array();
-	{
-		// Loop through the entries and write them
-		for (size_t i = 0; i < entries.size(); i++)
-		{
-			entries[i].serialise_unobfuscated(serialiser);
-		}
-	}
-	serialiser.write_end_array();
-}
-

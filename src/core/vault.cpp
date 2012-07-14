@@ -67,30 +67,8 @@ void vault::deserialise(const serialisation::json_value::object_t& json_data)
 		throw version_error("The file was created with a newer version of the application.");
 	}
 
-	// Now parse the actual data
-	// First, check whether the file uses obfuscation or not
-	bool obfuscation = (json_data.find("obfuscation_buffer") != json_data.end());
-
-	// If obfuscated, read with obfuscation
-	if (obfuscation)
-	{
-		// Retrieve the obfuscation buffer stored in the file
-		circular_buffer_512 file_obfuscation_buffer;
-		// TODO: fix this
-		//file_obfuscation_buffer.set_hexadecimal_string(json_data.at("obfuscation_buffer"));
-
-		// Transform the file buffer to convert between the file buffer and the current obfuscation buffer
-		// TODO: fix this
-		//file_obfuscation_buffer.transform(obfuscation_buffer);
-
-		// Deserialise the obfuscated entries
-		entries.deserialise_obfuscated(json_data.at("entries"), file_obfuscation_buffer);
-	}
-	else // Otherwise read plain passwords
-	{
-		// Deserialise plain passwords, and immediately store them obfuscated using the obfuscation buffer
-		entries.deserialise_unobfuscated(json_data.at("entries"));
-	}
+	// Deserialise the entries
+	entries.deserialise(json_data.at("entries"));
 }
 
 void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
@@ -104,26 +82,9 @@ void vault::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 		(*str_stream) << assembly_information::get_version();
 		serialiser.write_string(str_stream->str());
 
-		circular_buffer_512 obfuscation_buffer;
-
-		// If obfuscated, write the obfuscation buffer as an array of bytes
-		if (obfuscation)
-		{
-			obfuscation_buffer.fill_random();
-			serialiser.write_object_key("obfuscation_buffer");
-			serialiser.write_string(*obfuscation_buffer.get_hexadecimal_string());
-		}
-
 		// Write the entries
 		serialiser.write_object_key("entries");
-		if (obfuscation)
-		{
-			entries.serialise_obfuscated(serialiser, obfuscation_buffer);
-		}
-		else
-		{
-			entries.serialise_unobfuscated(serialiser);
-		}
+		entries.serialise(serialiser, obfuscation);
 	}
 	serialiser.write_end_object();
 }

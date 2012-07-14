@@ -47,16 +47,16 @@ namespace deadlock
 			void deserialise(const serialisation::json_value::object_t& json_data);
 
 			/// Writes the vault to the serialiser
-			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
-			/// and it will not write the obfuscation buffer.
+			/// If obfuscation is false, it will write data as-is.
+			/// Otherwise, it will write the data as hexadecimal strings.
 			void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 
 			/// Reads the password collection from a stream of JSON
 			void deserialise(std::istream& json_stream);
 
 			/// This exports the most recent version of the Deadlock JSON structure.
-			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
-			/// and it will not write the obfuscation buffer.
+			/// If obfuscation is false, it will write data as-is.
+			/// Otherwise, it will write the data as hexadecimal strings.
 			void serialise(std::ostream& json_stream, bool obfuscation, bool human_readable);
 
 		public:
@@ -75,14 +75,14 @@ namespace deadlock
 
 			/// Writes the password collection as JSON to a file
 			/// This always writes the most recent version of the Deadlock JSON structure.
-			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
-			/// and it will not write the obfuscation buffer.
+			/// If obfuscation is false, it will write data as-is.
+			/// Otherwise, it will write the data as hexadecimal strings.
 			void export_json(const std::string& filename, bool obfuscation);
 
 			/// Writes the password collection as JSON to a stream
 			/// This always writes the most recent version of the Deadlock JSON structure.
-			/// If obfuscation is false, it will de-obfuscate the strings before writing them,
-			/// and it will not write the obfuscation buffer.
+			/// If obfuscation is false, it will write data as-is.
+			/// Otherwise, it will write the data as hexadecimal strings.
 			void export_json(std::ostream& output_stream, bool obfuscation);
 
 			/// Saves the vault encrypted to a binary file

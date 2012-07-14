@@ -51,6 +51,9 @@ namespace deadlock
 				/// Constructs a new password with its store_time set to the current time
 				password(const secure_string& password_data);
 
+				/// Copy constructor
+				password(const password& other);
+
 				/// Returns the time at which the password was stored
 				inline std::int64_t get_stored_time() const { return store_time; }
 
