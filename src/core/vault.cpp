@@ -265,8 +265,8 @@ void vault::save(const std::string& filename, const cryptography::key& key)
 		// And a compression stream that compresses data
 		cryptography::xz_compress_stream compress_stream(encrypt_stream, 6);
 
-		// Write the obfuscated JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
-		serialise(compress_stream, true, false);
+		// Write the JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
+		serialise(compress_stream, false, false);
 		compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
 		encrypt_stream.flush();
 		file.flush();
