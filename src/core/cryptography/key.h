@@ -29,8 +29,9 @@ namespace deadlock
 	{
 		namespace cryptography
 		{
-			/// Wraps the PKCS5 PBKDF2 key derivation function
-			class _export key_generator
+			/// Wraps the PKCS5 PBKDF2 key derivation function,
+			/// and securely stores a cryptographic key
+			class _export key
 			{
 			public:
 
@@ -46,47 +47,41 @@ namespace deadlock
 			protected:
 
 				/// The actual key generated
-				std::uint8_t key[key_size];
+				std::uint8_t key_data[key_size];
 
 				/// The salt used to generate the key
-				std::uint8_t salt[salt_size];
+				std::uint8_t salt_data[salt_size];
 
 				/// The number of iterations done to generate the key
 				std::uint32_t number_of_iterations;
 
 			public:
 
-				key_generator();
+				key();
 
 				/// The destructor clears the memory for the key
-				~key_generator();
+				~key();
 
 				/// Generates a random salt value
 				void set_salt_random();
 
 				/// Returns the current salt
-				inline const std::uint8_t* get_salt() const { return salt; }
+				inline const std::uint8_t* get_salt() const { return salt_data; }
 
 				/// Returns the current salt
-				inline std::uint8_t* get_salt() { return salt; }
+				inline std::uint8_t* get_salt() { return salt_data; }
 
 				/// Returns the number of iterations done to generate the key
 				inline std::uint32_t get_iterations() const { return number_of_iterations; }
 
 				/// Generates the key using the specified number of iterations
-				void generate_key(const std::string& passphrase, std::uint32_t iterations);
+				void generate_key(const data::secure_string& passphrase, std::uint32_t iterations);
 
 				/// Returns the number of iterations required, such that deriving the key takes the specified amount of time (roughly)
 				std::uint32_t get_required_iterations(size_t passphrase_length, double seconds);
 
 				/// Returns the generated key
-				inline const std::uint8_t* get_key() const { return key; }
-
-				/// Obfuscates the in-memory key given the obfuscation buffer
-				void obfuscate_key(circular_buffer_512& obfuscation_buffer);
-
-				/// De-obfuscates the in-memory key given the obfuscation buffer
-				void deobfuscate_key(circular_buffer_512& obfuscation_buffer);
+				inline const std::uint8_t* get_key() const { return key_data; }
 			};
 		}
 	}

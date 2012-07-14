@@ -31,11 +31,11 @@ std::string save_load_test::get_name()
 void save_load_test::run()
 {
 	// Create a key
-	cryptography::key_generator key;
+	cryptography::key key;
 	key.set_salt_random();
-	std::string passphrase = "correct horse battery staple";
-	size_t iterations = key.get_required_iterations(passphrase.length(), 0.1);
-	key.generate_key(passphrase, iterations);
+	data::secure_string_ptr passphrase = data::make_secure_string("correct horse battery staple");
+	size_t iterations = key.get_required_iterations(passphrase->length(), 0.1);
+	key.generate_key(*passphrase, iterations);
 
 	// Create one vault that saves, one vault that loads
 	vault first, second;
@@ -59,7 +59,7 @@ void save_load_test::run()
 	first.save("test_save_load.dlk", key);
 
 	// Load
-	second.load("test_save_load.dlk", key, passphrase);
+	second.load("test_save_load.dlk", key, *passphrase);
 
 	// TODO: validate contents
 }

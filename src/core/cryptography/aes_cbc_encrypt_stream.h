@@ -27,7 +27,7 @@ extern "C"
 	#include <tomcrypt.h>
 }
 
-#include "key_generator.h"
+#include "key.h"
 #include "../win32_export.h"
 
 namespace deadlock
@@ -57,7 +57,7 @@ namespace deadlock
 					char plaintext[block_size];
 
 					/// The key used for encryption
-					key_generator& key;
+					const cryptography::key& key;
 
 					/// Whether the initialisation vector has been written already
 					bool iv_written;
@@ -69,7 +69,7 @@ namespace deadlock
 
 					/// Creates a streambuffer that streams its output to the given stream,
 					/// and encrypts with the given key and initialisation vector
-					aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
+					aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
 
 					/// Zeroes the buffers
 					virtual ~aes_cbc_encrypt_streambuffer();
@@ -96,8 +96,8 @@ namespace deadlock
 			public:
 
 				/// Creates a compression stream that streams its output to the given stream,
-				/// with the given key. The key should be deobfuscated.
-				aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key);
+				/// with the given key. The key must outlive the stream object.
+				aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
 
 				~aes_cbc_encrypt_stream();
 

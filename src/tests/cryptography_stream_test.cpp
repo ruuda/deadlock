@@ -33,11 +33,11 @@ std::string cryptography_stream_test::get_name()
 void cryptography_stream_test::run()
 {
 	// Create a key
-	cryptography::key_generator key;
+	cryptography::key key;
 	key.set_salt_random();
-	std::string passphrase = "correct horse battery staple";
-	size_t iterations = key.get_required_iterations(passphrase.length(), 0.1);
-	key.generate_key(passphrase, iterations);
+	data::secure_string_ptr passphrase = data::make_secure_string("correct horse battery staple");
+	size_t iterations = key.get_required_iterations(passphrase->length(), 0.1);
+	key.generate_key(*passphrase, iterations);
 
 	// Pass 1: 16 bytes IV + 8 characters + 8 bytes padding
 	{

@@ -22,7 +22,7 @@
 #include "entry.h"
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
-
+#include "secure_allocator.h"
 #include "../win32_export.h"
 
 namespace deadlock
@@ -39,7 +39,7 @@ namespace deadlock
 			protected:
 
 				/// The list of entries
-				std::vector<entry> entries;
+				std::vector<entry, detail::secure_allocator<entry>> entries;
 
 			public:
 

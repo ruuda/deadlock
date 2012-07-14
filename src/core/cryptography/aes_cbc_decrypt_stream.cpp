@@ -19,10 +19,11 @@
 
 using namespace deadlock::core::cryptography;
 using namespace deadlock::core::cryptography::detail;
+using namespace deadlock::core;
 using deadlock::core::crypt_error;
 
-aes_cbc_decrypt_streambuffer::aes_cbc_decrypt_streambuffer(std::basic_istream<char>& istr, key_generator& deobfuscated_key)
-	: key(deobfuscated_key), input_stream(istr)
+aes_cbc_decrypt_streambuffer::aes_cbc_decrypt_streambuffer(std::basic_istream<char>& istr, const cryptography::key& dkey)
+	: key(dkey), input_stream(istr)
 {
 	// No IV yet
 	iv_read = false;
@@ -109,8 +110,8 @@ aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()
 	return traits_type::eof();
 }
 
-aes_cbc_decrypt_stream::aes_cbc_decrypt_stream(std::basic_istream<char>& istr, key_generator& deobfuscated_key)
-	: streambuffer(istr, deobfuscated_key), basic_istream<char>(&streambuffer)
+aes_cbc_decrypt_stream::aes_cbc_decrypt_stream(std::basic_istream<char>& istr, const cryptography::key& dkey)
+	: streambuffer(istr, dkey), basic_istream<char>(&streambuffer)
 {
 		
 }

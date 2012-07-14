@@ -23,7 +23,7 @@
 #include "core.h"
 #include "errors.h"
 #include "endianness.h"
-#include "cryptography/key_generator.h"
+#include "cryptography/key.h"
 #include "cryptography/aes_cbc_decrypt_stream.h"
 #include "cryptography/aes_cbc_encrypt_stream.h"
 #include "cryptography/xz_compress_stream.h"
@@ -166,7 +166,7 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 	file.close();
 }
 
-void vault::load(const std::string& filename, cryptography::key_generator& key, const std::string& passphrase)
+void vault::load(const std::string& filename, cryptography::key& key, const data::secure_string& passphrase)
 {
 	// Open the file
 	std::ifstream file(filename, std::ios::binary);
@@ -233,7 +233,7 @@ void vault::load(const std::string& filename, cryptography::key_generator& key, 
 	}
 }
 
-void vault::save(const std::string& filename, cryptography::key_generator& key)
+void vault::save(const std::string& filename, const cryptography::key& key)
 {
 	// Open the file
 	std::ofstream file(filename, std::ios::binary);

@@ -19,10 +19,11 @@
 
 using namespace deadlock::core::cryptography;
 using namespace deadlock::core::cryptography::detail;
+using namespace deadlock::core;
 using deadlock::core::crypt_error;
 
-aes_cbc_encrypt_streambuffer::aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key)
-	: key(deobfuscated_key), output_stream(ostr)
+aes_cbc_encrypt_streambuffer::aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, const cryptography::key& dkey)
+	: key(dkey), output_stream(ostr)
 {
 	// Generate an initialisation vector
 	iv_written = false;
@@ -162,8 +163,8 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 	}
 }
 
-aes_cbc_encrypt_stream::aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, key_generator& deobfuscated_key)
-	: streambuffer(ostr, deobfuscated_key), basic_ostream<char>(&streambuffer)
+aes_cbc_encrypt_stream::aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, const cryptography::key& dkey)
+	: streambuffer(ostr, dkey), basic_ostream<char>(&streambuffer)
 {
 		
 }
