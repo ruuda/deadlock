@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cli.h"
+#include "../../core/errors.h"
 
 #include <iostream>
 #include <iomanip>
@@ -39,7 +40,7 @@ int cli::run(int argc, char** argv)
 		("key-iterations", po::value<std::uint32_t>(), "the number of iterations for the key-generation algorithm") // TODO
 		("key-time", po::value<double>(), "infer the number of iterations from a time in seconds")
 
-		("identify,i", "show information about the archive")
+		("identify", "show information about the archive")
 
 		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
@@ -89,6 +90,10 @@ int cli::run(int argc, char** argv)
 	{
 		return handle_new(vm);
 	}
+	else if (vm.count("identify"))
+	{
+		return handle_identify(vm);
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -114,11 +119,22 @@ secure_string_ptr cli::ask_passphrase() const
 	return passphrase;
 }
 
-int cli::handle_new(po::variables_map& vm)
+std::string cli::require_vault_filename(po::variables_map& vm)
 {
 	if (!vm.count("vault") || vm.at("vault").as<std::string>().empty())
 	{
-		std::cout << "No file specified." << std::endl;
+		std::cout << "No vault specified." << std::endl;
+		return "";
+	}
+
+	return vm.at("vault").as<std::string>();
+}
+
+int cli::handle_new(po::variables_map& vm)
+{
+	std::string filename = require_vault_filename(vm);
+	if (filename.empty())
+	{
 		return EXIT_FAILURE;
 	}
 
@@ -162,11 +178,53 @@ int cli::handle_new(po::variables_map& vm)
 	double duration = static_cast<double>((end_time - start_time).count()) / 1.0e9;
 	std::cout << "\b\b\b\b, done in " << std::setprecision(3) << duration << " seconds." << std::endl;
 
-	std::string filename = vm.at("vault").as<std::string>();
-
 	std::cout << "Encrypting and writing empty vault ...";
-	archive.save(filename, key);
+	vault.save(filename, key);
 	std::cout << "\b\b\b\b, done." << std::endl;
 
+	return EXIT_SUCCESS;
+}
+
+
+int cli::handle_identify(po::variables_map& vm)
+{
+	std::string filename = require_vault_filename(vm);
+	if (filename.empty())
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Try to load the file, and see what happens
+	try
+	{
+		vault.load(filename, key, *data::make_secure_string("no_passphrase"));
+	}
+	// If a format exception is thrown, the file is not valid
+	catch (deadlock::core::format_error& format_ex)
+	{
+		std::cout << format_ex.what() << std::endl;
+		return EXIT_SUCCESS;
+	}
+	catch (deadlock::core::version_error)
+	{
+		std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
+		std::cout << "No more information available due to a version mismatch." << std::endl;
+		return EXIT_SUCCESS;
+	}
+	// If xz fails, deserialisation fails, the format should be correct, but the passphrase is wrong
+	catch (serialisation::deserialisation_error& serialisation_ex)
+	{
+		std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
+		std::cout << "PBKDF2 iterations: " << key.get_iterations() << std::endl;
+		return EXIT_SUCCESS;
+	}
+	// If anything other goes wrong, report error.
+	catch (std::runtime_error& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	// If there is no error, the passphrase was "no_passphrase"
+	std::cout << "You should use a stronger passphrase." << std::endl;
 	return EXIT_SUCCESS;
 }

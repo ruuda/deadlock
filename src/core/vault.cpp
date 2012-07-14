@@ -184,7 +184,6 @@ void vault::load(const std::string& filename, cryptography::key& key, const data
 			}
 
 			// Now read the version
-			version file_version;
 			version application_version = assembly_information::get_version();
 			file_version.major = file.get(); file_version.minor = file.get();
 			file_version.revision = file.get(); file_version.build = file.get();

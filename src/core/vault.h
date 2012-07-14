@@ -40,6 +40,9 @@ namespace deadlock
 		{
 		protected:
 
+			/// The version of the loaded file (if the vault was loaded from a file)
+			version file_version;
+
 			/// The collection of entries that the vault stores
 			data::entry_collection entries;
 
@@ -66,6 +69,9 @@ namespace deadlock
 
 			/// Creates an empty vault
 			vault();
+
+			/// Returns the file version
+			inline const version& get_version() const { return file_version; }
 
 			/// Adds a new entry to the collection
 			void add_entry(const data::entry& tr);

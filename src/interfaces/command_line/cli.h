@@ -21,6 +21,7 @@
 #define BOOST_ALL_STATIC_LINK
 #endif
 #include <boost/program_options.hpp>
+#include <string>
 
 #include "../../core/core.h"
 
@@ -41,7 +42,7 @@ namespace deadlock
 				protected:
 
 					/// The vault that will be used throughout the session
-					core::vault archive;
+					core::vault vault;
 
 					/// The key that will be used throughout the session
 					core::cryptography::key key;
@@ -49,8 +50,15 @@ namespace deadlock
 					/// Asks the user for a passphrase
 					core::data::secure_string_ptr ask_passphrase() const;
 
+					/// Returns the vault filename if it is present,
+					/// otherwise prints a message and returns and returns an empty string.
+					std::string require_vault_filename(boost::program_options::variables_map& vm);
+
 					/// Handles the 'new vault' logic
 					int handle_new(boost::program_options::variables_map& vm);
+
+					/// Handles the 'identify' logic
+					int handle_identify(boost::program_options::variables_map& vm);
 			};
 		}
 	}
