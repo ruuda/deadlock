@@ -17,6 +17,7 @@
 #include "entry.h"
 
 #include "../errors.h"
+#include "hexadecimal_convert.h"
 
 using namespace deadlock::core;
 using namespace deadlock::core::data;
@@ -71,8 +72,8 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	}
 	else // Read hexadecimal key
 	{
-		// TODO: decode hex string
-		key = make_secure_string(json_data.at("key_hexadecimal"));
+		// No need to make a copy here, this instance simply takes over ownership from the temporary
+		key = from_hexadecimal_string(json_data.at("key_hexadecimal"));
 	}
 
 	// Read the username (if present)
@@ -82,8 +83,8 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	}
 	else if (json_data.find("username_hexadecimal") != json_data.end()) // Read hexadecimal password
 	{
-		// TODO: decode hex string
-		username = make_secure_string(json_data.at("username_hexadecimal"));
+		// No need to make a copy here, this instance simply takes over ownership from the temporary
+		username = from_hexadecimal_string(json_data.at("username_hexadecimal"));
 	}
 
 	// Read additional data (if present)
@@ -93,8 +94,8 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	}
 	else if (json_data.find("additional_data_hexadecimal") != json_data.end()) // Read hexadecimal password
 	{
-		// TODO: decode hex string
-		additional_data = make_secure_string(json_data.at("additional_data_hexadecimal"));
+		// No need to make a copy here, this instance simply takes over ownership from the temporary
+		additional_data = from_hexadecimal_string(json_data.at("additional_data_hexadecimal"));
 	}
 
 	// Loop through the passwords and add them
@@ -118,8 +119,8 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 		}
 		else // Read hexadecimal string password
 		{
-			// TODO: decode hex string
-			password_str = make_secure_string(psswd.at("password_hexadecimal"));
+			// No need to make a copy here, this instance simply takes over ownership from the temporary
+			password_str = from_hexadecimal_string(psswd.at("password_hexadecimal"));
 		}
 
 		// Add the password to the list
@@ -135,23 +136,20 @@ void entry::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 		{
 			// Write the key
 			serialiser.write_object_key("key_hexadecimal");
-			// TODO: hex encode
-			serialiser.write_string(*key);
+			serialiser.write_string(*to_hexadecimal_string(*key));
 
 			// Write the username (if present)
 			if (!username->empty())
 			{
 				serialiser.write_object_key("username_hexadecimal");
-				// TODO: hex encode
-				serialiser.write_string(*username);
+				serialiser.write_string(*to_hexadecimal_string(*username));
 			}
 
 			// Write additional data (if present)
 			if (!additional_data->empty())
 			{
 				serialiser.write_object_key("additional_data_hexadecimal");
-				// TODO: hex encode
-				serialiser.write_string(*additional_data);
+				serialiser.write_string(*to_hexadecimal_string(*additional_data));
 			}
 		}
 		else
@@ -189,8 +187,7 @@ void entry::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 					{
 						// Write the hexadecimal password to "password_hexadecimal"
 						serialiser.write_object_key("password_hexadecimal");
-						// TODO: hex encode
-						serialiser.write_string(passwords[i].get_password());
+						serialiser.write_string(*to_hexadecimal_string(passwords[i].get_password()));
 					}
 					else
 					{
