@@ -20,9 +20,8 @@
 #include <allocators>
 #include <memory>
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
+#define INCLUDE_WINDOWS_HEADERS
+#include "../win32.h"
 
 namespace deadlock
 {

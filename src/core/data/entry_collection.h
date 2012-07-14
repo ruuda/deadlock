@@ -23,7 +23,7 @@
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
 #include "secure_allocator.h"
-#include "../win32_export.h"
+#include "../win32.h"
 
 namespace deadlock
 {

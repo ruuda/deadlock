@@ -21,7 +21,7 @@
 #include <ostream>
 #include <istream>
 
-#include "win32_export.h"
+#include "win32.h"
 
 namespace deadlock
 {

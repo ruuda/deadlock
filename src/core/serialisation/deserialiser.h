@@ -22,7 +22,7 @@
 
 #include "value.h"
 
-#include "../win32_export.h"
+#include "../win32.h"
 
 namespace deadlock
 {

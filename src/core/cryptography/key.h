@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../win32_export.h"
+#include "../win32.h"
 #include "../circular_buffer.h"
 
 namespace deadlock

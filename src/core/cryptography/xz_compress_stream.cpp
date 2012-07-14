@@ -16,6 +16,7 @@
 
 #include "xz_compress_stream.h"
 #include "../errors.h"
+#include "../data/secure_allocator.h"
 
 using namespace deadlock::core::cryptography;
 using namespace deadlock::core::cryptography::detail;
@@ -55,8 +56,8 @@ xz_compress_streambuffer::~xz_compress_streambuffer()
 	lzma_end(&xz_stream);
 
 	// Zero the buffers, so no data remains in memory
-	std::memset(in_buffer, 0, buffer_size);
-	std::memset(out_buffer, 0, buffer_size);
+	data::detail::secure_memzero(in_buffer, buffer_size);
+	data::detail::secure_memzero(out_buffer, buffer_size);
 }
 
 void xz_compress_streambuffer::finalise()

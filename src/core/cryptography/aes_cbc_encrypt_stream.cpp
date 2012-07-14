@@ -52,12 +52,12 @@ aes_cbc_encrypt_streambuffer::aes_cbc_encrypt_streambuffer(std::basic_ostream<ch
 aes_cbc_encrypt_streambuffer::~aes_cbc_encrypt_streambuffer()
 {
 	// Zero the buffers, so no data remains in memory
-	std::memset(plaintext, 0, block_size);
-	std::memset(iv,        0, block_size);
+	data::detail::secure_memzero(plaintext, block_size);
+	data::detail::secure_memzero(iv,        block_size);
 
 	// Finalise the crypt key and zero it
 	aes_done(&skey); // Do not check return value because throwing from a destructor would make things worse anyway
-	std::memset(&skey, 0, sizeof(symmetric_key));
+	data::detail::secure_memzero(&skey, sizeof(symmetric_key));
 }
 
 void aes_cbc_encrypt_streambuffer::finalise()

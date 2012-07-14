@@ -41,14 +41,13 @@ aes_cbc_decrypt_streambuffer::aes_cbc_decrypt_streambuffer(std::basic_istream<ch
 aes_cbc_decrypt_streambuffer::~aes_cbc_decrypt_streambuffer()
 {
 	// Zero the buffers, so no data remains in memory
-	// TODO: use a SecureZeroMemory
-	std::memset(plaintext, 0, block_size);
-	std::memset(iv,        0, block_size);
-	std::memset(buffer,    0, block_size);
+	data::detail::secure_memzero(plaintext, block_size);
+	data::detail::secure_memzero(iv,        block_size);
+	data::detail::secure_memzero(buffer,    block_size);
 
 	// Finalise the crypt key and zero it
 	aes_done(&skey); // Do not check return value because throwing from a destructor would make things worse anyway
-	std::memset(&skey, 0, sizeof(symmetric_key));
+	data::detail::secure_memzero(&skey, sizeof(symmetric_key));
 }
 
 aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()

@@ -23,8 +23,25 @@
 	#else
 		#define _export __declspec(dllimport)
 	#endif
-#else /* defined (_WIN32) */ 
-  #define _export 
-#endif 
 
+#else // defined (_WIN32)
+  #define _export 
+#endif
+
+#endif
+
+#ifdef INCLUDE_WINDOWS_HEADERS
+#ifndef _DEADLOCK_CORE_WIN32_HEADERS_H_
+#define _DEADLOCK_CORE_WIN32_HEADERS_H_
+
+#if defined(_WIN32)
+	// Troublesome windows headers mess up everything, so this is a way to include them without much trouble
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
+
+	#undef min
+	#undef max
+#endif
+
+#endif
 #endif

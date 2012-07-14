@@ -21,7 +21,7 @@
 
 #include "password.h"
 
-#include "../win32_export.h"
+#include "../win32.h"
 #include "../circular_buffer.h"
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
