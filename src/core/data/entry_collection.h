@@ -43,6 +43,9 @@ namespace deadlock
 
 			public:
 
+				typedef std::vector<entry, detail::secure_allocator<entry>>::iterator entry_iterator;
+				typedef std::vector<entry, detail::secure_allocator<entry>>::const_iterator const_entry_iterator;
+
 				/// Reconstructs the entries given the JSON data
 				void deserialise(const serialisation::json_value::array_t& json_data);
 
@@ -53,6 +56,22 @@ namespace deadlock
 
 				/// Adds a new entry to the collection
 				void push_back(const entry& new_entry);
+
+				/// Returns a list of entries that could match the specified search pattern,
+				/// sorted by match probability
+				std::vector<entry*> find_entries(const data::secure_string& search) const;
+
+				/// Returns an iterator to the first entry
+				inline entry_iterator begin() { return entries.begin(); }
+
+				/// Returns an iterator past the last entry
+				inline entry_iterator end() { return entries.end(); }
+
+				/// Returns an iterator to the first entry
+				inline const_entry_iterator begin() const { return entries.begin(); }
+
+				/// Returns an iterator past the last entry
+				inline const_entry_iterator end() const { return entries.end(); }
 			};
 		}
 	}

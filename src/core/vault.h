@@ -61,11 +61,26 @@ namespace deadlock
 
 		public:
 
+			typedef data::entry_collection::entry_iterator entry_iterator;
+			typedef data::entry_collection::const_entry_iterator const_entry_iterator;
+
 			/// Creates an empty vault
 			vault();
 
 			/// Adds a new entry to the collection
 			void add_entry(const data::entry& tr);
+
+			/// Returns an iterator to the first entry
+			inline entry_iterator begin() { return entries.begin(); }
+
+			/// Returns an iterator past the last entry
+			inline entry_iterator end() { return entries.end(); }
+
+			/// Returns an iterator to the first entry
+			inline const_entry_iterator begin() const { return entries.begin(); }
+
+			/// Returns an iterator past the last entry
+			inline const_entry_iterator end() const { return entries.end(); }
 
 			/// Reads the password collection from a file
 			void import_json(const std::string& filename);

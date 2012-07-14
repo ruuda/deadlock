@@ -59,5 +59,23 @@ void import_export_test::run()
 	third.import_json("test_import_export_1.json");
 	third.import_json("test_import_export_2.json");
 
-	// TODO: validate the data in the third vault
+
+	vault::const_entry_iterator it = third.begin();
+
+	// Validate the first entry
+	if (it->get_username() != etr1.get_username()) throw std::runtime_error("Username not retrieved correctly.");
+	if (it->get_password().get_password() != etr1.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+	if (it->get_key() != etr1.get_key()) throw std::runtime_error("Key not retrieved correctly.");
+	if (it->get_additional_data() != etr1.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+
+	it++;
+
+	// Validate the second entry
+	if (it->get_username() != etr2.get_username()) throw std::runtime_error("Username not retrieved correctly.");
+	if (it->get_password().get_password() != etr2.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+	if (it->get_key() != etr2.get_key()) throw std::runtime_error("Key not retrieved correctly.");
+	if (it->get_additional_data() != etr2.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+
+	it++;
+	if (it != third.end()) throw std::runtime_error("Incorrect number of entries encountered.");
 }
