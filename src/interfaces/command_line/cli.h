@@ -59,6 +59,9 @@ namespace deadlock
 
 					/// Handles the 'identify' logic
 					int handle_identify(boost::program_options::variables_map& vm);
+
+					/// Handles the 'add' logic
+					int handle_add(boost::program_options::variables_map& vm);
 			};
 		}
 	}

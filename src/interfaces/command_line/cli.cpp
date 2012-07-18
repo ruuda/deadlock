@@ -42,6 +42,8 @@ int cli::run(int argc, char** argv)
 
 		("identify", "show information about the archive")
 
+		("add,a", po::value<std::string>(), "add a new entry to the vault, with the specified key")
+
 		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
 
@@ -69,7 +71,20 @@ int cli::run(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	if (vm.count("help"))
+	// Add entry to archive
+	if (vm.count("add"))
+	{
+		return handle_add(vm);
+	}
+
+	// Create a new archive
+	else if (vm.count("new"))
+	{
+		return handle_new(vm);
+	}
+
+	// Print help message
+	else if (vm.count("help"))
 	{
 		std::cout << "Deadlock password manager" << std::endl;
 		std::cout << "Licensed under the GNU Public Licence" << std::endl;
@@ -78,21 +93,18 @@ int cli::run(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
-	if (vm.count("version"))
+	// Give information about an archive
+	else if (vm.count("identify"))
+	{
+		return handle_identify(vm);
+	}
+
+	// Print version
+	else if (vm.count("version"))
 	{
 		std::cout << "Deadlock command-line interface (deadlock_cli)" << std::endl;
 		std::cout << "Using libdeadlock " << deadlock::core::assembly_information::get_version() << std::endl;
 		return EXIT_SUCCESS;
-	}
-
-	/// Create a new archive
-	if (vm.count("new"))
-	{
-		return handle_new(vm);
-	}
-	else if (vm.count("identify"))
-	{
-		return handle_identify(vm);
 	}
 
 	return EXIT_SUCCESS;
@@ -215,7 +227,7 @@ int cli::handle_identify(po::variables_map& vm)
 	catch (serialisation::deserialisation_error& serialisation_ex)
 	{
 		std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
-		std::cout << "PBKDF2 iterations: " << key.get_iterations() << std::endl;
+		std::cout << "PBKDF2 iterations: " << key.get_iterations() << "." << std::endl;
 		return EXIT_SUCCESS;
 	}
 	// If anything other goes wrong, report error.
@@ -224,7 +236,47 @@ int cli::handle_identify(po::variables_map& vm)
 		std::cerr << ex.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+	std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
+	std::cout << "PBKDF2 iterations: " << key.get_iterations() << "." << std::endl;
 	// If there is no error, the passphrase was "no_passphrase"
 	std::cout << "You should use a stronger passphrase." << std::endl;
+	return EXIT_SUCCESS;
+}
+
+int cli::handle_add(po::variables_map& vm)
+{
+	std::string filename = require_vault_filename(vm);
+	if (filename.empty())
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Ask the user for his passphrase
+	data::secure_string_ptr passphrase = ask_passphrase();	
+
+	// Try to load the vault
+	try
+	{
+		vault.load(filename, key, *passphrase);
+	}
+	// If xz fails, deserialisation fails.
+	// XZ would fail because the passphrase is incorrect (or because the file is damaged)
+	catch (serialisation::deserialisation_error& serialisation_ex)
+	{
+		std::cerr << "Unable to decrypt vault." << std::endl;
+		return EXIT_FAILURE;
+	}
+	// If anything other goes wrong, report error.
+	catch (std::runtime_error& ex)
+	{
+		std::cerr << "Could not open vault." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	//std::cout << "Encrypting and writing empty vault ...";
+	//vault.save(filename, key);
+	//std::cout << "\b\b\b\b, done." << std::endl;
+
 	return EXIT_SUCCESS;
 }
