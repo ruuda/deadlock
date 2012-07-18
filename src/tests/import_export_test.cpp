@@ -36,7 +36,7 @@ void import_export_test::run()
 	// Store one entry in each vault
 	data::entry etr1;
 	etr1.set_username("Guybrush Threepwood");
-	etr1.set_key("Fictional Key 1");
+	etr1.set_id("Fictional Identifier 1");
 	etr1.set_password("correct horse battery staple");
 	etr1.set_additional_data("nothing");
 	first.add_entry(etr1);
@@ -44,7 +44,7 @@ void import_export_test::run()
 	// Store one entry in each vault
 	data::entry etr2;
 	etr2.set_username("Gordon Freeman");
-	etr2.set_key("Fictional Key 2");
+	etr2.set_id("Fictional Identifier 2");
 	etr2.set_password("the cake is a lie");
 	second.add_entry(etr2);
 
@@ -66,7 +66,7 @@ void import_export_test::run()
 	if (it->get_username() != etr1.get_username()) throw std::runtime_error("Username not retrieved correctly.");
 	if (it->get_password().get_password() != etr1.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
 	if (it->get_password().get_stored_time() != etr1.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_key() != etr1.get_key()) throw std::runtime_error("Key not retrieved correctly.");
+	if (it->get_id() != etr1.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
 	if (it->get_additional_data() != etr1.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
 	it++;
@@ -75,7 +75,7 @@ void import_export_test::run()
 	if (it->get_username() != etr2.get_username()) throw std::runtime_error("Username not retrieved correctly.");
 	if (it->get_password().get_password() != etr2.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
 	if (it->get_password().get_stored_time() != etr2.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_key() != etr2.get_key()) throw std::runtime_error("Key not retrieved correctly.");
+	if (it->get_id() != etr2.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
 	if (it->get_additional_data() != etr2.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
 	it++;

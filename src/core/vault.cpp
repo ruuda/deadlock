@@ -166,6 +166,52 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 	file.close();
 }
 
+void vault::load(std::istream& input_stream, cryptography::key& key, const data::secure_string& passphrase)
+{
+	// Validate the header
+	char d, l, k, zero;
+	input_stream >> d; input_stream >> l; input_stream >> k; input_stream >> zero;
+	if (d != 'D' || l != 'L' || k != 'K' || zero != 0)
+	{
+		throw format_error("The file is not a valid Deadlock vault; the header is incorrect.");
+	}
+
+	// Now read the version
+	version application_version = assembly_information::get_version();
+	file_version.major = input_stream.get(); file_version.minor = input_stream.get();
+	file_version.revision = input_stream.get(); file_version.build = input_stream.get();
+
+	// Version checks could be added here to parse old versions
+	// For now, there is only one version, so it does not matter
+	// Forward compatibility is not assumed, reading a newer version is an error.
+	if (application_version < file_version)
+	{
+		throw version_error("The file was created with a newer version of the application.");
+	}
+
+	// Read the number of PBKDF2 iterations (stored as a big-endian 32-bit integer)
+	std::uint32_t iterations;
+	input_stream.read(reinterpret_cast<char*>(&iterations), 4);
+	iterations = portable_to_internal(iterations);
+
+	// Followed by the 32 bytes of salt that were used to generate the key
+	for (size_t i = 0; i < key.salt_size; i++)
+	{
+		key.get_salt()[i] = input_stream.get();
+	}
+
+	// Now generate the key
+	key.generate_key(passphrase, iterations);
+
+	// Create a decryption stream that reads encrypted data
+	cryptography::aes_cbc_decrypt_stream decrypt_stream(input_stream, key);
+	// And a decompression stream that decompresses data
+	cryptography::xz_decompress_stream decompress_stream(decrypt_stream);
+
+	// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
+	deserialise(decompress_stream);
+}
+
 void vault::load(const std::string& filename, cryptography::key& key, const data::secure_string& passphrase)
 {
 	// Open the file
@@ -175,48 +221,7 @@ void vault::load(const std::string& filename, cryptography::key& key, const data
 	{
 		try
 		{
-			// Validate the header
-			char d, l, k, zero;
-			file >> d; file >> l; file >> k; file >> zero;
-			if (d != 'D' || l != 'L' || k != 'K' || zero != 0)
-			{
-				throw format_error("The file is not a valid Deadlock vault; the header is incorrect.");
-			}
-
-			// Now read the version
-			version application_version = assembly_information::get_version();
-			file_version.major = file.get(); file_version.minor = file.get();
-			file_version.revision = file.get(); file_version.build = file.get();
-
-			// Version checks could be added here to parse old versions
-			// For now, there is only one version, so it does not matter
-			// Forward compatibility is not assumed, reading a newer version is an error.
-			if (application_version < file_version)
-			{
-				throw version_error("The file was created with a newer version of the application.");
-			}
-
-			// Read the number of PBKDF2 iterations (stored as a big-endian 32-bit integer)
-			std::uint32_t iterations;
-			file.read(reinterpret_cast<char*>(&iterations), 4);
-			iterations = portable_to_internal(iterations);
-
-			// Followed by the 32 bytes of salt that were used to generate the key
-			for (size_t i = 0; i < key.salt_size; i++)
-			{
-				key.get_salt()[i] = file.get();
-			}
-
-			// Now generate the key
-			key.generate_key(passphrase, iterations);
-
-			// Create a decryption stream that reads encrypted data
-			cryptography::aes_cbc_decrypt_stream decrypt_stream(file, key);
-			// And a decompression stream that decompresses data
-			cryptography::xz_decompress_stream decompress_stream(decrypt_stream);
-
-			// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
-			deserialise(decompress_stream);
+			load(file, key, passphrase);
 		}
 		catch (...)
 		{
@@ -232,6 +237,38 @@ void vault::load(const std::string& filename, cryptography::key& key, const data
 	}
 }
 
+void vault::save(std::ostream& output_stream, const cryptography::key& key)
+{
+	// First, write the header structure
+	// In this case, it is "DLK\0", followed by four bytes for the version
+	// The version is written to allow future extensions / reading legacy formats
+	output_stream.put('D'); output_stream.put('L'); output_stream.put('K'); output_stream.put(0);
+	version file_version = assembly_information::get_version();
+	// Write the version bytes independently to avoid endianness issues
+	output_stream.put(file_version.major); output_stream.put(file_version.minor);
+	output_stream.put(file_version.revision); output_stream.put(file_version.build);
+
+	// Now for the current version, write the number of PBKDF2 iterations (as a big-endian 32-bit integer)
+	std::uint32_t iterations = key.get_iterations();
+	iterations = internal_to_portable(iterations);
+	output_stream.write(reinterpret_cast<char*>(&iterations), 4);
+
+	// Followed by the 32 bytes of salt that were used to generate the key
+	for (size_t i = 0; i < key.salt_size; i++)
+	{
+		output_stream.put(key.get_salt()[i]);
+	}
+
+	// Create an encryption stream that saves data encrypted
+	cryptography::aes_cbc_encrypt_stream encrypt_stream(output_stream, key);
+	// And a compression stream that compresses data
+	cryptography::xz_compress_stream compress_stream(encrypt_stream, 6);
+
+	// Write the JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
+	serialise(compress_stream, false, false);
+	compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
+}
+
 void vault::save(const std::string& filename, const cryptography::key& key)
 {
 	// Open the file
@@ -239,42 +276,20 @@ void vault::save(const std::string& filename, const cryptography::key& key)
 
 	if (file.good())
 	{
-		// First, write the header structure
-		// In this case, it is "DLK\0", followed by four bytes for the version
-		// The version is written to allow future extensions / reading legacy formats
-		file.put('D'); file.put('L'); file.put('K'); file.put(0);
-		version file_version = assembly_information::get_version();
-		// Write the version bytes independently to avoid endianness issues
-		file.put(file_version.major); file.put(file_version.minor);
-		file.put(file_version.revision); file.put(file_version.build);
-
-		// Now for the current version, write the number of PBKDF2 iterations (as a big-endian 32-bit integer)
-		std::uint32_t iterations = key.get_iterations();
-		iterations = internal_to_portable(iterations);
-		file.write(reinterpret_cast<char*>(&iterations), 4);
-
-		// Followed by the 32 bytes of salt that were used to generate the key
-		for (size_t i = 0; i < key.salt_size; i++)
+		try
 		{
-			file.put(key.get_salt()[i]);
+			save(file, key);
 		}
-
-		// Create an encryption stream that saves data encrypted
-		cryptography::aes_cbc_encrypt_stream encrypt_stream(file, key);
-		// And a compression stream that compresses data
-		cryptography::xz_compress_stream compress_stream(encrypt_stream, 6);
-
-		// Write the JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
-		serialise(compress_stream, false, false);
-		compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
-		encrypt_stream.flush();
-		file.flush();
+		catch (...)
+		{
+			file.close();
+			throw;
+		}
+		file.close();
 	}
 	else
 	{
 		file.close();
 		throw std::runtime_error("Could not open file for writing.");
 	}
-
-	file.close();
 }

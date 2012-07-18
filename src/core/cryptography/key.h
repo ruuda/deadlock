@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _DEADLOCK_CORE_CRYPTOGRAPHY_KEY_GENERATOR_H_
-#define _DEADLOCK_CORE_CRYPTOGRAPHY_KEY_GENERATOR_H_
+#ifndef _DEADLOCK_CORE_CRYPTOGRAPHY_KEY_H_
+#define _DEADLOCK_CORE_CRYPTOGRAPHY_KEY_H_
 
 #include <cstdint>
 #include <string>

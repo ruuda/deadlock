@@ -45,33 +45,34 @@ namespace deadlock
 
 			protected:
 
-				/// The key used to identify this entry.
-				/// This will be the name of a website or service in most cases
-				secure_string_ptr key;
+				/// The string used to identify this entry.
+				/// This will be the name of a website or service in most cases.
+				/// The identifier need not be unique.
+				secure_string_ptr id;
 
 				/// A list of passwords associated with the key
-				/// The most recent one is the "best" passwords, but older passwords are stored by means of a backup
+				/// The most recent one is the "best" passwords, but older passwords are stored by means of a backup.
 				password_collection passwords;
 
-				/// The username associated with the password
+				/// The username associated with the password.
 				secure_string_ptr username;
 
-				/// Can be used to store additional information with the key
+				/// Can be used to store additional information with the key.
 				secure_string_ptr additional_data;
 
 			public:
 
-				/// Constructs an entry with empty password and other values
+				/// Constructs an entry with empty password and other values.
 				entry();
 
 				/// Copy constructor
 				entry(const entry& other);
 
-				/// Returns the key associated with this entry
-				inline const secure_string& get_key() const { return *key; }
+				/// Returns the identifier associated with this entry
+				inline const secure_string& get_id() const { return *id; }
 
-				/// Modifies the key associated with this entry
-				inline void set_key(const secure_string& new_key) { key = make_secure_string(new_key); }
+				/// Modifies the identifier associated with this entry
+				inline void set_id(const secure_string& new_key) { id = make_secure_string(new_key); }
 
 				/// Returns an iterator to the first password
 				inline password_iterator passwords_begin() const { return passwords.begin(); }

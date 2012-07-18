@@ -24,7 +24,7 @@ using namespace deadlock::core::data;
 
 entry::entry()
 {
-	key = make_secure_string();
+	id = make_secure_string();
 	username = make_secure_string();
 	additional_data = make_secure_string();
 }
@@ -33,7 +33,7 @@ entry::entry(const entry& other)
 	:
 	// Copy the values; shared pointers are only used to manage per-instance storage,
 	// not to share ownership between instances.
-	key(make_secure_string(other.get_key())),
+	id(make_secure_string(other.get_id())),
 	username(make_secure_string(other.get_username())),
 	additional_data(make_secure_string(other.get_additional_data())),
 	passwords(other.passwords_begin(), other.passwords_end())
@@ -57,23 +57,23 @@ void entry::set_password(const secure_string& new_password)
 
 void entry::deserialise(const serialisation::json_value::object_t& json_data)
 {
-	// At least, a key and passwords should be present
-	if (json_data.find("key") == json_data.end() &&
-		json_data.find("key_hexadecimal") == json_data.end())
-		throw format_error("No key present for entry.");
+	// At least, an identifier and passwords should be present
+	if (json_data.find("id") == json_data.end() &&
+		json_data.find("id_hexadecimal") == json_data.end())
+		throw format_error("No identifier present for entry.");
 
 	if (json_data.find("passwords") == json_data.end())
 		throw format_error("No passwords present in entry.");
 
-	// Read the key
-	if (json_data.find("key") != json_data.end())
+	// Read the identifier
+	if (json_data.find("id") != json_data.end())
 	{
-		key = make_secure_string(json_data.at("key"));
+		id = make_secure_string(json_data.at("id"));
 	}
-	else // Read hexadecimal key
+	else // Read hexadecimal identifier
 	{
 		// No need to make a copy here, this instance simply takes over ownership from the temporary
-		key = from_hexadecimal_string(json_data.at("key_hexadecimal"));
+		id = from_hexadecimal_string(json_data.at("id_hexadecimal"));
 	}
 
 	// Read the username (if present)
@@ -134,9 +134,9 @@ void entry::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 	{
 		if (obfuscation)
 		{
-			// Write the key
-			serialiser.write_object_key("key_hexadecimal");
-			serialiser.write_string(*to_hexadecimal_string(*key));
+			// Write the identifier
+			serialiser.write_object_key("id_hexadecimal");
+			serialiser.write_string(*to_hexadecimal_string(*id));
 
 			// Write the username (if present)
 			if (!username->empty())
@@ -154,9 +154,9 @@ void entry::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 		}
 		else
 		{
-			// Write the key
-			serialiser.write_object_key("key");
-			serialiser.write_string(*key);
+			// Write the identifier
+			serialiser.write_object_key("id");
+			serialiser.write_string(*id);
 
 			// Write the username (if present)
 			if (!username->empty())
