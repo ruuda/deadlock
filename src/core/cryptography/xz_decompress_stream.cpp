@@ -110,7 +110,7 @@ xz_decompress_streambuffer::int_type xz_decompress_streambuffer::underflow()
 			setg(out_buffer, out_buffer + 0, out_buffer + out_length);
 
 			// Update input length, so we know when to fetch new data
-			in_length -= (xz_stream.next_in - reinterpret_cast<std::uint8_t*>(in_buffer));
+			in_length = xz_stream.avail_in;
 		}
 
 		output_done = output_done || (xz_result == LZMA_STREAM_END);
