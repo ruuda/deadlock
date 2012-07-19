@@ -16,6 +16,7 @@
 
 #include "cli.h"
 #include "../../core/errors.h"
+#include "../../core/data/secure_string.h"
 
 #include <iostream>
 #include <iomanip>
@@ -272,9 +273,31 @@ int cli::handle_add(po::variables_map& vm)
 		return EXIT_FAILURE;
 	}
 
-	//std::cout << "Encrypting and writing empty vault ...";
-	//vault.save(filename, key);
-	//std::cout << "\b\b\b\b, done." << std::endl;
+	// Retrieve the identifier from the command line and store it in a secure string.
+	// The secure string is simply easier to use in combination with the rest of the application;
+	// it adds no value since the data is insecure anyway.
+	data::secure_string_ptr id = data::make_secure_string(vm.at("add").as<std::string>());
+
+	// Make sure the key is not present already
+	if (std::find_if(vault.begin(), vault.end(), [&id](const entry& e)
+		{ return string_equals(e.get_id(), *id); }
+	) != vault.end())
+	{
+		std::cerr << "The entry '" << *id << "' exists already." << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	// Create the new entry
+	entry new_entry;
+	new_entry.set_id(*id);
+
+	// Add the entry to the vault
+	vault.add_entry(new_entry);
+
+	// Write the vault with the new contents
+	std::cout << "'" << *id << "' added, encrypting and writing vault ...";
+	vault.save(filename, key);
+	std::cout << "\b\b\b\b, done." << std::endl;
 
 	return EXIT_SUCCESS;
 }

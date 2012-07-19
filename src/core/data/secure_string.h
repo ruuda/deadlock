@@ -22,6 +22,7 @@
 #include <sstream>
 #include <istream>
 #include <ostream>
+#include <algorithm>
 #include "secure_allocator.h"
 
 namespace deadlock
@@ -66,6 +67,12 @@ namespace deadlock
 				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), 1, c);
 			}
 
+			/// Creates a secure string from an insecure string
+			inline secure_string_ptr make_secure_string(const std::string& str)
+			{
+				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str.begin(), str.end());
+			}
+
 			/// Prepends the character to the string and returns the shared pointer to the string
 			/// This modifies the stored string; it does not act on a copy
 			inline secure_string_ptr combine_secure_string(char c, secure_string_ptr str)
@@ -90,6 +97,13 @@ namespace deadlock
 			inline secure_stringstream_ptr make_secure_stringstream(const secure_string& str)
 			{
 				return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>(), str);
+			}
+
+			/// Returns whether two strings of diffent string type are equal
+			template <typename A1, typename A2>
+			inline bool string_equals(const A1& str1, const A2& str2)
+			{
+				return (str1.length() != str2.length()) ? false : std::equal(str1.begin(), str1.end(), str2.begin());
 			}
 		}
 	}
