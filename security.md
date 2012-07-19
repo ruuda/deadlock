@@ -20,7 +20,7 @@ Zeroing memory
 When memory is no longer used, the program gives it back to
 the operating system. After a while, the operating system
 can give this memory to a different program. By default,
-memory is never cleared, so the new program receives �garbadge�
+memory is never cleared, so the new program receives ‘garbadge’
 that is actually the data from the previous program.
 If that data happens to be unencrypted sensitive data,
 the other program could easily read the sensitive data.
