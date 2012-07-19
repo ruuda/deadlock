@@ -261,7 +261,7 @@ int cli::handle_add(po::variables_map& vm)
 	// Check for incorrect key
 	catch (incorrect_key_error&)
 	{
-		std::cerr << "The key is incorrect." << std::endl;
+		std::cerr << "The passphrase is incorrect." << std::endl;
 		return EXIT_FAILURE;
 	}
 	// If anything other goes wrong, report error.
