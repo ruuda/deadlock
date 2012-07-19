@@ -58,6 +58,13 @@ namespace deadlock
 			key_error(std::string const& msg) : crypt_error(msg) {}
 		};
 
+		/// Indicates that the used key is not the key that was used to encrypt data.
+		class _export incorrect_key_error : public key_error
+		{
+		public:
+			incorrect_key_error(std::string const& msg) : key_error(msg) {}
+		};
+
 		/// A problem related to compression or decompression
 		class _export xz_error : public std::runtime_error
 		{

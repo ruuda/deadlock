@@ -80,4 +80,9 @@ void save_load_test::run()
 
 	it++;
 	if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");
+
+	// Now try empty vault
+	vault third, fourth;
+	third.save("test_save_load_empty.dlk", key);
+	fourth.load("test_save_load_empty.dlk", key, *passphrase);
 }

@@ -32,63 +32,91 @@ std::string compression_stream_test::get_name()
 
 void compression_stream_test::run()
 {
-	// Create two initial vaults, one for import, one for export
-	vault first, second;
+	{
 
-	// Store two entries in the first vault
-	data::entry etr1;
-	etr1.set_username("Guybrush Threepwood"); // No need to use make_secure_string; security fails already due to hard-coded constants
-	etr1.set_id("Fictional Identifier 1");
-	etr1.set_password("correct horse battery staple");
-	etr1.set_additional_data("nothing");
-	first.add_entry(etr1);
+		// Create two initial vaults, one for import, one for export
+		vault first, second;
 
-	data::entry etr2;
-	etr2.set_username("Gordon Freeman");
-	etr2.set_id("Fictional Identifier 2");
-	etr2.set_password("the cake is a lie");
-	first.add_entry(etr2);
+		// Store two entries in the first vault
+		data::entry etr1;
+		etr1.set_username("Guybrush Threepwood"); // No need to use make_secure_string; security fails already due to hard-coded constants
+		etr1.set_id("Fictional Identifier 1");
+		etr1.set_password("correct horse battery staple");
+		etr1.set_additional_data("nothing");
+		first.add_entry(etr1);
 
-	// A stream to hold the compressed data
-	std::stringstream compressed_data_stream;
+		data::entry etr2;
+		etr2.set_username("Gordon Freeman");
+		etr2.set_id("Fictional Identifier 2");
+		etr2.set_password("the cake is a lie");
+		first.add_entry(etr2);
+
+		// A stream to hold the compressed data
+		std::stringstream compressed_data_stream;
 	
-	// A stream that compresses data
-	cryptography::xz_compress_stream compression_stream(compressed_data_stream, 6);
+		// A stream that compresses data
+		cryptography::xz_compress_stream compression_stream(compressed_data_stream, 6);
 
-	// Export and compress
-	// stringstream << compression_stream << vault
-	first.export_json(compression_stream, true);
-	compression_stream.flush();
+		// Export and compress
+		// stringstream << compression_stream << vault
+		first.export_json(compression_stream, true);
+		compression_stream.close();
 
-	// Seek to the beginning of the compressed data
-	compressed_data_stream.seekg(0, std::ios_base::beg);
+		// Seek to the beginning of the compressed data
+		compressed_data_stream.seekg(0, std::ios_base::beg);
 
-	// A stream that decompresses data
-	cryptography::xz_decompress_stream decompression_stream(compressed_data_stream);
+		// A stream that decompresses data
+		cryptography::xz_decompress_stream decompression_stream(compressed_data_stream);
 
-	// Decompress and import
-	// stringstream >> compression_stream >> vault
-	second.import_json(decompression_stream);
+		// Decompress and import
+		// stringstream >> compression_stream >> vault
+		second.import_json(decompression_stream);
 
 	
-	vault::const_entry_iterator it = second.begin();
+		vault::const_entry_iterator it = second.begin();
 
-	// Validate the first entry
-	if (it->get_username() != etr1.get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr1.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr1.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr1.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr1.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+		// Validate the first entry
+		if (it->get_username() != etr1.get_username()) throw std::runtime_error("Username not retrieved correctly.");
+		if (it->get_password().get_password() != etr1.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+		if (it->get_password().get_stored_time() != etr1.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+		if (it->get_id() != etr1.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+		if (it->get_additional_data() != etr1.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
+		it++;
 
-	// Validate the second entry
-	if (it->get_username() != etr2.get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr2.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr2.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr2.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr2.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+		// Validate the second entry
+		if (it->get_username() != etr2.get_username()) throw std::runtime_error("Username not retrieved correctly.");
+		if (it->get_password().get_password() != etr2.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+		if (it->get_password().get_stored_time() != etr2.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+		if (it->get_id() != etr2.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+		if (it->get_additional_data() != etr2.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
-	if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");
+		it++;
+		if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");
+
+	}
+
+	{
+		// Test little data
+
+		// A stream to hold the compressed data
+		std::stringstream compressed_data_stream;
+	
+		// A stream that compresses data
+		cryptography::xz_compress_stream compression_stream(compressed_data_stream, 6);
+
+		// Write something and flush
+		compression_stream << "hullo, world";
+		compression_stream.close();
+
+		// Seek to the beginning of the compressed data
+		compressed_data_stream.seekg(0, std::ios_base::beg);
+
+		// A stream that decompresses data
+		cryptography::xz_decompress_stream decompression_stream(compressed_data_stream);
+
+		// Decompress
+		std::string result; std::getline(decompression_stream, result);
+		if (result != "hullo, world") throw std::runtime_error("Compression or decompression failed for little data.");
+	}
 }

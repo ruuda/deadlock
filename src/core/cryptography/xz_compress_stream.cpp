@@ -64,9 +64,6 @@ void xz_compress_streambuffer::finalise()
 {
 	// When overflow is called with eof, it will finalise
 	overflow();
-
-	// If output is done, flush the output stream as well
-	output_stream.flush();
 }
 
 xz_compress_streambuffer::int_type xz_compress_streambuffer::overflow(int_type new_char)
@@ -101,7 +98,7 @@ xz_compress_streambuffer::int_type xz_compress_streambuffer::overflow(int_type n
 			out_length = buffer_size - xz_stream.avail_out;
 
 			// Write the bytes to the output stream
-			output_stream.write(out_buffer, out_length);
+			if (out_length > 0) output_stream.write(out_buffer, out_length);
 		}
 
 		output_done = output_done || (xz_result == LZMA_STREAM_END);
@@ -130,13 +127,8 @@ xz_compress_stream::~xz_compress_stream()
 
 }
 
-xz_compress_stream& xz_compress_stream::flush()
+void xz_compress_stream::close()
 {
-	// Do whatever the base would do on flush
-	std::basic_ostream<char>::flush();
-
 	// Finalise compression
 	streambuffer.finalise();
-
-	return *this;
 }

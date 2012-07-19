@@ -208,6 +208,15 @@ void vault::load(std::istream& input_stream, cryptography::key& key, const data:
 	// And a decompression stream that decompresses data
 	cryptography::xz_decompress_stream decompress_stream(decrypt_stream);
 
+	// Read 16 bytes before the compressed data from the encryption stream.
+	// Those bytes are used to validate that the encryption key is correct.
+	// (16 is the AES block size.)
+	for (size_t i = 0; i < 16; i++)
+	{
+		std::uint8_t c = decrypt_stream.get();
+		if (key.get_salt()[i] != c) throw incorrect_key_error("This key cannot correctly decrypt the data.");
+	}
+
 	// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
 	deserialise(decompress_stream);
 }
@@ -264,9 +273,18 @@ void vault::save(std::ostream& output_stream, const cryptography::key& key)
 	// And a compression stream that compresses data
 	cryptography::xz_compress_stream compress_stream(encrypt_stream, 6);
 
+	// Write 16 bytes before the compressed data to the encryption stream.
+	// Those bytes will be used to validate that the encryption key is correct.
+	// (16 is the AES block size.)
+	for (size_t i = 0; i < 16; i++)
+	{
+		encrypt_stream.put(key.get_salt()[i]);
+	}
+
 	// Write the JSON as follows: JSON >> XZ compress >> AES CBC encrypt >> file
 	serialise(compress_stream, false, false);
-	compress_stream.flush(); // Finalises compression, adds padding for encryption, and flushes
+	compress_stream.close(); // Finalises compression
+	encrypt_stream.close(); // Adds padding for encryption and encrypts the last block
 }
 
 void vault::save(const std::string& filename, const cryptography::key& key)

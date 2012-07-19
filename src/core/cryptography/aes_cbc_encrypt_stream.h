@@ -102,7 +102,7 @@ namespace deadlock
 				~aes_cbc_encrypt_stream();
 
 				/// Adds padding, and flushes the remaining block(s)
-				aes_cbc_encrypt_stream& flush();
+				void close();
 			};
 		}
 	}

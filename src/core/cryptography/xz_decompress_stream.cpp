@@ -30,8 +30,7 @@ xz_decompress_streambuffer::xz_decompress_streambuffer(std::basic_istream<char>&
 	xz_stream = xz_stream_init;
 
 	// Decompression flags
-	// TODO: is LZMA_CONCATENATED useful here?
-	const std::uint32_t flags = LZMA_TELL_UNSUPPORTED_CHECK | LZMA_CONCATENATED;
+	const std::uint32_t flags = LZMA_TELL_UNSUPPORTED_CHECK;
 	// No memory limit
 	const std::uint64_t memory_limit = std::numeric_limits<std::uint64_t>::max();
 
@@ -50,7 +49,7 @@ xz_decompress_streambuffer::xz_decompress_streambuffer(std::basic_istream<char>&
 	// Not done yet
 	input_done = false;
 	output_done = false;
-	in_length = buffer_size;
+	in_length = 0;
 	out_length = 0;
 }
 
@@ -74,18 +73,21 @@ xz_decompress_streambuffer::int_type xz_decompress_streambuffer::underflow()
 	// Run one iteration of decoding until there is something in the buffer
 	while (!output_done && out_length == 0)
 	{
-		// Attempt to read from the input buffer
-		input_stream.read(in_buffer + (buffer_size - in_length), in_length);
+		if (in_length == 0 && !input_done)
+		{
+			// Attempt to read from the input buffer
+			input_stream.read(in_buffer, buffer_size);
 
-		// Retrieve the number of characters in the buffer
-		in_length = (buffer_size - in_length) + input_stream.gcount();
+			// Retrieve the number of characters in the buffer
+			in_length = input_stream.gcount();
 
-		// Set xz input properties
-		xz_stream.next_in = reinterpret_cast<std::uint8_t*>(in_buffer);
-		xz_stream.avail_in = in_length;
+			// Set xz input properties
+			xz_stream.next_in = reinterpret_cast<std::uint8_t*>(in_buffer);
+			xz_stream.avail_in = in_length;
 
-		// If done, finalise the stream (decompress the remaining data), otherwise run with more input
-		input_done = input_stream.eof();
+			// If done, finalise the stream (decompress the remaining data), otherwise run with more input
+			input_done = input_stream.eof();
+		}
 		xz_action = input_done ? LZMA_FINISH : LZMA_RUN;
 
 		// Set xz stream properties
@@ -107,12 +109,8 @@ xz_decompress_streambuffer::int_type xz_decompress_streambuffer::underflow()
 			// Set the get pointer
 			setg(out_buffer, out_buffer + 0, out_buffer + out_length);
 
-			// Move data that was not consumed to the beginning of the buffer
-			in_length = (buffer_size - xz_stream.avail_in);
-			for (size_t i = in_length, j = 0; i < buffer_size; i++, j++)
-			{
-				in_buffer[j] = in_buffer[i];
-			}
+			// Update input length, so we know when to fetch new data
+			in_length -= (xz_stream.next_in - reinterpret_cast<std::uint8_t*>(in_buffer));
 		}
 
 		output_done = output_done || (xz_result == LZMA_STREAM_END);

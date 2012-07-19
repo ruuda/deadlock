@@ -64,9 +64,6 @@ void aes_cbc_encrypt_streambuffer::finalise()
 {
 	// When overflow is called with eof, it will finalise
 	overflow();
-
-	// If output is done, flush the output stream as well
-	output_stream.flush();
 }
 
 aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(int_type new_char)
@@ -174,13 +171,8 @@ aes_cbc_encrypt_stream::~aes_cbc_encrypt_stream()
 
 }
 
-aes_cbc_encrypt_stream& aes_cbc_encrypt_stream::flush()
+void aes_cbc_encrypt_stream::close()
 {
-	// Do whatever the base would do on flush
-	std::basic_ostream<char>::flush();
-
 	// Finalise encryption
 	streambuffer.finalise();
-
-	return *this;
 }

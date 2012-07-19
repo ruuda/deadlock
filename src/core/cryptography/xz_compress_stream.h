@@ -112,7 +112,7 @@ namespace deadlock
 
 				/// Marks the stream as done, and flushes the remaining data
 				/// This should only be called once.
-				xz_compress_stream& flush();
+				void close();
 			};
 		}
 	}

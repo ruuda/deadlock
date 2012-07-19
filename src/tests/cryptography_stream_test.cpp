@@ -47,7 +47,7 @@ void cryptography_stream_test::run()
 		cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
 		// Write some data
 		enc_stream << "12345678";
-		enc_stream.flush();
+		enc_stream.close();
 
 		// Validate length
 		std::string ciphertext = encrypted_data_stream.str();
@@ -78,7 +78,7 @@ void cryptography_stream_test::run()
 		cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
 		// Write some data
 		enc_stream << "abcdefghijklmnop";
-		enc_stream.flush();
+		enc_stream.close();
 
 		// Validate length
 		std::string ciphertext = encrypted_data_stream.str();
@@ -112,7 +112,7 @@ void cryptography_stream_test::run()
 		{
 			enc_stream.put(i);
 		}
-		enc_stream.flush();
+		enc_stream.close();
 
 		// Validate length
 		std::string ciphertext = encrypted_data_stream.str();

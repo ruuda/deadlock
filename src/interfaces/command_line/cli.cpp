@@ -217,14 +217,13 @@ int cli::handle_identify(po::variables_map& vm)
 		std::cout << format_ex.what() << std::endl;
 		return EXIT_SUCCESS;
 	}
-	catch (deadlock::core::version_error)
+	catch (deadlock::core::version_error&)
 	{
 		std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
 		std::cout << "No more information available due to a version mismatch." << std::endl;
 		return EXIT_SUCCESS;
 	}
-	// If xz fails, deserialisation fails, the format should be correct, but the passphrase is wrong
-	catch (serialisation::deserialisation_error& serialisation_ex)
+	catch (incorrect_key_error&)
 	{
 		std::cout << "Deadlock " << vault.get_version() << " vault." << std::endl;
 		std::cout << "PBKDF2 iterations: " << key.get_iterations() << "." << std::endl;
@@ -259,11 +258,10 @@ int cli::handle_add(po::variables_map& vm)
 	{
 		vault.load(filename, key, *passphrase);
 	}
-	// If xz fails, deserialisation fails.
-	// XZ would fail because the passphrase is incorrect (or because the file is damaged)
-	catch (serialisation::deserialisation_error& serialisation_ex)
+	// Check for incorrect key
+	catch (incorrect_key_error&)
 	{
-		std::cerr << "Unable to decrypt vault." << std::endl;
+		std::cerr << "The key is incorrect." << std::endl;
 		return EXIT_FAILURE;
 	}
 	// If anything other goes wrong, report error.
