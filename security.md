@@ -20,7 +20,7 @@ Zeroing memory
 When memory is no longer used, the program gives it back to
 the operating system. After a while, the operating system
 can give this memory to a different program. By default,
-memory is never cleared, so the new program receives ‘garbadge’
+memory is never cleared, so the new program receives ï¿½garbadgeï¿½
 that is actually the data from the previous program.
 If that data happens to be unencrypted sensitive data,
 the other program could easily read the sensitive data.
@@ -71,17 +71,17 @@ Best practices
     partition.
  4. Make sure your system has enough memory available.
  
- A note about open vaults
- ------------------------
- When you open a vault, it is decrypted, and stored in memory.
- All security measures are aimed at making sure that the
- unencrypted data cannot be accessed _after_ the memory
- has been released. When the unencrypted data is in memory,
- it is vulnerable. Of course it is, because if you can use it,
- anyone can. Deadlock only provides secure _storage_ of your data.
- 
- To read the unencrypted data from memory, an attacker must have
- access to the system. This could be physical access, but it 
- could be a virus as well. Deadlock is not concerned with these
- problems, because it is the user who should make sure that
- his system is free of viruses and physically secure.
+A note about open vaults
+------------------------
+When you open a vault, it is decrypted, and stored in memory.
+All security measures are aimed at making sure that the
+unencrypted data cannot be accessed _after_ the memory
+has been released. When the unencrypted data is in memory,
+it is vulnerable. Of course it is, because if you can use it,
+anyone can. Deadlock only provides secure _storage_ of your data.
+
+To read the unencrypted data from memory, an attacker must have
+access to the system. This could be physical access, but it 
+could be a virus as well. Deadlock is not concerned with these
+problems, because it is the user who should make sure that
+his system is free of viruses and physically secure.
