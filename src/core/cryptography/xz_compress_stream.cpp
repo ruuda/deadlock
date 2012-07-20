@@ -112,7 +112,8 @@ xz_compress_streambuffer::int_type xz_compress_streambuffer::overflow(int_type n
 		// Put the character in the buffer
 		in_buffer[0] = new_char;
 		// Reset the pointer (note that the next pointer is in_buffer + 1 because there already is a character now)
-		setp(in_buffer + 1, in_buffer + buffer_size);
+		setp(in_buffer, in_buffer + buffer_size);
+		pbump(1);
 	}
 
 	// Return 0 to indicate success

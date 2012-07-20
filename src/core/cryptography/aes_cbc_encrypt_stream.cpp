@@ -156,7 +156,8 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 		// Put the character in the buffer
 		plaintext[0] = new_char;
 		// Reset the pointer (note that the next pointer is plaintext + 1 because there already is a character now)
-		setp(plaintext + 1, plaintext + block_size);
+		setp(plaintext, plaintext + block_size);
+		pbump(1);
 	}
 	
 	// Return 0 to indicate success
