@@ -81,7 +81,7 @@ namespace deadlock
 				inline password_iterator passwords_end() const { return passwords.end(); }
 
 				/// Returns the current (most recent) password
-				inline const password& get_password() const;
+				const password& get_password() const;
 
 				/// Appends a new password to the list of passwords, making it the current password
 				void set_password(const secure_string& new_password);

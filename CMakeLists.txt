@@ -23,7 +23,7 @@ find_package(XZUtils REQUIRED)
 include_directories(${XZUtils_INCLUDE_DIR})
 link_directories(${XZUtils_LIBRARY_DIRS})
 
-SET(liblist boost_program_options)
+SET(liblist boost_program_options boost_chrono)
 
 # Deadlock requires C++11 support
 if (CMAKE_COMPILER_IS_GNUCXX)

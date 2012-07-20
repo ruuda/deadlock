@@ -17,3 +17,12 @@ add_library(libdeadlock SHARED ${DEADLOCK_CORE_HEADERS} ${DEADLOCK_CORE_SOURCES}
 target_link_libraries(libdeadlock ${LibTomCrypt_LIBRARIES})
 target_link_libraries(libdeadlock ${Boost_LIBRARIES})
 target_link_libraries(libdeadlock ${XZUtils_LIBRARIES})
+
+# Chrono requires librt to be linked
+if (CMAKE_COMPILER_IS_GNUCXX)
+target_link_libraries(libdeadlock -lrt)
+endif()
+
+if (CMAKE_C_COMPILER MATCHES clang)
+target_link_libraries(libdeadlock -lrt)
+endif()
