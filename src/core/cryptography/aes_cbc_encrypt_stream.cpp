@@ -40,12 +40,12 @@ aes_cbc_encrypt_streambuffer::aes_cbc_encrypt_streambuffer(std::basic_ostream<ch
 	}
 
 	// Set buffer pointers
-	_Init();
-	setp(plaintext, plaintext, plaintext + block_size);
+	setg(0, 0, 0);	
+	setp(plaintext, plaintext + block_size);
 
 	// Set up the crypt key
 	int err;
-	if (err = aes_setup(key.get_key(), key.key_size, 0, &skey) != CRYPT_OK)
+	if ((err = aes_setup(key.get_key(), key.key_size, 0, &skey)) != CRYPT_OK)
 		throw crypt_error("Could not initialise AES algorithm: " + std::string(error_to_string(err)));
 }
 
@@ -116,8 +116,8 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 
 	// Encrypt to IV (cyphertext of this block is the IV of the next block
 	int err;
-	if (err = aes_ecb_encrypt(reinterpret_cast<std::uint8_t*>(plaintext),
-							  reinterpret_cast<std::uint8_t*>(iv), &skey) != CRYPT_OK)
+	if ((err = aes_ecb_encrypt(reinterpret_cast<std::uint8_t*>(plaintext),
+							  reinterpret_cast<std::uint8_t*>(iv), &skey)) != CRYPT_OK)
 		throw crypt_error("Could not encrypt block: " + std::string(error_to_string(err)));
 
 	// Write to stream
@@ -142,8 +142,8 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 
 		// Encrypt to IV (cyphertext of this block is the IV of the next block
 		int err;
-		if (err = aes_ecb_encrypt(reinterpret_cast<std::uint8_t*>(plaintext),
-								  reinterpret_cast<std::uint8_t*>(iv), &skey) != CRYPT_OK)
+		if ((err = aes_ecb_encrypt(reinterpret_cast<std::uint8_t*>(plaintext),
+								  reinterpret_cast<std::uint8_t*>(iv), &skey)) != CRYPT_OK)
 			throw crypt_error("Could not encrypt block: " + std::string(error_to_string(err)));
 
 		// Write to stream
@@ -156,8 +156,11 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 		// Put the character in the buffer
 		plaintext[0] = new_char;
 		// Reset the pointer (note that the next pointer is plaintext + 1 because there already is a character now)
-		setp(plaintext, plaintext + 1, plaintext + block_size);
+		setp(plaintext + 1, plaintext + block_size);
 	}
+	
+	// Return 0 to indicate success
+	return 0;
 }
 
 aes_cbc_encrypt_stream::aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, const cryptography::key& dkey)

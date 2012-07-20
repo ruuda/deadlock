@@ -15,6 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "xz_decompress_stream.h"
+
+#include <limits>
+
 #include "../errors.h"
 #include "../data/secure_allocator.h"
 
@@ -42,7 +45,7 @@ xz_decompress_streambuffer::xz_decompress_streambuffer(std::basic_istream<char>&
 	}
 
 	// Set buffer pointers
-	_Init();
+	setp(0, 0);	
 	// The input buffer is empty to begin with
 	setg(out_buffer, out_buffer, out_buffer + 0);
 

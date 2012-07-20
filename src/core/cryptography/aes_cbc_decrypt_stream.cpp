@@ -29,12 +29,12 @@ aes_cbc_decrypt_streambuffer::aes_cbc_decrypt_streambuffer(std::basic_istream<ch
 	iv_read = false;
 
 	// Set buffer pointers
-	_Init();
+	setp(0, 0);
 	setg(plaintext, plaintext, plaintext + 0);
 
 	// Set up the crypt key
 	int err;
-	if (err = aes_setup(key.get_key(), key.key_size, 0, &skey) != CRYPT_OK)
+	if ((err = aes_setup(key.get_key(), key.key_size, 0, &skey)) != CRYPT_OK)
 		throw crypt_error("Could not initialise AES algorithm: " + std::string(error_to_string(err)));
 }
 
@@ -71,8 +71,8 @@ aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()
 
 	//  Decrypt one block
 	int err;
-	if (err = aes_ecb_decrypt(reinterpret_cast<std::uint8_t*>(ciphertext),
-							  reinterpret_cast<std::uint8_t*>(plaintext), &skey) != CRYPT_OK)
+	if ((err = aes_ecb_decrypt(reinterpret_cast<std::uint8_t*>(ciphertext),
+							  reinterpret_cast<std::uint8_t*>(plaintext), &skey)) != CRYPT_OK)
 		throw crypt_error("Could not decrypt block: " + std::string(error_to_string(err)));
 
 	// Undo the xor with the IV

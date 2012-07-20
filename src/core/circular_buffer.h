@@ -124,7 +124,7 @@ namespace deadlock
 				while (((*hex_string) >> std::setw(2) >> (*byte_string)) && (i < buffer_size))
 				{
 					// Create a new stringstream with the two characters
-					data::secure_stringstream_ptr byte_stream = data::make_secure_stringstream(byte_string);
+					data::secure_stringstream_ptr byte_stream = data::make_secure_stringstream(*byte_string);
 					// Read the integer value
 					int byte; (*byte_stream) >> std::hex >> byte;
 					buffer[i] = static_cast<std::uint8_t>(byte);

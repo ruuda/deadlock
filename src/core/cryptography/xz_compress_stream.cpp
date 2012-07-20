@@ -40,8 +40,8 @@ xz_compress_streambuffer::xz_compress_streambuffer(std::basic_ostream<char>& ost
 	}
 
 	// Set buffer pointers
-	_Init();
-	setp(in_buffer, in_buffer, in_buffer + buffer_size);
+	setg(0, 0, 0);
+	setp(in_buffer, in_buffer + buffer_size);
 
 	// Not done yet
 	input_done = false;
@@ -112,8 +112,11 @@ xz_compress_streambuffer::int_type xz_compress_streambuffer::overflow(int_type n
 		// Put the character in the buffer
 		in_buffer[0] = new_char;
 		// Reset the pointer (note that the next pointer is in_buffer + 1 because there already is a character now)
-		setp(in_buffer, in_buffer + 1, in_buffer + buffer_size);
+		setp(in_buffer + 1, in_buffer + buffer_size);
 	}
+
+	// Return 0 to indicate success
+	return 0;
 }
 
 xz_compress_stream::xz_compress_stream(std::basic_ostream<char>& ostr, int compression_level)

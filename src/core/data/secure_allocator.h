@@ -17,8 +17,9 @@
 #ifndef _DEADLOCK_CORE_DATA_SECURE_ALLOCATOR_H_
 #define _DEADLOCK_CORE_DATA_SECURE_ALLOCATOR_H_
 
-#include <allocators>
+//#include <allocators>
 #include <memory>
+#include <cstring> // for std::memset
 
 #define INCLUDE_WINDOWS_HEADERS
 #include "../win32.h"
@@ -49,14 +50,17 @@ namespace deadlock
 				/// An allocator that zeroes memory upon deallocation
 				/// Based on http://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
 				/// and http://stackoverflow.com/questions/3785582/how-to-write-a-password-safe-class
-				template <class T> class secure_allocator : public std::allocator<T>
+				template <typename T> class secure_allocator : public std::allocator<T>
 				{
 					public:
 
-						template<class U> struct rebind { typedef secure_allocator<U> other; };
+						typedef typename std::allocator<T>::pointer pointer;
+						typedef typename std::allocator<T>::size_type size_type;
+
+						template<typename U> struct rebind { typedef secure_allocator<U> other; };
 						secure_allocator() throw() {}
 						secure_allocator(const secure_allocator&) throw() {}
-						template <class U> secure_allocator(const secure_allocator<U>&) throw() {}
+						template <typename U> secure_allocator(const secure_allocator<U>&) throw() {}
 
 						void deallocate(pointer p, size_type num)
 						{

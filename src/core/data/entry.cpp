@@ -68,7 +68,7 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	// Read the identifier
 	if (json_data.find("id") != json_data.end())
 	{
-		id = make_secure_string(json_data.at("id"));
+		id = make_secure_string(static_cast<const secure_string&>(json_data.at("id")));
 	}
 	else // Read hexadecimal identifier
 	{
@@ -79,7 +79,7 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	// Read the username (if present)
 	if (json_data.find("username") != json_data.end())
 	{
-		username = make_secure_string(json_data.at("username"));
+		username = make_secure_string(static_cast<const secure_string&>(json_data.at("username")));
 	}
 	else if (json_data.find("username_hexadecimal") != json_data.end()) // Read hexadecimal password
 	{
@@ -90,7 +90,7 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 	// Read additional data (if present)
 	if (json_data.find("additional_data") != json_data.end())
 	{
-		additional_data = data::make_secure_string(json_data.at("additional_data"));
+		additional_data = data::make_secure_string(static_cast<const secure_string&>(json_data.at("additional_data")));
 	}
 	else if (json_data.find("additional_data_hexadecimal") != json_data.end()) // Read hexadecimal password
 	{
@@ -115,7 +115,7 @@ void entry::deserialise(const serialisation::json_value::object_t& json_data)
 
 		if (psswd.find("password") != psswd.end()) // Read normal password
 		{
-			password_str = make_secure_string(psswd.at("password"));
+			password_str = make_secure_string(static_cast<const secure_string&>(psswd.at("password")));
 		}
 		else // Read hexadecimal string password
 		{
