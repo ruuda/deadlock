@@ -47,21 +47,35 @@ namespace deadlock
 					/// The key that will be used throughout the session
 					core::cryptography::key key;
 
+					/// The file that the vault was loaded from
+					std::string vault_filename;
+
 					/// Asks the user for a passphrase
 					core::data::secure_string_ptr ask_passphrase() const;
 
-					/// Returns the vault filename if it is present,
-					/// otherwise prints a message and returns and returns an empty string.
-					std::string require_vault_filename(boost::program_options::variables_map& vm);
+					/// Tries to open the vault, asks the user for a passphrase in the process,
+					/// and returns whether the operation was successful.
+					/// If not, it prints an error message and returns false.
+					bool load_vault(const boost::program_options::variables_map& vm);
+
+					/// Sets the vault filename if it is present,
+					/// otherwise prints a message and returns false.
+					bool require_vault_filename(const boost::program_options::variables_map& vm);
 
 					/// Handles the 'new vault' logic
-					int handle_new(boost::program_options::variables_map& vm);
+					int handle_new(const boost::program_options::variables_map& vm);
 
 					/// Handles the 'identify' logic
-					int handle_identify(boost::program_options::variables_map& vm);
+					int handle_identify(const boost::program_options::variables_map& vm);
 
 					/// Handles the 'add' logic
-					int handle_add(boost::program_options::variables_map& vm);
+					int handle_add(const boost::program_options::variables_map& vm);
+
+					/// Handles the 'list' logic
+					int handle_list(const boost::program_options::variables_map& vm);
+
+					/// Handles the 'show' logic
+					int handle_show(const boost::program_options::variables_map& vm);
 			};
 		}
 	}

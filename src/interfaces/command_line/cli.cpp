@@ -43,7 +43,11 @@ int cli::run(int argc, char** argv)
 
 		("identify", "show information about the archive")
 
-		("add,a", po::value<std::string>(), "add a new entry to the vault, with the specified key")
+		("add,a", po::value<std::string>(), "add a new entry to the vault, with the specified identifier")
+
+		("show,s", po::value<std::string>(), "show the entry with the specified identifier")
+
+		("list,l", "list the identifiers of all stored entries")
 
 		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
@@ -77,6 +81,12 @@ int cli::run(int argc, char** argv)
 	{
 		return handle_add(vm);
 	}
+
+	// List all stored entries
+	if (vm.count("list"))
+	{
+		return handle_list(vm);
+	}	
 
 	// Create a new archive
 	else if (vm.count("new"))
@@ -132,21 +142,53 @@ secure_string_ptr cli::ask_passphrase() const
 	return passphrase;
 }
 
-std::string cli::require_vault_filename(po::variables_map& vm)
+bool cli::require_vault_filename(const po::variables_map& vm)
 {
 	if (!vm.count("vault") || vm.at("vault").as<std::string>().empty())
 	{
-		std::cout << "No vault specified." << std::endl;
-		return "";
+		std::cerr << "No vault specified." << std::endl;
+		return false;
 	}
 
-	return vm.at("vault").as<std::string>();
+	vault_filename = vm.at("vault").as<std::string>();
+	return true;
 }
 
-int cli::handle_new(po::variables_map& vm)
+bool cli::load_vault(const boost::program_options::variables_map& vm)
 {
-	std::string filename = require_vault_filename(vm);
-	if (filename.empty())
+	if (!require_vault_filename(vm))
+	{
+		return false;
+	}
+
+	// Ask the user for his passphrase
+	data::secure_string_ptr passphrase = ask_passphrase();	
+
+	// Try to load the vault
+	try
+	{
+		vault.load(vault_filename, key, *passphrase);
+	}
+	// Check for incorrect key
+	catch (incorrect_key_error&)
+	{
+		std::cerr << "The passphrase is incorrect." << std::endl;
+		return false;
+	}
+	// If anything other goes wrong, report error.
+	catch (std::runtime_error& ex)
+	{
+		std::cerr << "Could not open vault." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return false;
+	}
+	
+	return true;	
+}
+
+int cli::handle_new(const po::variables_map& vm)
+{
+	if (!require_vault_filename(vm))
 	{
 		return EXIT_FAILURE;
 	}
@@ -192,17 +234,26 @@ int cli::handle_new(po::variables_map& vm)
 	std::cout << "\b\b\b\b, done in " << std::setprecision(3) << duration << " seconds." << std::endl;
 
 	std::cout << "Encrypting and writing empty vault ...";
-	vault.save(filename, key);
+	try
+	{
+		vault.save(vault_filename, key);
+	}
+	catch (const std::runtime_error& ex)
+	{
+		std::cout << std::endl;
+		std::cerr << "Failed to write vault." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 	std::cout << "\b\b\b\b, done." << std::endl;
 
 	return EXIT_SUCCESS;
 }
 
 
-int cli::handle_identify(po::variables_map& vm)
+int cli::handle_identify(const po::variables_map& vm)
 {
-	std::string filename = require_vault_filename(vm);
-	if (filename.empty())
+	if (require_vault_filename(vm))
 	{
 		return EXIT_FAILURE;
 	}
@@ -210,7 +261,7 @@ int cli::handle_identify(po::variables_map& vm)
 	// Try to load the file, and see what happens
 	try
 	{
-		vault.load(filename, key, *data::make_secure_string("no_passphrase"));
+		vault.load(vault_filename, key, *data::make_secure_string("no_passphrase"));
 	}
 	// If a format exception is thrown, the file is not valid
 	catch (deadlock::core::format_error& format_ex)
@@ -243,33 +294,17 @@ int cli::handle_identify(po::variables_map& vm)
 	return EXIT_SUCCESS;
 }
 
-int cli::handle_add(po::variables_map& vm)
+int cli::handle_add(const po::variables_map& vm)
 {
-	std::string filename = require_vault_filename(vm);
-	if (filename.empty())
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
 	{
 		return EXIT_FAILURE;
 	}
 
-	// Ask the user for his passphrase
-	data::secure_string_ptr passphrase = ask_passphrase();	
-
-	// Try to load the vault
-	try
+	// Open the vault
+	if(!load_vault(vm))
 	{
-		vault.load(filename, key, *passphrase);
-	}
-	// Check for incorrect key
-	catch (incorrect_key_error&)
-	{
-		std::cerr << "The passphrase is incorrect." << std::endl;
-		return EXIT_FAILURE;
-	}
-	// If anything other goes wrong, report error.
-	catch (std::runtime_error& ex)
-	{
-		std::cerr << "Could not open vault." << std::endl;
-		std::cerr << ex.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -296,8 +331,41 @@ int cli::handle_add(po::variables_map& vm)
 
 	// Write the vault with the new contents
 	std::cout << "'" << *id << "' added, encrypting and writing vault ...";
-	vault.save(filename, key);
+	try
+	{
+		vault.save(vault_filename, key);
+	}
+	catch (const std::runtime_error& ex)
+	{
+		std::cout << std::endl;
+		std::cerr << "Failed to write vault." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 	std::cout << "\b\b\b\b, done." << std::endl;
+
+	return EXIT_SUCCESS;
+}
+
+int cli::handle_list(const po::variables_map& vm)
+{
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Open the vault
+	if(!load_vault(vm))
+	{
+		return EXIT_FAILURE;
+	}
+	
+	// Print out the identifiers of every entry, one per line
+	for (auto i = vault.begin(); i != vault.end(); i++)
+	{
+		std::cout << i->get_id() << std::endl;
+	}
 
 	return EXIT_SUCCESS;
 }
