@@ -20,6 +20,8 @@
 #include <istream>
 #include <ostream>
 
+#include <boost/iterator/indirect_iterator.hpp>
+
 #include "version.h"
 #include "circular_buffer.h"
 #include "data/entry_collection.h"
@@ -64,8 +66,8 @@ namespace deadlock
 
 		public:
 
-			typedef data::entry_collection::entry_iterator entry_iterator;
-			typedef data::entry_collection::const_entry_iterator const_entry_iterator;
+			typedef boost::indirect_iterator<data::entry_collection::entry_iterator> entry_iterator;
+			typedef boost::indirect_iterator<data::entry_collection::const_entry_iterator> const_entry_iterator;
 
 			/// Creates an empty vault
 			vault();
@@ -74,7 +76,7 @@ namespace deadlock
 			inline const version& get_version() const { return file_version; }
 
 			/// Adds a new entry to the collection
-			void add_entry(const data::entry& tr);
+			void add_entry(data::entry_ptr new_entry);
 
 			/// Returns an iterator to the first entry
 			inline entry_iterator begin() { return entries.begin(); }

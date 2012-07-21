@@ -15,14 +15,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "cli.h"
-#include "../../core/errors.h"
-#include "../../core/data/secure_string.h"
 
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include <string>
 #include <boost/chrono.hpp>
+#include <forward_list>
+
+#include "../../core/errors.h"
+#include "../../core/data/secure_string.h"
+#include "../../core/search.h"
 
 namespace po = boost::program_options;
 using namespace deadlock::interfaces::command_line;
@@ -47,7 +50,8 @@ int cli::run(int argc, char** argv)
 
 		("show,s", po::value<std::string>(), "show the entry with the specified identifier")
 
-		("list,l", "list the identifiers of all stored entries")
+		("list,l", po::value<std::string>()->implicit_value(""), "list the identifiers of all stored entries, " \
+																 "or all the entries that match the search criteria")
 
 		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
@@ -323,8 +327,8 @@ int cli::handle_add(const po::variables_map& vm)
 	}
 
 	// Create the new entry
-	entry new_entry;
-	new_entry.set_id(*id);
+	entry_ptr new_entry = data::make_entry();
+	new_entry->set_id(*id);
 
 	// Add the entry to the vault
 	vault.add_entry(new_entry);
@@ -360,11 +364,37 @@ int cli::handle_list(const po::variables_map& vm)
 	{
 		return EXIT_FAILURE;
 	}
-	
-	// Print out the identifiers of every entry, one per line
-	for (auto i = vault.begin(); i != vault.end(); i++)
+
+	// If no argument was given, print all stored entries
+	if (vm.at("list").as<std::string>().empty())
+	{	
+		// Print out the identifiers of every entry, one per line
+		for (auto i = vault.begin(); i != vault.end(); i++)
+		{
+			std::cout << i->get_id() << std::endl;
+		}
+	}
+	else // Otherwise, print only the entries that match the search query
 	{
-		std::cout << i->get_id() << std::endl;
+		// Retrieve the identifier from the command line and store it in a secure string.
+		// The secure string is simply easier to use in combination with the rest of the application;
+		// it adds no value since the data is insecure anyway.
+		data::secure_string_ptr query = data::make_secure_string(vm.at("list").as<std::string>());
+
+		// Create a search algorithm
+		deadlock::core::search search;
+
+		// Search results
+		std::forward_list<data::entry_ptr> results;
+
+		// Now execute the search
+		search.find_matches(*query, vault.begin(), vault.end(), std::front_inserter(results));
+
+		// And print the identifiers of the matches, one per line
+		for (auto i = results.begin(); i != results.end(); i++)
+		{
+			std::cout << (*i)->get_id() << std::endl;
+		}
 	}
 
 	return EXIT_SUCCESS;

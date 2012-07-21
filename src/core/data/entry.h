@@ -18,6 +18,7 @@
 #define _DEADLOCK_CORE_DATA_ENTRY_H_
 
 #include <vector>
+#include <memory>
 
 #include "password.h"
 
@@ -25,6 +26,7 @@
 #include "../circular_buffer.h"
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
+#include "secure_allocator.h"
 
 namespace deadlock
 {
@@ -32,12 +34,17 @@ namespace deadlock
 	{
 		namespace data
 		{
+			class entry;
+
+			typedef std::shared_ptr<entry> entry_ptr;
+
 			/// An entry for the collection, containing a password and username
 			/// This contains one single item for the collection (identified by a key),
 			/// A collection of passwords associated with it,
 			/// a username and additional data
 			class _export entry
 			{
+
 			public:
 
 				typedef std::vector<password, data::detail::secure_allocator<password>> password_collection;
@@ -106,6 +113,18 @@ namespace deadlock
 				/// If it is false, it will write the data "as-is".
 				void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 			};
+
+			/// Constructs an empty entry with the secure allocator
+			inline entry_ptr make_entry()
+			{
+				return std::allocate_shared<entry>(detail::secure_allocator<entry>());
+			}
+
+			/// Copies an entry with the secure allocator
+			inline entry_ptr make_entry(const entry& other)
+			{
+				return std::allocate_shared<entry>(detail::secure_allocator<entry>(), other);
+			}
 		}
 	}
 }

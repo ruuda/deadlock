@@ -36,9 +36,9 @@ vault::vault()
 
 }
 
-void vault::add_entry(const data::entry& tr)
+void vault::add_entry(data::entry_ptr new_entry)
 {
-	entries.push_back(tr);
+	entries.push_back(new_entry);
 }
 
 void vault::deserialise(const serialisation::json_value::object_t& json_data)

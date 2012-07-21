@@ -18,6 +18,7 @@
 #define _DEADLOCK_CORE_DATA_ENTRY_COLLECTION_H_
 
 #include <vector>
+#include <memory>
 
 #include "entry.h"
 #include "../serialisation/value.h"
@@ -39,12 +40,13 @@ namespace deadlock
 			protected:
 
 				/// The list of entries
-				std::vector<entry, detail::secure_allocator<entry>> entries;
+				std::vector<std::shared_ptr<entry>> entries;
 
 			public:
 
-				typedef std::vector<entry, detail::secure_allocator<entry>>::iterator entry_iterator;
-				typedef std::vector<entry, detail::secure_allocator<entry>>::const_iterator const_entry_iterator;
+				typedef std::shared_ptr<entry> entry_ptr;
+				typedef std::vector<entry_ptr>::iterator entry_iterator;
+				typedef std::vector<entry_ptr>::const_iterator const_entry_iterator;
 
 				/// Reconstructs the entries given the JSON data
 				void deserialise(const serialisation::json_value::array_t& json_data);
@@ -55,11 +57,7 @@ namespace deadlock
 				void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 
 				/// Adds a new entry to the collection
-				void push_back(const entry& new_entry);
-
-				/// Returns a list of entries that could match the specified search pattern,
-				/// sorted by match probability
-				std::vector<entry*> find_entries(const data::secure_string& search) const;
+				void push_back(entry_ptr entry);
 
 				/// Returns an iterator to the first entry
 				inline entry_iterator begin() { return entries.begin(); }

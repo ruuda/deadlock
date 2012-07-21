@@ -38,17 +38,17 @@ void compression_stream_test::run()
 		vault first, second;
 
 		// Store two entries in the first vault
-		data::entry etr1;
-		etr1.set_username("Guybrush Threepwood"); // No need to use make_secure_string; security fails already due to hard-coded constants
-		etr1.set_id("Fictional Identifier 1");
-		etr1.set_password("correct horse battery staple");
-		etr1.set_additional_data("nothing");
+		data::entry_ptr etr1 = data::make_entry();
+		etr1->set_username("Guybrush Threepwood"); // No need to use make_secure_string; security fails already due to hard-coded constants
+		etr1->set_id("Fictional Identifier 1");
+		etr1->set_password("correct horse battery staple");
+		etr1->set_additional_data("nothing");
 		first.add_entry(etr1);
 
-		data::entry etr2;
-		etr2.set_username("Gordon Freeman");
-		etr2.set_id("Fictional Identifier 2");
-		etr2.set_password("the cake is a lie");
+		data::entry_ptr etr2 = data::make_entry();
+		etr2->set_username("Gordon Freeman");
+		etr2->set_id("Fictional Identifier 2");
+		etr2->set_password("the cake is a lie");
 		first.add_entry(etr2);
 
 		// A stream to hold the compressed data
@@ -76,20 +76,20 @@ void compression_stream_test::run()
 		vault::const_entry_iterator it = second.begin();
 
 		// Validate the first entry
-		if (it->get_username() != etr1.get_username()) throw std::runtime_error("Username not retrieved correctly.");
-		if (it->get_password().get_password() != etr1.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-		if (it->get_password().get_stored_time() != etr1.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-		if (it->get_id() != etr1.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-		if (it->get_additional_data() != etr1.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+		if (it->get_username() != etr1->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+		if (it->get_password().get_password() != etr1->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+		if (it->get_password().get_stored_time() != etr1->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+		if (it->get_id() != etr1->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+		if (it->get_additional_data() != etr1->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
 		it++;
 
 		// Validate the second entry
-		if (it->get_username() != etr2.get_username()) throw std::runtime_error("Username not retrieved correctly.");
-		if (it->get_password().get_password() != etr2.get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-		if (it->get_password().get_stored_time() != etr2.get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-		if (it->get_id() != etr2.get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-		if (it->get_additional_data() != etr2.get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+		if (it->get_username() != etr2->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+		if (it->get_password().get_password() != etr2->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+		if (it->get_password().get_stored_time() != etr2->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+		if (it->get_id() != etr2->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+		if (it->get_additional_data() != etr2->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
 		it++;
 		if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");

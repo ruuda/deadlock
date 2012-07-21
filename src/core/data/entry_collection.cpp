@@ -21,7 +21,7 @@
 using namespace deadlock::core;
 using namespace deadlock::core::data;
 
-void entry_collection::push_back(const entry& new_entry)
+void entry_collection::push_back(entry_ptr new_entry)
 {
 	entries.push_back(new_entry);
 
@@ -34,9 +34,9 @@ void entry_collection::deserialise(const serialisation::json_value::array_t& jso
 	for (size_t i = 0; i < json_data.size(); i++)
 	{
 		// Add a new, blank entry to the collection
-		entries.push_back(entry());
+		entries.push_back(make_entry());
 		// Load the correct data into it
-		entries.back().deserialise(json_data[i]);
+		entries.back()->deserialise(json_data[i]);
 	}
 
 	// TODO: generate acceleration structure
@@ -50,46 +50,8 @@ void entry_collection::serialise(serialisation::serialiser& serialiser, bool obf
 		// Loop through the entries and write them
 		for (size_t i = 0; i < entries.size(); i++)
 		{
-			entries[i].serialise(serialiser, obfuscation);
+			entries[i]->serialise(serialiser, obfuscation);
 		}
 	}
 	serialiser.write_end_array();
-}
-
-// A helper structure for the search algorithm
-struct entry_match
-{
-	entry* entry;
-	int probability;
-};
-
-// By defining this operator, std::less works, and this allows the priority queue to work
-bool operator<(const entry_match& m1, const entry_match& m2)
-{
-	return m1.probability < m2.probability;
-}
-
-std::vector<entry*> entry_collection::find_entries(const data::secure_string& search) const
-{
-	std::priority_queue<entry_match> matches;
-
-	// First of all, make the search string lowercase
-	data::secure_string_ptr str = make_secure_string(search);
-	// TODO: UTF-8 tolower, and what about the locale?
-	// Is there a better way to do this?
-	std::for_each(str->begin(), str->end(), [](char& c) { c = std::tolower(c, std::locale()); });
-
-	// TODO: find results
-
-	// A vector with the results
-	std::vector<entry*> result;
-
-	// Copy the found matches in the correct order
-	while (!matches.empty())
-	{
-		result.push_back(matches.top().entry);
-		matches.pop();
-	}
-
-	return result;
 }
