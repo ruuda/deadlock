@@ -18,6 +18,9 @@
 #define _DEADLOCK_CORE_SEARCH_H_
 
 #include <queue>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 #include "win32.h"
 #include "data/secure_string.h"
@@ -64,6 +67,25 @@ namespace deadlock
 					return lower;
 				}
 
+				/// Splits a string into words on whitspace
+				inline data::secure_string_vector get_words(const data::secure_string& str) const
+				{
+					data::secure_string_vector words;
+
+					data::secure_stringstream_ptr iss = data::make_secure_stringstream(str);
+					std::copy(std::istream_iterator<data::secure_string>(*iss),
+						      std::istream_iterator<data::secure_string>(),
+						      std::back_inserter(words));
+
+					return words;
+				}
+
+				/// Returns how similar the two strings are
+				int match_words(const data::secure_string& needle, const data::secure_string& haystack) const;
+
+				/// Checks every word against every other word, and accumulates the matches
+				int cross_match_words(const data::secure_string_vector& needles, const data::secure_string_vector& haystacks) const;
+
 				/// Considers all entries and, given the search string, puts all matches in a priority queue.
 				template <typename IndirectIterator> std::priority_queue<detail::entry_match>
 				find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
@@ -72,6 +94,9 @@ namespace deadlock
 
 					// First of all, make the search string lowercase
 					data::secure_string_ptr query_lower = tolower(query);
+
+					// Split the query into words
+					data::secure_string_vector query_words = get_words(*query_lower);
 
 					// Now search through the entries
 					for (IndirectIterator i = begin; i != end; i++)
@@ -82,6 +107,9 @@ namespace deadlock
 						// Make the identifier lowercase as well
 						data::secure_string_ptr id_lower = tolower(i->get_id());
 
+						// And split it into words too
+						data::secure_string_vector id_words = get_words(*id_lower);
+
 						// If the match is perfect, set a high probability
 						if (*id_lower == *query_lower)
 						{
@@ -90,6 +118,9 @@ namespace deadlock
 							// If the match is case-sensistive, the probability is even higher
 							if (i->get_id() == query) probability += 50;
 						}
+
+						// Cross check the words
+						probability += cross_match_words(query_words, id_words);
 
 						// If a match was found, add it to the queue
 						if (probability > 0)

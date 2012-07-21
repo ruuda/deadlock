@@ -21,7 +21,7 @@
 #include <cmath>
 #include <string>
 #include <boost/chrono.hpp>
-#include <forward_list>
+#include <list>
 
 #include "../../core/errors.h"
 #include "../../core/data/secure_string.h"
@@ -148,9 +148,6 @@ secure_string_ptr cli::ask_passphrase() const
 		}
 	}
 	while (passphrase->empty());
-
-	// Write an empty line to separate the input from the output of the program
-	std::cout << std::endl;
 
 	return passphrase;
 }
@@ -394,10 +391,10 @@ int cli::handle_list(const po::variables_map& vm)
 		deadlock::core::search search;
 
 		// Search results
-		std::forward_list<data::entry_ptr> results;
+		std::list<data::entry_ptr> results;
 
 		// Now execute the search
-		search.find_matches(*query, vault.begin(), vault.end(), std::front_inserter(results));
+		search.find_matches(*query, vault.begin(), vault.end(), std::back_inserter(results));
 
 		// And print the identifiers of the matches, one per line
 		for (auto i = results.begin(); i != results.end(); i++)

@@ -18,6 +18,7 @@
 #define _DEADLOCK_CORE_DATA_SECURE_STRING_H_
 
 #include <memory>
+#include <vector>
 #include <string>
 #include <sstream>
 #include <istream>
@@ -42,6 +43,9 @@ namespace deadlock
 
 			/// Shared pointer to a secure stringstream
 			typedef std::shared_ptr<secure_stringstream> secure_stringstream_ptr;
+
+			/// Vector of secure strings
+			typedef std::vector<secure_string, detail::secure_allocator<secure_string>> secure_string_vector;
 
 			/// Constructs an empty secure string
 			inline secure_string_ptr make_secure_string()
