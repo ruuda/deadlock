@@ -36,6 +36,12 @@ If you compile LibTomCrypt on a 64-bit Unix-like system,
 you must explicitly set `CXXFLAGS=-fPIC` to make the library work in
 the dynamically linked Deadlock core library.
 
+XZ Utils
+--------
+Vault contents are compressed before they are encrypted,
+using LZMA2 encryption. Deadlock uses [XZ Utils](http://tukaani.org/xz/) (liblzma)
+for this. You can either build the libraries yourself, or use
+one of the pre-built versions.
 
 Generating a configuration with CMake
 =====================================
