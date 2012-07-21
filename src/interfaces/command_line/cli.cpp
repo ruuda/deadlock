@@ -48,7 +48,7 @@ int cli::run(int argc, char** argv)
 
 		("add,a", po::value<std::string>(), "add a new entry to the vault, with the specified identifier")
 
-		("show,s", po::value<std::string>(), "show the entry with the specified identifier")
+		("show,g", po::value<std::string>(), "show the entry with the specified identifier")
 
 		("list,l", po::value<std::string>()->implicit_value(""), "list the identifiers of all stored entries, " \
 																 "or all the entries that match the search criteria")
@@ -84,6 +84,12 @@ int cli::run(int argc, char** argv)
 	if (vm.count("add"))
 	{
 		return handle_add(vm);
+	}
+
+	// Show the details of one entry
+	if (vm.count("show"))
+	{
+		return handle_show(vm);
 	}
 
 	// List all stored entries
@@ -142,6 +148,9 @@ secure_string_ptr cli::ask_passphrase() const
 		}
 	}
 	while (passphrase->empty());
+
+	// Write an empty line to separate the input from the output of the program
+	std::cout << std::endl;
 
 	return passphrase;
 }
@@ -398,4 +407,56 @@ int cli::handle_list(const po::variables_map& vm)
 	}
 
 	return EXIT_SUCCESS;
+}
+
+int cli::handle_show(const po::variables_map& vm)
+{
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Open the vault
+	if(!load_vault(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Retrieve the identifier from the command line and store it in a secure string.
+	// The secure string is simply easier to use in combination with the rest of the application;
+	// it adds no value since the data is insecure anyway.
+	data::secure_string_ptr query = data::make_secure_string(vm.at("show").as<std::string>());
+
+	// Create a search algorithm
+	deadlock::core::search search;
+
+	// Now execute the search
+	data::entry_ptr result = search.find_match(*query, vault.begin(), vault.end());
+
+	if (result != nullptr)
+	{
+
+		// Write the identifier first
+		std::cout << result->get_id() << std::endl;
+		// Followed by the username if it is set
+		if (!result->get_username().empty())
+		{
+			std::cout << "Username: " << result->get_username() << std::endl;
+		}
+		// Then the most recent password
+		std::cout << "Password: " << result->get_password().get_password() << std::endl;
+		// Followed by additional data (if set)
+		if (!result->get_additional_data().empty())
+		{
+			std::cout << "Additional data: " << result->get_additional_data() << std::endl;
+		}
+	
+		return EXIT_SUCCESS;
+	}
+	else // The entry was not found
+	{
+		std::cout << "Nothing found that resembles '" << *query << "'." << std::endl;
+		return EXIT_FAILURE;
+	}
 }

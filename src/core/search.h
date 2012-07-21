@@ -64,13 +64,9 @@ namespace deadlock
 					return lower;
 				}
 
-			public:
-
-				/// Creates a new search algorithm
-				search();
-
-				template <typename IndirectIterator, typename OutputIterator>
-				void find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end, OutputIterator output_iterator) const
+				/// Considers all entries and, given the search string, puts all matches in a priority queue.
+				template <typename IndirectIterator> std::priority_queue<detail::entry_match>
+				find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
 				{
 					std::priority_queue<detail::entry_match> matches;
 
@@ -106,13 +102,43 @@ namespace deadlock
 						}
 					}
 
+					return matches;
+				}
+
+			public:
+
+				/// Creates a new search algorithm
+				search();
+
+				/// Scans through the entries defined by begin and end,
+				/// and appends all matches to the output iterator in order of match probability.
+				template <typename IndirectIterator, typename OutputIterator>
+				void find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end, OutputIterator output_iterator) const
+				{
+					// First, find all matches
+					// They are roughly sorted in the priority queue.
+					std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
+
 					// Copy the found matches in the correct order
+					// This ensures that they are sorted correctly.
 					while (!matches.empty())
 					{
 						output_iterator = matches.top().entry;
 						output_iterator++;
 						matches.pop();
 					}
+				}
+
+				/// Returns the best match given the query, or nullptr if none was found.
+				template <typename IndirectIterator>
+				data::entry_ptr find_match(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
+				{
+					// First, find all matches
+					// They are roughly sorted in the priority queue, only the top is guaranteed to be sorted correctly.
+					const std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
+
+					// Becayse the top is sorted correctly, the best match is at the top, and the rest need not be sorted.
+					return matches.empty() ? nullptr : matches.top().entry;
 				}
 		};
 	}
