@@ -241,7 +241,7 @@ int cli::handle_new(const po::variables_map& vm)
 	key.generate_key(*passphrase, key_iterations);
 	auto end_time = boost::chrono::high_resolution_clock::now();
 	double duration = static_cast<double>((end_time - start_time).count()) / 1.0e9;
-	std::cout << "\b\b\b\b, done in " << std::setprecision(3) << duration << " seconds." << std::endl;
+	std::cout << "\b\b\b\b, done in " << std::setprecision(2) << std::fixed << duration << " seconds." << std::endl;
 
 	std::cout << "Encrypting and writing empty vault ...";
 	try
