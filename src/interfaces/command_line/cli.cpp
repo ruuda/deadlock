@@ -263,7 +263,7 @@ int cli::handle_new(const po::variables_map& vm)
 
 int cli::handle_identify(const po::variables_map& vm)
 {
-	if (require_vault_filename(vm))
+	if (!require_vault_filename(vm))
 	{
 		return EXIT_FAILURE;
 	}
