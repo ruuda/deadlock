@@ -17,6 +17,7 @@
 #include "cli.h"
 
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <cmath>
 #include <string>
@@ -50,7 +51,7 @@ int cli::run(int argc, char** argv)
 
 		("show,g", po::value<std::string>(), "show the entry with the specified identifier")
 
-		("list,l", po::value<std::string>()->implicit_value(""), "list the identifiers of all stored entries, " \
+		("list,l", po::value<std::string>(), "list the identifiers of all stored entries, " \
 																 "or all the entries that match the search criteria")
 
 		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
@@ -72,6 +73,14 @@ int cli::run(int argc, char** argv)
 		po::store(
 			po::command_line_parser(argc, argv).
 			options(desc).positional(p).run(), vm);
+
+		// Fix argument precedence
+		if (!vm.count("vault") && vm.count("list"))
+		{
+			vm.insert(std::make_pair("vault", vm.at("list")));
+			vm.at("list").as<std::string>() = std::string();
+		}
+
 		po::notify(vm);
 	}
 	catch (std::exception& ex)
@@ -161,6 +170,17 @@ bool cli::require_vault_filename(const po::variables_map& vm)
 	}
 
 	vault_filename = vm.at("vault").as<std::string>();
+
+	// Make sure the vault exists
+	std::ifstream vault_file;
+	vault_file.open(vault_filename, std::ios_base::in);
+	if (!vault_file.good())
+	{
+		std::cerr << "The file does not exist." << std::endl;
+		return false;
+	}
+	vault_file.close();
+
 	return true;
 }
 
