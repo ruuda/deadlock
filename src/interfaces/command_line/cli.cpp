@@ -50,10 +50,12 @@ int cli::run(int argc, char** argv)
 		("add,a", po::value<std::string>(), "add a new entry to the vault, with the specified identifier")
 
 		("show,g", po::value<std::string>(), "show the entry with the specified identifier")
+		("historical", "show all passwords, including old ones")
 
 		("set,s", po::value<std::string>(), "set a field for the specified entry")
 		("id", po::value<std::string>(), "set the identifier for an entry")
 		("username", po::value<std::string>(), "set the username for an entry")
+		("password", po::value<std::string>(), "set a new password for an entry")
 		("additional-data", po::value<std::string>(), "set additional data for an entry")
 
 		("list,l", po::value<std::string>(), "list the identifiers of all stored entries, " \
@@ -280,6 +282,18 @@ bool cli::set_fields(const po::variables_map& vm, data::entry_ptr entr)
 		data::secure_string_ptr username = data::make_secure_string(vm.at("username").as<std::string>());
 		// Set the new username.
 		entr->set_username(*username);
+
+		anything_set |= true;
+	}
+
+	// Handle adding a new password
+	if (vm.count("password"))
+	{
+		// Retrieve the password from the command line and store it in a secure string.
+		// Please note that this is severely insecure anyway, because the terminal probably caches the password.
+		data::secure_string_ptr password = data::make_secure_string(vm.at("password").as<std::string>());
+		// Set the new password.
+		entr->set_password(*password);
 
 		anything_set |= true;
 	}
@@ -546,8 +560,42 @@ int cli::handle_show(const po::variables_map& vm)
 		{
 			std::cout << "Username: " << result->get_username() << std::endl;
 		}
-		// Then the most recent password
-		std::cout << "Password: " << result->get_password().get_password() << std::endl;
+
+		// Then the most recent password(s)
+		if (vm.count("historical"))
+		{
+			std::cout << "Passwords:" << std::endl;
+			// Print all passwords including date
+			for (auto i = result->passwords_begin(); i != result->passwords_end(); i++)
+			{
+				// Indent the list by one space
+				std::cout << " ";
+
+				// Get the time that the password was stored
+				time_t timestamp = i->get_stored_time();
+				std::tm* store_time = std::localtime(&timestamp);
+
+				// Print in a (hopefully non-ambiguous) format
+				std::cout << std::setw(4) << std::setfill('0') << std::fixed << (store_time->tm_year + 1900) << "-";
+				std::cout << std::setw(2) << std::setfill('0') << std::fixed << (store_time->tm_mon + 1) << "-";
+				std::cout << std::setw(2) << std::setfill('0') << std::fixed << (store_time->tm_mday) << " ";
+				std::cout << std::setw(2) << std::setfill('0') << std::fixed << (store_time->tm_hour) << ":";
+				std::cout << std::setw(2) << std::setfill('0') << std::fixed << (store_time->tm_min) << ":";
+				std::cout << std::setw(2) << std::setfill('0') << std::fixed << (store_time->tm_sec) << " ";
+
+				// Write the password itself
+				std::cout << i->get_password() << std::endl;
+			}
+
+			// Clear the static tm variable
+			time_t clear_timestamp = 0;
+			std::localtime(&clear_timestamp);
+		}
+		else // Only the most recent password
+		{
+			std::cout << "Password: " << result->get_password().get_password() << std::endl;
+		}
+		
 		// Followed by additional data (if set)
 		if (!result->get_additional_data().empty())
 		{
