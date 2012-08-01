@@ -62,6 +62,10 @@ namespace deadlock
 					/// otherwise prints a message and returns false.
 					bool require_vault_filename(const boost::program_options::variables_map& vm);
 
+					/// Sets identifier, username, or additional data fields for an entry.
+					/// Returns wheher any value was set.
+					bool set_fields(const boost::program_options::variables_map& vm, deadlock::core::data::entry_ptr entr);
+
 					/// Handles the 'new vault' logic
 					int handle_new(const boost::program_options::variables_map& vm);
 
@@ -76,6 +80,9 @@ namespace deadlock
 
 					/// Handles the 'show' logic
 					int handle_show(const boost::program_options::variables_map& vm);
+
+					/// Handles the 'set' logic
+					int handle_set(const boost::program_options::variables_map& vm);
 			};
 		}
 	}

@@ -51,6 +51,11 @@ int cli::run(int argc, char** argv)
 
 		("show,g", po::value<std::string>(), "show the entry with the specified identifier")
 
+		("set,s", po::value<std::string>(), "set a field for the specified entry")
+		("id", po::value<std::string>(), "set the identifier for an entry")
+		("username", po::value<std::string>(), "set the username for an entry")
+		("additional-data", po::value<std::string>(), "set additional data for an entry")
+
 		("list,l", po::value<std::string>(), "list the identifiers of all stored entries, " \
 																 "or all the entries that match the search criteria")
 
@@ -89,16 +94,22 @@ int cli::run(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	// Add entry to archive
-	if (vm.count("add"))
-	{
-		return handle_add(vm);
-	}
-
 	// Show the details of one entry
 	if (vm.count("show"))
 	{
 		return handle_show(vm);
+	}
+
+	// Set fields for one entry
+	if (vm.count("set"))
+	{
+		return handle_set(vm);
+	}
+
+	// Add entry to archive
+	if (vm.count("add"))
+	{
+		return handle_add(vm);
 	}
 
 	// List all stored entries
@@ -114,7 +125,7 @@ int cli::run(int argc, char** argv)
 	}
 
 	// Print help message
-	else if (vm.count("help"))
+	if (vm.count("help"))
 	{
 		std::cout << "Deadlock password manager" << std::endl;
 		std::cout << "Licensed under the GNU Public Licence" << std::endl;
@@ -124,13 +135,13 @@ int cli::run(int argc, char** argv)
 	}
 
 	// Give information about an archive
-	else if (vm.count("identify"))
+	if (vm.count("identify"))
 	{
 		return handle_identify(vm);
 	}
 
 	// Print version
-	else if (vm.count("version"))
+	if (vm.count("version"))
 	{
 		std::cout << "Deadlock command-line interface (deadlock_cli)" << std::endl;
 		std::cout << "Using libdeadlock " << deadlock::core::assembly_information::get_version() << std::endl;
@@ -139,6 +150,34 @@ int cli::run(int argc, char** argv)
 
 	return EXIT_SUCCESS;
 }
+
+#if defined (_WIN32)
+
+/// Disables echo to allow password input
+void set_echo(bool do_echo)
+{
+	DWORD  mode;
+	HANDLE hConsole = GetStdHandle(STD_INPUT_HANDLE);
+	GetConsoleMode(hConsole, &mode);
+	if (do_echo)
+	{
+		mode = mode | ENABLE_ECHO_INPUT;
+	}
+	else
+	{
+		mode = mode & ~ENABLE_ECHO_INPUT;
+	}
+	SetConsoleMode(hConsole, mode);
+}
+
+#else
+
+void set_echo(bool do_echo)
+{
+
+}
+
+#endif
 
 secure_string_ptr cli::ask_passphrase() const
 {
@@ -149,7 +188,10 @@ secure_string_ptr cli::ask_passphrase() const
 		// Ask for a passphrase
 		// TODO: use the secure variant that does not write to the console
 		std::cout << "Passphrase: ";
+		set_echo(false);
 		std::getline(std::cin, *passphrase);
+		set_echo(true);
+		std::cout << std::endl; // Print a newline, because the enter from getline is not echoed.
 
 		if (passphrase->empty())
 		{
@@ -214,6 +256,46 @@ bool cli::load_vault(const boost::program_options::variables_map& vm)
 	}
 	
 	return true;	
+}
+
+bool cli::set_fields(const po::variables_map& vm, data::entry_ptr entr)
+{
+	bool anything_set = false;
+
+	// Handle setting identifier
+	if (vm.count("id"))
+	{
+		// Retrieve the identifier from the command line and store it in a secure string.
+		data::secure_string_ptr id = data::make_secure_string(vm.at("id").as<std::string>());
+		// Set the new identifier.
+		entr->set_id(*id);
+
+		anything_set |= true;
+	}
+
+	// Handle setting username
+	if (vm.count("username"))
+	{
+		// Retrieve the username from the command line and store it in a secure string.
+		data::secure_string_ptr username = data::make_secure_string(vm.at("username").as<std::string>());
+		// Set the new username.
+		entr->set_username(*username);
+
+		anything_set |= true;
+	}
+
+	// Handle setting additional data
+	if (vm.count("additional-data"))
+	{
+		// Retrieve the additional data from the command line and store it in a secure string.
+		data::secure_string_ptr additional_data = data::make_secure_string(vm.at("additional-data").as<std::string>());
+		// Set the new additional_data.
+		entr->set_additional_data(*additional_data);
+
+		anything_set |= true;
+	}
+
+	return anything_set;
 }
 
 int cli::handle_new(const po::variables_map& vm)
@@ -356,6 +438,9 @@ int cli::handle_add(const po::variables_map& vm)
 	entry_ptr new_entry = data::make_entry();
 	new_entry->set_id(*id);
 
+	// Set additional fiels on the entry, if specified
+	set_fields(vm, new_entry);
+
 	// Add the entry to the vault
 	vault.add_entry(new_entry);
 
@@ -470,6 +555,66 @@ int cli::handle_show(const po::variables_map& vm)
 		}
 	
 		return EXIT_SUCCESS;
+	}
+	else // The entry was not found
+	{
+		std::cout << "Nothing found that resembles '" << *query << "'." << std::endl;
+		return EXIT_FAILURE;
+	}
+}
+
+int cli::handle_set(const po::variables_map& vm)
+{
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Open the vault
+	if(!load_vault(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Retrieve the identifier from the command line and store it in a secure string.
+	// The secure string is simply easier to use in combination with the rest of the application;
+	// it adds no value since the data is insecure anyway.
+	data::secure_string_ptr query = data::make_secure_string(vm.at("set").as<std::string>());
+
+	// Create a search algorithm
+	deadlock::core::search search;
+
+	// Now execute the search
+	data::entry_ptr result = search.find_match(*query, vault.begin(), vault.end());
+
+	if (result != nullptr)
+	{
+		// Change values for the entry
+		if (set_fields(vm, result))
+		{
+			// Write the vault with the updated entry
+			std::cout << "'" << result->get_id() << "' updated, encrypting and writing vault ...";
+			try
+			{
+				vault.save(vault_filename, key);
+			}
+			catch (const std::runtime_error& ex)
+			{
+				std::cout << std::endl;
+				std::cerr << "Failed to write vault." << std::endl;
+				std::cerr << ex.what() << std::endl;
+				return EXIT_FAILURE;
+			}
+			std::cout << "\b\b\b\b, done." << std::endl;
+
+			return EXIT_SUCCESS;
+		}
+		else // No field specified to set
+		{
+			std::cerr << "No fields specified to set." << std::endl;
+			return EXIT_FAILURE;
+		}		
 	}
 	else // The entry was not found
 	{

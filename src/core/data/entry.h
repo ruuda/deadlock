@@ -79,7 +79,7 @@ namespace deadlock
 				inline const secure_string& get_id() const { return *id; }
 
 				/// Modifies the identifier associated with this entry
-				inline void set_id(const secure_string& new_key) { id = make_secure_string(new_key); }
+				inline void set_id(const secure_string& new_id) { id = make_secure_string(new_id); }
 
 				/// Returns an iterator to the first password
 				inline password_iterator passwords_begin() const { return passwords.begin(); }
