@@ -32,16 +32,13 @@ or download an archive from the website.
 A Visual Studio project is included with the library.
 To build a 64-bit binary, simply add a new target to the project.
 
-If you compile LibTomCrypt on a 64-bit Unix-like system,
-you must explicitly set `CXXFLAGS=-fPIC` to make the library work in
-the dynamically linked Deadlock core library.
-
 XZ Utils
 --------
 Vault contents are compressed before they are encrypted,
 using LZMA2 encryption. Deadlock uses [XZ Utils](http://tukaani.org/xz/) (liblzma)
-for this. You can either build the libraries yourself, or use
-one of the pre-built versions.
+for this. On Windows, you can either build the libraries yourself, or use
+one of the pre-built versions. On Unix-like systems, you probably have liblzma
+installed already, or you can install it via your package manager.
 
 Generating a configuration with CMake
 =====================================

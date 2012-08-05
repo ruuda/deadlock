@@ -13,7 +13,7 @@ source_group("core\\serialisation" FILES ${DEADLOCK_CORE_SERIALISATION_FILES})
 file(GLOB_RECURSE DEADLOCK_CORE_HEADERS *.h)
 file(GLOB_RECURSE DEADLOCK_CORE_SOURCES *.cpp)
 
-add_library(libdeadlock SHARED ${DEADLOCK_CORE_HEADERS} ${DEADLOCK_CORE_SOURCES})
+add_library(libdeadlock STATIC ${DEADLOCK_CORE_HEADERS} ${DEADLOCK_CORE_SOURCES})
 target_link_libraries(libdeadlock ${LibTomCrypt_LIBRARIES})
 target_link_libraries(libdeadlock ${Boost_LIBRARIES})
 target_link_libraries(libdeadlock ${XZUtils_LIBRARIES})
