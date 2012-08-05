@@ -205,7 +205,7 @@ secure_string_ptr cli::ask_passphrase() const
 	return passphrase;
 }
 
-bool cli::require_vault_filename(const po::variables_map& vm)
+bool cli::require_vault_filename(const po::variables_map& vm, bool must_exist)
 {
 	if (!vm.count("vault") || vm.at("vault").as<std::string>().empty())
 	{
@@ -214,6 +214,9 @@ bool cli::require_vault_filename(const po::variables_map& vm)
 	}
 
 	vault_filename = vm.at("vault").as<std::string>();
+
+	// If file is not requied to exist, only specifying a name is enough.
+	if (!must_exist) return true;
 
 	// Make sure the vault exists
 	std::ifstream vault_file;
@@ -314,7 +317,7 @@ bool cli::set_fields(const po::variables_map& vm, data::entry_ptr entr)
 
 int cli::handle_new(const po::variables_map& vm)
 {
-	if (!require_vault_filename(vm))
+	if (!require_vault_filename(vm, false))
 	{
 		return EXIT_FAILURE;
 	}

@@ -60,7 +60,7 @@ namespace deadlock
 
 					/// Sets the vault filename if it is present,
 					/// otherwise prints a message and returns false.
-					bool require_vault_filename(const boost::program_options::variables_map& vm);
+					bool require_vault_filename(const boost::program_options::variables_map& vm, bool must_exist = true);
 
 					/// Sets identifier, username, or additional data fields for an entry.
 					/// Returns wheher any value was set.
