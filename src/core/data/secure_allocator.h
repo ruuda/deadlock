@@ -21,7 +21,6 @@
 #include <memory>
 #include <cstring> // for std::memset
 
-#define INCLUDE_WINDOWS_HEADERS
 #include "../win32.h"
 
 namespace deadlock

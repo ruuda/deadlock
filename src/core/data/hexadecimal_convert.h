@@ -22,8 +22,6 @@
 
 #include "secure_string.h"
 
-#include "../win32.h"
-
 namespace deadlock
 {
 	namespace core

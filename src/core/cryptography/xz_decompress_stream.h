@@ -33,7 +33,7 @@ namespace deadlock
 			{
 
 				/// The XZ streambuffer that decompresses data
-				class _export xz_decompress_streambuffer : public std::basic_streambuf<char>
+				class xz_decompress_streambuffer : public std::basic_streambuf<char>
 				{
 				protected:
 
@@ -86,7 +86,7 @@ namespace deadlock
 			}
 
 			/// A stream that reads compressed data from the underlying stream, and provides the decompressed data
-			class _export xz_decompress_stream : public std::basic_istream<char>
+			class  xz_decompress_stream : public std::basic_istream<char>
 			{
 			protected:
 

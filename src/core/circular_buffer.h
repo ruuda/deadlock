@@ -23,7 +23,6 @@
 #include <iomanip>
 
 #include "data/secure_string.h"
-#include "win32.h"
 
 namespace deadlock
 {

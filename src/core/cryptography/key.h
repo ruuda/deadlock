@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <string>
 
-#include "../win32.h"
 #include "../circular_buffer.h"
 
 namespace deadlock
@@ -31,7 +30,7 @@ namespace deadlock
 		{
 			/// Wraps the PKCS5 PBKDF2 key derivation function,
 			/// and securely stores a cryptographic key
-			class _export key
+			class key
 			{
 			public:
 

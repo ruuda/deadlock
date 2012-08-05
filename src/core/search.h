@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include "win32.h"
 #include "data/secure_string.h"
 #include "data/entry.h"
 
@@ -33,7 +32,7 @@ namespace deadlock
 		namespace detail
 		{
 			// A helper structure for the search algorithm
-			struct _export entry_match
+			struct entry_match
 			{
 				data::entry_ptr entry;
 				int probability;
@@ -48,7 +47,7 @@ namespace deadlock
 
 		/// Contains the search logic that intelligently
 		/// identifies entries based on a search string
-		class _export search
+		class search
 		{
 			protected:
 

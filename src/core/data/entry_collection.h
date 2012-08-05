@@ -24,7 +24,6 @@
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
 #include "secure_allocator.h"
-#include "../win32.h"
 
 namespace deadlock
 {
@@ -35,7 +34,7 @@ namespace deadlock
 			/// A container that stores all entries.
 			/// It also contains an acceleration structure, used to do fast searches,
 			/// and it handles finding possible matches for a given search string.
-			class _export entry_collection
+			class entry_collection
 			{
 			protected:
 

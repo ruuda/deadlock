@@ -21,8 +21,6 @@
 
 #include "secure_string.h"
 
-#include "../win32.h"
-
 namespace deadlock
 {
 	namespace core
@@ -30,7 +28,7 @@ namespace deadlock
 		namespace data
 		{
 			/// Keeps a password and the date-time it was stored
-			class _export password
+			class password
 			{
 			protected:
 

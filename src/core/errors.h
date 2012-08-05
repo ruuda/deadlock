@@ -24,49 +24,47 @@ extern "C"
 	#include <lzma.h>
 }
 
-#include "win32.h"
-
 namespace deadlock
 {
 	namespace core
 	{
 		/// Indicates a problem with reading a vault
-		class _export format_error: public std::runtime_error
+		class format_error: public std::runtime_error
 		{
 		public:
 			format_error(std::string const& msg) : std::runtime_error(msg) {}
 		};
 
 		/// Indicates a version mismatch
-		class _export version_error: public std::runtime_error
+		class version_error: public std::runtime_error
 		{
 		public:
 			version_error(std::string const& msg) : std::runtime_error(msg) {}
 		};
 
 		/// Indicates a cryptographic problem
-		class _export crypt_error : public std::runtime_error
+		class crypt_error : public std::runtime_error
 		{
 		public:
 			crypt_error(std::string const& msg): std::runtime_error(msg) {}
 		};
 
 		/// Indicates a problem with the key
-		class _export key_error: public crypt_error
+		class key_error: public crypt_error
 		{
 		public:
 			key_error(std::string const& msg) : crypt_error(msg) {}
 		};
 
 		/// Indicates that the used key is not the key that was used to encrypt data.
-		class _export incorrect_key_error : public key_error
+		class incorrect_key_error : public key_error
 		{
 		public:
 			incorrect_key_error(std::string const& msg) : key_error(msg) {}
 		};
 
 		/// A problem related to compression or decompression
-		class _export xz_error : public std::runtime_error
+		class xz_error : public std::runtime_error
 		{
 		public:
 

@@ -22,7 +22,6 @@
 
 #include "password.h"
 
-#include "../win32.h"
 #include "../circular_buffer.h"
 #include "../serialisation/value.h"
 #include "../serialisation/serialiser.h"
@@ -42,7 +41,7 @@ namespace deadlock
 			/// This contains one single item for the collection (identified by a key),
 			/// A collection of passwords associated with it,
 			/// a username and additional data
-			class _export entry
+			class entry
 			{
 
 			public:

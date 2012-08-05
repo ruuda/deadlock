@@ -28,7 +28,6 @@ extern "C"
 }
 
 #include "key.h"
-#include "../win32.h"
 
 namespace deadlock
 {
@@ -39,7 +38,7 @@ namespace deadlock
 			namespace detail
 			{
 				/// The encryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
-				class _export aes_cbc_encrypt_streambuffer : public std::basic_streambuf<char>
+				class aes_cbc_encrypt_streambuffer : public std::basic_streambuf<char>
 				{
 				protected:
 
@@ -86,7 +85,7 @@ namespace deadlock
 
 			/// A stream that encrypts the data written to it, and writes that data to the underlying stream
 			/// The stream uses 256-bit key AES in CBC mode with a random initialisation vector
-			class _export aes_cbc_encrypt_stream : public std::basic_ostream<char>
+			class aes_cbc_encrypt_stream : public std::basic_ostream<char>
 			{
 			protected:
 

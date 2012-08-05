@@ -19,14 +19,12 @@
 
 #include "vault.h"
 
-#include "win32.h"
-
 namespace deadlock
 {
 	namespace core
 	{
 		/// Provides information about Deadlock
-		class _export assembly_information
+		class assembly_information
 		{
 		public:
 

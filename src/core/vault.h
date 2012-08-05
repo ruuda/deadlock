@@ -29,8 +29,6 @@
 #include "serialisation/serialiser.h"
 #include "cryptography/key.h"
 
-#include "win32.h"
-
 namespace deadlock
 {
 	namespace core
@@ -38,7 +36,7 @@ namespace deadlock
 		/// Represents one 'vault' of passwords
 		/// The vault contains the collection of passwords,
 		/// properties, and can be written and loaded.
-		class _export vault
+		class vault
 		{
 		protected:
 

@@ -27,8 +27,6 @@ extern "C"
 	#include <lzma.h>
 }
 
-#include "../win32.h"
-
 namespace deadlock
 {
 	namespace core
@@ -38,7 +36,7 @@ namespace deadlock
 			namespace detail
 			{
 				/// The XZ streamuffer that compresses data
-				class _export xz_compress_streambuffer : public std::basic_streambuf<char>
+				class xz_compress_streambuffer : public std::basic_streambuf<char>
 				{
 				protected:
 
@@ -95,7 +93,7 @@ namespace deadlock
 			}
 
 			/// A stream that compresses the data written to it, and writes that data to the underlying stream
-			class _export xz_compress_stream : public std::basic_ostream<char>
+			class xz_compress_stream : public std::basic_ostream<char>
 			{
 			protected:
 

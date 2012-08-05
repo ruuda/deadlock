@@ -21,8 +21,6 @@
 #include <ostream>
 #include <istream>
 
-#include "win32.h"
-
 namespace deadlock
 {
 	namespace core
@@ -30,7 +28,7 @@ namespace deadlock
 		/// Represents a version as a 32-bit integer
 		/// 8-bits are reserved for the major number, minor number, revision and build number.
 		/// (That means there should not be more than 255 builds of one revision)
-		struct _export version
+		struct version
 		{
 			std::uint8_t major;
 
@@ -76,10 +74,10 @@ namespace deadlock
 		};
 
 		/// Compares two versions
-		_export bool operator<(version v1, version v2);
+		bool operator<(version v1, version v2);
 
 		/// Compares two versions
-		_export bool operator<=(version v1, version v2);
+		bool operator<=(version v1, version v2);
 	}
 }
 
