@@ -35,6 +35,12 @@ using namespace deadlock::core::data;
 
 int cli::run(int argc, char** argv)
 {
+	#ifdef _WIN32
+	// On Windows, set the console to UTF-8 output encoded text, and expect UTF-8 encoded input
+	SetConsoleCP(65001);
+	SetConsoleOutputCP(65001);
+	#endif
+
 	// Declare the supported options
 	po::options_description desc("Supported commands", 80, 40);
 	desc.add_options()
@@ -61,10 +67,10 @@ int cli::run(int argc, char** argv)
 		("list,l", po::value<std::string>(), "list the identifiers of all stored entries, " \
 																 "or all the entries that match the search criteria")
 
-		("export", po::value<std::string>(), "export the archive to JSON (removes encryption)")
+		("export", po::value<std::string>(), "export the vault to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
 
-		("import", po::value<std::string>(), "import the archive from JSON (appends to an archive)")
+		("import", po::value<std::vector<std::string>>(), "append unencrypted JSON vault(s) to the vault")
 
 		("vault", po::value<std::string>()->implicit_value(""), "the vault to operate on");
 	;
@@ -118,7 +124,19 @@ int cli::run(int argc, char** argv)
 	if (vm.count("list"))
 	{
 		return handle_list(vm);
-	}	
+	}
+
+	// Export a vault to plain JSON (removes encryption/compression)
+	else if (vm.count("export"))
+	{
+		return handle_export(vm);
+	}
+
+	// Imports plain JSON into the encrypted vault
+	else if (vm.count("import"))
+	{
+		return handle_import(vm);
+	}
 
 	// Create a new archive
 	else if (vm.count("new"))
@@ -379,6 +397,42 @@ int cli::handle_new(const po::variables_map& vm)
 	return EXIT_SUCCESS;
 }
 
+int cli::handle_export(const po::variables_map& vm)
+{
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Open the vault
+	if(!load_vault(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Retrieve the file to save to
+	std::string json_file = vm.at("export").as<std::string>();
+
+	bool obfuscation = !vm.count("plain");
+
+	// Export the vault as JSON with hexadecimal entries, or plain JSON if --plain was specified
+	std::cout << "Exporting vault as " << (obfuscation ? "JSON with hexadecimal-encoded entries" : "plain JSON") << " ...";
+	try
+	{
+		vault.export_json(json_file, obfuscation);
+	}
+	catch (const std::runtime_error& ex)
+	{
+		std::cout << std::endl;
+		std::cerr << "Failed to write JSON." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	std::cout << "\b\b\b\b, done." << std::endl;
+
+	return EXIT_SUCCESS;
+}
 
 int cli::handle_identify(const po::variables_map& vm)
 {
@@ -463,6 +517,58 @@ int cli::handle_add(const po::variables_map& vm)
 
 	// Write the vault with the new contents
 	std::cout << "'" << *id << "' added, encrypting and writing vault ...";
+	try
+	{
+		vault.save(vault_filename, key);
+	}
+	catch (const std::runtime_error& ex)
+	{
+		std::cout << std::endl;
+		std::cerr << "Failed to write vault." << std::endl;
+		std::cerr << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+	std::cout << "\b\b\b\b, done." << std::endl;
+
+	return EXIT_SUCCESS;
+}
+
+int cli::handle_import(const po::variables_map& vm)
+{
+	// Make sure the user specified a vault to use
+	if (!require_vault_filename(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Open the vault
+	if(!load_vault(vm))
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Retrieve all specified import files (multiple files can be joined in one command)
+	std::vector<std::string> json_files = vm.at("import").as<std::vector<std::string>>();
+
+	// Import every file specified
+	for (auto i = json_files.begin(); i != json_files.end(); i++)
+	{
+		try
+		{
+			// Import JSON file
+			vault.import_json(*i);
+		}
+		catch (const std::runtime_error& ex)
+		{
+			std::cout << std::endl;
+			std::cerr << "Failed to import " << *i << "." << std::endl;
+			std::cerr << ex.what() << std::endl;
+			return EXIT_FAILURE;
+		}
+	}
+
+	// Write the vault with the new contents
+	std::cout << (json_files.size() > 1 ? "Files" : "File") << " imported, encrypting and writing vault ...";
 	try
 	{
 		vault.save(vault_filename, key);

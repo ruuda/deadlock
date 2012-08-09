@@ -69,11 +69,17 @@ namespace deadlock
 					/// Handles the 'new vault' logic
 					int handle_new(const boost::program_options::variables_map& vm);
 
+					/// Handles exporting a vault to JSON
+					int handle_export(const boost::program_options::variables_map& vm);
+
 					/// Handles the 'identify' logic
 					int handle_identify(const boost::program_options::variables_map& vm);
 
 					/// Handles the 'add' logic
 					int handle_add(const boost::program_options::variables_map& vm);
+
+					/// Handles importing JSON into a vault
+					int handle_import(const boost::program_options::variables_map& vm);
 
 					/// Handles the 'list' logic
 					int handle_list(const boost::program_options::variables_map& vm);
