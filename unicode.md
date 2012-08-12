@@ -51,5 +51,7 @@ you can use `cat` to display the UTF-8 characters.
 
     $ deadlock -g github vault.dlk | cat
 
-Windows does send through the input command-line parameters
-correctly, so you need not take special care of those.
+Windows does **not** send through the input command-line parameters
+correctly, so you cannot correctly pass non-ASCII characters
+to the program on Windows. Please note that those characters will
+work in some cases, but they will cause malformed UTF-8 text.
