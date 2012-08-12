@@ -72,6 +72,9 @@ namespace deadlock
 					/// Handles exporting a vault to JSON
 					int handle_export(const boost::program_options::variables_map& vm);
 
+					/// Handles decrypting and exporting the internal JSON structure, without deserialisation/serialisation.
+					int handle_export_raw(const std::string& input_filename, const std::string& output_filename);
+
 					/// Handles the 'identify' logic
 					int handle_identify(const boost::program_options::variables_map& vm);
 

@@ -28,6 +28,8 @@
 #include "serialisation/deserialiser.h"
 #include "serialisation/serialiser.h"
 #include "cryptography/key.h"
+#include "cryptography/aes_cbc_decrypt_stream.h"
+#include "cryptography/xz_decompress_stream.h"
 
 namespace deadlock
 {
@@ -119,6 +121,16 @@ namespace deadlock
 			/// Loads an encrypted binary vault from a stream.
 			/// This also generates the correct key.
 			void load(std::istream& input_stream, cryptography::key& key, const data::secure_string& passphrase);
+
+			/// Builds a stream that reads a Deadlock vault from input_stream,
+			/// and allows the plaintext data to be read from the resulting decompression stream.
+			/// This will put the correct key in key, and version of the vault in vault_version.
+			/// decrypt_stream will contain the decryption stream, which should be deleted after use, but not used directly.
+			/// decompress_stream will contain the decompression stream from which the plaintext can be read.
+			/// decompress_stream should also be deleted after use.
+			static void build_decrypt_stream(std::istream& input_stream, version& vault_version, cryptography::key& key,
+				cryptography::aes_cbc_decrypt_stream*& decrypt_stream,
+				cryptography::xz_decompress_stream*& decompress_stream, const data::secure_string& passphrase);
 		};
 	}
 }

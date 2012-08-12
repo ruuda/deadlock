@@ -69,6 +69,7 @@ int cli::run(int argc, char** argv)
 
 		("export", po::value<std::string>(), "export the vault to JSON (removes encryption)")
 		("plain", "save data as plain text instead of hexadecimal representation")
+		("raw", "decrypt the internal JSON structure without interpretation")
 
 		("import", po::value<std::vector<std::string>>(), "append unencrypted JSON vault(s) to the vault")
 
@@ -405,14 +406,17 @@ int cli::handle_export(const po::variables_map& vm)
 		return EXIT_FAILURE;
 	}
 
+	// Retrieve the file to save to
+	std::string json_file = vm.at("export").as<std::string>();
+
+	// If the --raw option has been specified, decrypt the vault contents without interpreting them.
+	if (vm.count("raw")) return handle_export_raw(vm.at("vault").as<std::string>(), json_file);
+
 	// Open the vault
 	if(!load_vault(vm))
 	{
 		return EXIT_FAILURE;
 	}
-
-	// Retrieve the file to save to
-	std::string json_file = vm.at("export").as<std::string>();
 
 	bool obfuscation = !vm.count("plain");
 
@@ -432,6 +436,99 @@ int cli::handle_export(const po::variables_map& vm)
 	std::cout << "\b\b\b\b, done." << std::endl;
 
 	return EXIT_SUCCESS;
+}
+
+int cli::handle_export_raw(const std::string& input_filename, const std::string& output_filename)
+{
+	// Ask the user for his passphrase
+	data::secure_string_ptr passphrase = ask_passphrase();	
+
+	// Open the file
+	std::ifstream input_file(input_filename, std::ios::binary);
+
+	if (!input_file.good())
+	{
+		std::cerr << "Could not open file." << std::endl;
+		return EXIT_FAILURE;
+	}
+	else
+	{
+		// Now open the file to which the raw contents should be written
+		std::ofstream output_file(output_filename);
+
+		if (!output_file.good())
+		{
+			input_file.close();
+			std::cerr << "Could not open file for writing." << std::endl;
+			return EXIT_FAILURE;
+		}
+		else
+		{
+			// TODO: use shared pointers here
+			cryptography::aes_cbc_decrypt_stream* decrypt_stream = nullptr;
+			cryptography::xz_decompress_stream* decompress_stream = nullptr;
+			core::version file_version;
+
+			try
+			{
+				// Build streams from which plaintext can be read
+				vault::build_decrypt_stream(input_file, file_version, key, decrypt_stream, decompress_stream, *passphrase);
+
+				std::cout << "Decrypting vault ...";
+
+				// Copy every character
+				int character;
+				while ((character = decompress_stream->get()) != std::char_traits<char>::eof())
+				{
+					output_file.put(character);
+				}
+
+				std::cout << "\b\b\b\b, done." << std::endl;
+
+				// Free resources
+				if (decrypt_stream != nullptr) delete decrypt_stream;
+				if (decompress_stream != nullptr) delete decompress_stream;
+				output_file.close();
+				input_file.close();
+			}
+			// Check for incorrect key
+			catch (incorrect_key_error&)
+			{
+				// Free resources
+				if (decrypt_stream != nullptr) delete decrypt_stream;
+				if (decompress_stream != nullptr) delete decompress_stream;
+				output_file.close();
+				input_file.close();
+				std::cerr << "The passphrase is incorrect." << std::endl;
+				return EXIT_FAILURE;
+			}
+			// If anything other goes wrong, report error.
+			catch (std::runtime_error& ex)
+			{
+				// Free resources
+				if (decrypt_stream != nullptr) delete decrypt_stream;
+				if (decompress_stream != nullptr) delete decompress_stream;
+				output_file.close();
+				input_file.close();
+				std::cout << std::endl;
+				std::cerr << ex.what() << std::endl;
+				return EXIT_FAILURE;
+			}
+			catch (...)
+			{
+				// Free resources on exception
+				if (decrypt_stream != nullptr) delete decrypt_stream;
+				if (decompress_stream != nullptr) delete decompress_stream;
+				input_file.close();
+				output_file.close();
+				std::cout << std::endl;
+				std::cerr << "Something went wrong.";
+				return EXIT_FAILURE;
+			}
+		}
+	}
+
+	return EXIT_SUCCESS;	
 }
 
 int cli::handle_identify(const po::variables_map& vm)

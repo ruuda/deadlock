@@ -166,8 +166,67 @@ void vault::export_json(const std::string& filename, bool obfuscation)
 	file.close();
 }
 
+void vault::build_decrypt_stream(std::istream& input_stream, version& vault_version, cryptography::key& key,
+	cryptography::aes_cbc_decrypt_stream*& decrypt_stream,
+	cryptography::xz_decompress_stream*& decompress_stream,
+	const data::secure_string& passphrase)
+{
+	// Validate the header
+	char d, l, k, zero;
+	input_stream >> d; input_stream >> l; input_stream >> k; input_stream >> zero;
+	if (d != 'D' || l != 'L' || k != 'K' || zero != 0)
+	{
+		throw format_error("The file is not a valid Deadlock vault; the header is incorrect.");
+	}
+
+	// Now read the version
+	version application_version = assembly_information::get_version();
+	vault_version.major = input_stream.get(); vault_version.minor = input_stream.get();
+	vault_version.revision = input_stream.get(); vault_version.build = input_stream.get();
+
+	// Version checks could be added here to parse old versions
+	// For now, there is only one version, so it does not matter
+	// Forward compatibility is not assumed, reading a newer version is an error.
+	if (application_version < vault_version)
+	{
+		throw version_error("The file was created with a newer version of the application.");
+	}
+
+	// Read the number of PBKDF2 iterations (stored as a big-endian 32-bit integer)
+	std::uint32_t iterations;
+	input_stream.read(reinterpret_cast<char*>(&iterations), 4);
+	iterations = portable_to_internal(iterations);
+
+	// Followed by the 32 bytes of salt that were used to generate the key
+	for (size_t i = 0; i < key.salt_size; i++)
+	{
+		key.get_salt()[i] = input_stream.get();
+	}
+
+	// Now generate the key
+	key.generate_key(passphrase, iterations);
+
+	// Create a decryption stream that reads encrypted data
+	decrypt_stream = new cryptography::aes_cbc_decrypt_stream(input_stream, key);
+	// And a decompression stream that decompresses data
+	decompress_stream = new cryptography::xz_decompress_stream(*decrypt_stream);
+
+	// Read 16 bytes before the compressed data from the encryption stream.
+	// Those bytes are used to validate that the encryption key is correct.
+	// (16 is the AES block size.)
+	for (size_t i = 0; i < 16; i++)
+	{
+		std::uint8_t c = decrypt_stream->get();
+		if (key.get_salt()[i] != c) throw incorrect_key_error("This key cannot correctly decrypt the data.");
+	}
+
+	// Finally, the streams can be used.
+	// This works as follows: file or other stream >> AES CBC decrypt >> XZ decompress >> JSON plaintext
+}
+
 void vault::load(std::istream& input_stream, cryptography::key& key, const data::secure_string& passphrase)
 {
+	/*
 	// Validate the header
 	char d, l, k, zero;
 	input_stream >> d; input_stream >> l; input_stream >> k; input_stream >> zero;
@@ -216,9 +275,30 @@ void vault::load(std::istream& input_stream, cryptography::key& key, const data:
 		std::uint8_t c = decrypt_stream.get();
 		if (key.get_salt()[i] != c) throw incorrect_key_error("This key cannot correctly decrypt the data.");
 	}
+	*/
 
-	// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
-	deserialise(decompress_stream);
+	cryptography::aes_cbc_decrypt_stream* decrypt_stream = nullptr;
+	cryptography::xz_decompress_stream* decompress_stream = nullptr;
+
+	try
+	{
+		// Build streams from which plaintext can be read
+		build_decrypt_stream(input_stream, file_version, key, decrypt_stream, decompress_stream, passphrase);
+
+		// Read the obfuscated JSON as follows: file >> AES CBC decrypt >> XZ decompress >> JSON >> deserialise
+		deserialise(*decompress_stream);
+
+		if (decrypt_stream != nullptr) delete decrypt_stream;
+		if (decompress_stream != nullptr) delete decompress_stream;
+	}
+	catch (...)
+	{
+		// Free resources on exception
+		if (decrypt_stream != nullptr) delete decrypt_stream;
+		if (decompress_stream != nullptr) delete decompress_stream;
+
+		throw;
+	}
 }
 
 void vault::load(const std::string& filename, cryptography::key& key, const data::secure_string& passphrase)
