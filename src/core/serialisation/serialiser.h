@@ -147,7 +147,7 @@ namespace deadlock
 						else if (*c >= 0x00 && *c <= 0x1f)
 						// TODO: what about unicode code points here? They are not properly handled at this point (or are they?)
 					    // TODO: what about character values above 127?
-							ostr << "\\u00" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*c);
+							ostr << "\\u00" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(*c) << std::dec;
 						else
 							ostr << *c;
 					}
