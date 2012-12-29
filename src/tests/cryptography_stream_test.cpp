@@ -137,4 +137,48 @@ void cryptography_stream_test::run()
 		if (n != 250)
 			throw std::runtime_error("Unexpected decrypted size; should be 250.");
 	}
+
+	// Pass 4: 16 bytes IV + N characters + padding
+	{
+		for (int amount = 0; amount < 999; amount++)
+		{
+			// The output stream
+			std::stringstream encrypted_data_stream;
+			// The cryptostream
+			cryptography::aes_cbc_encrypt_stream enc_stream(encrypted_data_stream, key);
+			// Write some data
+			for (unsigned int i = 0; i < amount; i++)
+			{
+				enc_stream.put(static_cast<std::uint8_t>(i % 0x100));
+			}
+			enc_stream.close();
+
+			// Calculate the amount of padding which should be added
+			int mod = amount % 16;
+			int padding = 16 - mod;
+
+			// Validate length
+			std::string ciphertext = encrypted_data_stream.str();
+			if (ciphertext.length() != 16 + amount + padding)
+				throw std::runtime_error("Unexpected encrypted size.");
+
+			// Seek to the beginning of the compressed data
+			encrypted_data_stream.seekg(0, std::ios_base::beg);
+			// The decrypt cryptostream
+			cryptography::aes_cbc_decrypt_stream dec_stream(encrypted_data_stream, key);
+		
+			// Read bytes until the stream ends
+			std::uint8_t n = 0;
+			char j;
+			while (dec_stream.get(j))
+			{
+				std::uint8_t i = j;
+				if (i != n) throw std::runtime_error("Data was not decrypted correctly.");
+				n++;
+			}
+
+			if (n != (amount % 0x100))
+				throw std::runtime_error("Unexpected decrypted size.");
+		}
+	}
 }
