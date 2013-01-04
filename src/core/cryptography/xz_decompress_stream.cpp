@@ -120,7 +120,7 @@ xz_decompress_streambuffer::int_type xz_decompress_streambuffer::underflow()
 	}
 
 	// Return the first character of the new buffer, or eof if the stream ends
-	if (out_length > 0) return out_buffer[0];
+	if (out_length > 0) return traits_type::to_int_type(out_buffer[0]);
 	return traits_type::eof();
 }
 

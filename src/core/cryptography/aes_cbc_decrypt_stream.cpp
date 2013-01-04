@@ -105,7 +105,7 @@ aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()
 	setg(plaintext, plaintext + 0, plaintext + out_length);
 
 	// Return the first character of the new buffer, or eof if the stream ends
-	if (out_length > 0) return plaintext[0];
+	if (out_length > 0) return traits_type::to_int_type(plaintext[0]);
 	return traits_type::eof();
 }
 
