@@ -35,7 +35,7 @@ data::secure_string_ptr search::make_acronym(const data::secure_string& words) c
 	for (auto i = words.begin(); i != words.end(); i++)
 	{
 		// TODO: what about UTF-8 etc?
-		bool alnum = std::isalnum(*i);
+		bool alnum = std::isalnum(*i) != 0;
 
 		// At the start of a word, append the character to the acronym.
 		if (alnum && !inside_word)
@@ -69,8 +69,8 @@ int search::match_words(const data::secure_string& needle, const data::secure_st
 	int match = 0;
 
 	// Loop over the minimum subset of the string beginnings, and check whether they are equal.
-	int min_length = std::min(needle.length(), haystack.length());
-	int max_length = std::max(needle.length(), haystack.length());
+	size_t min_length = std::min(needle.length(), haystack.length());
+	size_t max_length = std::max(needle.length(), haystack.length());
 	
 	int front_bonus = 0;
 

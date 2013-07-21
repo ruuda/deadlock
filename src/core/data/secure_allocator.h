@@ -63,7 +63,6 @@ namespace deadlock
 
 						void deallocate(pointer p, size_type num)
 						{
-							size_t q = sizeof(T) * num;
 							secure_memzero(p, sizeof(T) * num);
 							std::allocator<T>::deallocate(p, num);
 						}

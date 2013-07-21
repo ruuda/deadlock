@@ -539,14 +539,14 @@ namespace deadlock
 				}
 
 				/// Assignment constructor (null)
-				json_value(std::nullptr_t v)
+				json_value(std::nullptr_t)
 				{
 					type = value_type::c_null;
 					value = nullptr;
 				}
 
 				/// Assignment operator (null)
-				std::nullptr_t operator=(std::nullptr_t v)
+				std::nullptr_t operator=(std::nullptr_t)
 				{
 					if (value) delete_value();
 					type = value_type::c_null;

@@ -85,7 +85,7 @@ aes_cbc_decrypt_streambuffer::int_type aes_cbc_decrypt_streambuffer::underflow()
 	std::memcpy(iv, ciphertext, block_size); // TODO: is memcpy safe?
 	std::memcpy(ciphertext, buffer, block_size);
 
-	int out_length = block_size;
+	size_t out_length = block_size;
 
 	// Remove padding from last block
 	if (read_last_block)

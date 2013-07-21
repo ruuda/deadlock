@@ -60,7 +60,7 @@ void key::generate_key(const data::secure_string& passphrase, std::uint32_t iter
 {
 	// Use PKCS5 PBKDF2 password-based key derivation function with an SHA256 hash to generate keys
 
-	// Allocate a buffer for the password (because Crypto++ expects bytes, not a string)
+	// Allocate a buffer for the password (because libtom expects bytes, not a string)
 	std::uint8_t* passphrase_buffer = new std::uint8_t[passphrase.size()];
 
 	// Copy the password
@@ -94,7 +94,7 @@ std::uint32_t key::get_required_iterations(size_t passphrase_length, double seco
 	// Fill the buffer with numbers, actual content is not important here
 	for (size_t i = 0; i < passphrase_length; i++)
 	{
-		passphrase[i] = i;
+		passphrase[i] = static_cast<std::uint8_t>(i);
 	}
 
 	// Derive the key from the password, using PKCS#5 PBKDF2 with SHA256 hash

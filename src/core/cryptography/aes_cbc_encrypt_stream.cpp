@@ -83,7 +83,7 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 	} action = encrypt_run;
 
 	// Retrieve the number of characters in the buffer
-	int in_length = pptr() - pbase();
+	auto in_length = pptr() - pbase();
 
 	// Determine what to do based on the number of bytes in the buffer and the given character
 	if (in_length != block_size)
@@ -102,7 +102,7 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 		size_t missing_bytes = block_size - in_length;
 		for (size_t i = 0; i < missing_bytes; i++)
 		{
-			plaintext[in_length + i] = missing_bytes;
+			plaintext[in_length + i] = static_cast<char>(missing_bytes);
 		}
 
 		in_length = block_size;
@@ -130,7 +130,7 @@ aes_cbc_encrypt_streambuffer::int_type aes_cbc_encrypt_streambuffer::overflow(in
 		size_t missing_bytes = block_size;
 		for (size_t i = 0; i < missing_bytes; i++)
 		{
-			plaintext[i] = missing_bytes;
+			plaintext[i] = static_cast<char>(missing_bytes);
 		}
 		in_length = block_size;
 
