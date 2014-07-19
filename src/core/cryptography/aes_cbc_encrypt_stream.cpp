@@ -29,8 +29,7 @@ aes_cbc_encrypt_streambuffer::aes_cbc_encrypt_streambuffer(std::basic_ostream<ch
 	iv_written = false;
 	// TODO: generate a cryptographically random IV
 	// Create a random engine and distribution for generating random bytes
-	std::mt19937 random_engine;
-	random_engine.seed(std::time(nullptr));
+	std::random_device random_engine;
 	std::uniform_int_distribution<std::uint8_t> random_byte(0x00, 0xff);
 
 	// Simply copy the buffer
