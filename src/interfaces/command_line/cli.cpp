@@ -1,5 +1,5 @@
 // Deadlock – fast search-based password manager
-// Copyright (C) 2012 Ruud van Asseldonk
+// Copyright (C) 2014 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@
 #include <string>
 #include <boost/chrono.hpp>
 #include <list>
+
+#ifndef _WIN32
+#include <termios.h>
+#endif
 
 #include "../../core/errors.h"
 #include "../../core/data/secure_string.h"
@@ -195,7 +199,17 @@ void set_echo(bool do_echo)
 
 void set_echo(bool do_echo)
 {
-
+	struct termios tty;
+	tcgetattr(STDIN_FILENO, &tty);
+	if (do_echo)
+	{
+		tty.c_lflag = tty.c_lflag | ECHO;
+	}
+	else
+	{
+		tty.c_lflag = tty.c_lflag & ~ECHO;
+	}
+	tcsetattr(STDIN_FILENO, TCSANOW, &tty);
 }
 
 #endif
