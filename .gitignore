@@ -11,11 +11,18 @@
 *.la
 *.a
 
-# Visual Studio garbadge
+# Visual Studio garbage
 *.suo
 *.sdf
 *.user
 # .user ignores CMake project files written by Qt Creator as well
 
 # CMake build directory (if building in the same directory)
-build
+/build/
+
+# Other CMake stuff
+CMakeCache.txt
+CMakeFiles/
+Makefile
+/bin/
+*.cmake
