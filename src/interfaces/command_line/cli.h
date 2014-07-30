@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -27,74 +27,74 @@
 
 namespace deadlock
 {
-	namespace interfaces
-	{
-		namespace command_line
-		{
-			/// The Deadlock command-line interface
-			class cli
-			{
-				public:
+  namespace interfaces
+  {
+    namespace command_line
+    {
+      /// The Deadlock command-line interface
+      class cli
+      {
+        public:
 
-					/// Executes the program
-					int run(int argc, char** argv);
+          /// Executes the program
+          int run(int argc, char** argv);
 
-				protected:
+        protected:
 
-					/// The vault that will be used throughout the session
-					core::vault vault;
+          /// The vault that will be used throughout the session
+          core::vault vault;
 
-					/// The key that will be used throughout the session
-					core::cryptography::key key;
+          /// The key that will be used throughout the session
+          core::cryptography::key key;
 
-					/// The file that the vault was loaded from
-					std::string vault_filename;
+          /// The file that the vault was loaded from
+          std::string vault_filename;
 
-					/// Asks the user for a passphrase
-					core::data::secure_string_ptr ask_passphrase() const;
+          /// Asks the user for a passphrase
+          core::data::secure_string_ptr ask_passphrase() const;
 
-					/// Tries to open the vault, asks the user for a passphrase in the process,
-					/// and returns whether the operation was successful.
-					/// If not, it prints an error message and returns false.
-					bool load_vault(const boost::program_options::variables_map& vm);
+          /// Tries to open the vault, asks the user for a passphrase in the process,
+          /// and returns whether the operation was successful.
+          /// If not, it prints an error message and returns false.
+          bool load_vault(const boost::program_options::variables_map& vm);
 
-					/// Sets the vault filename if it is present,
-					/// otherwise prints a message and returns false.
-					bool require_vault_filename(const boost::program_options::variables_map& vm, bool must_exist = true);
+          /// Sets the vault filename if it is present,
+          /// otherwise prints a message and returns false.
+          bool require_vault_filename(const boost::program_options::variables_map& vm, bool must_exist = true);
 
-					/// Sets identifier, username, or additional data fields for an entry.
-					/// Returns wheher any value was set.
-					bool set_fields(const boost::program_options::variables_map& vm, deadlock::core::data::entry_ptr entr);
+          /// Sets identifier, username, or additional data fields for an entry.
+          /// Returns wheher any value was set.
+          bool set_fields(const boost::program_options::variables_map& vm, deadlock::core::data::entry_ptr entr);
 
-					/// Handles the 'new vault' logic
-					int handle_new(const boost::program_options::variables_map& vm);
+          /// Handles the 'new vault' logic
+          int handle_new(const boost::program_options::variables_map& vm);
 
-					/// Handles exporting a vault to JSON
-					int handle_export(const boost::program_options::variables_map& vm);
+          /// Handles exporting a vault to JSON
+          int handle_export(const boost::program_options::variables_map& vm);
 
-					/// Handles decrypting and exporting the internal JSON structure, without deserialisation/serialisation.
-					int handle_export_raw(const std::string& input_filename, const std::string& output_filename);
+          /// Handles decrypting and exporting the internal JSON structure, without deserialisation/serialisation.
+          int handle_export_raw(const std::string& input_filename, const std::string& output_filename);
 
-					/// Handles the 'identify' logic
-					int handle_identify(const boost::program_options::variables_map& vm);
+          /// Handles the 'identify' logic
+          int handle_identify(const boost::program_options::variables_map& vm);
 
-					/// Handles the 'add' logic
-					int handle_add(const boost::program_options::variables_map& vm);
+          /// Handles the 'add' logic
+          int handle_add(const boost::program_options::variables_map& vm);
 
-					/// Handles importing JSON into a vault
-					int handle_import(const boost::program_options::variables_map& vm);
+          /// Handles importing JSON into a vault
+          int handle_import(const boost::program_options::variables_map& vm);
 
-					/// Handles the 'list' logic
-					int handle_list(const boost::program_options::variables_map& vm);
+          /// Handles the 'list' logic
+          int handle_list(const boost::program_options::variables_map& vm);
 
-					/// Handles the 'show' logic
-					int handle_show(const boost::program_options::variables_map& vm);
+          /// Handles the 'show' logic
+          int handle_show(const boost::program_options::variables_map& vm);
 
-					/// Handles the 'set' logic
-					int handle_set(const boost::program_options::variables_map& vm);
-			};
-		}
-	}
+          /// Handles the 'set' logic
+          int handle_set(const boost::program_options::variables_map& vm);
+      };
+    }
+  }
 }
 
 #endif

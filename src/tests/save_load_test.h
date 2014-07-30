@@ -21,20 +21,20 @@
 
 namespace deadlock
 {
-	namespace tests
-	{
-		/// Tests save and load functionality
-		class save_load_test : public test
-		{
-			public:
+  namespace tests
+  {
+    /// Tests save and load functionality
+    class save_load_test : public test
+    {
+      public:
 
-				/// Runs the test
-				void run();
+        /// Runs the test
+        void run();
 
-				/// Returns the name of the test
-				std::string get_name();
-		};
-	}
+        /// Returns the name of the test
+        std::string get_name();
+    };
+  }
 }
 
 #endif

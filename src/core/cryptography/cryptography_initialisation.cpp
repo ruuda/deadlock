@@ -18,7 +18,7 @@
 
 extern "C"
 {
-	#include <tomcrypt.h>
+  #include <tomcrypt.h>
 }
 
 #include "../errors.h"
@@ -33,16 +33,16 @@ int _initialisation::aes_index = -1;
 
 _initialisation::_initialisation()
 {
-	// Register the SHA-256 hash
-	sha256_index = register_hash(&sha256_desc);
+  // Register the SHA-256 hash
+  sha256_index = register_hash(&sha256_desc);
 
-	// Register the AES cipher
-	aes_index = register_cipher(&aes_desc);
+  // Register the AES cipher
+  aes_index = register_cipher(&aes_desc);
 }
 
 _initialisation::~_initialisation()
 {
-	// Cleanup
-	unregister_hash(&sha256_desc);
-	unregister_cipher(&aes_desc);
+  // Cleanup
+  unregister_hash(&sha256_desc);
+  unregister_cipher(&aes_desc);
 }

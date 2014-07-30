@@ -19,38 +19,38 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace cryptography
-		{
-			namespace detail
-			{
-				/// Registers the hash and cipher functions used by LibTomCrypt upon construction
-				class _initialisation
-				{
-				private:
+  namespace core
+  {
+    namespace cryptography
+    {
+      namespace detail
+      {
+        /// Registers the hash and cipher functions used by LibTomCrypt upon construction
+        class _initialisation
+        {
+        private:
 
-					/// Registers the required LibTomCrypt hashes and ciphers
-					/// Private because there should be one single instance, also contained within this class
-					_initialisation();
+          /// Registers the required LibTomCrypt hashes and ciphers
+          /// Private because there should be one single instance, also contained within this class
+          _initialisation();
 
-					/// A static instance to make sure the constructor gets called once
-					static _initialisation _instance;
+          /// A static instance to make sure the constructor gets called once
+          static _initialisation _instance;
 
-				public:
+        public:
 
-					/// Unregisters the LibTomCrypt hashes and ciphers
-					~_initialisation();
+          /// Unregisters the LibTomCrypt hashes and ciphers
+          ~_initialisation();
 
-					/// The LibTomCrypt index for the SHA-256 hash
-					static int sha256_index;
+          /// The LibTomCrypt index for the SHA-256 hash
+          static int sha256_index;
 
-					/// The LibTomCrypt index for the AES cipher
-					static int aes_index;
-				};
-			}
-		}
-	}
+          /// The LibTomCrypt index for the AES cipher
+          static int aes_index;
+        };
+      }
+    }
+  }
 }
 
 #endif

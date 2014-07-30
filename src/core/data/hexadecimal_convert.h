@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -24,54 +24,54 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			/// Converts a string byte-by-byte into a hexadecimal string
-			inline secure_string_ptr to_hexadecimal_string(const secure_string& plaintext)
-			{
-				// Create a stream to stream the bytes to
-				secure_stringstream_ptr strstr = make_secure_stringstream();
+  namespace core
+  {
+    namespace data
+    {
+      /// Converts a string byte-by-byte into a hexadecimal string
+      inline secure_string_ptr to_hexadecimal_string(const secure_string& plaintext)
+      {
+        // Create a stream to stream the bytes to
+        secure_stringstream_ptr strstr = make_secure_stringstream();
 
-				// Loop through the characters
-				for (size_t i = 0; i < plaintext.length(); i++)
-				{
-					// Convert to 8-bit unsigned integer (characters are signed, which results in problematic behaviour here).
-					std::uint8_t byte = plaintext[i];
+        // Loop through the characters
+        for (size_t i = 0; i < plaintext.length(); i++)
+        {
+          // Convert to 8-bit unsigned integer (characters are signed, which results in problematic behaviour here).
+          std::uint8_t byte = plaintext[i];
 
-					// Write to the stream as an integer, so that the byte is not interpreted as a character.
-					(*strstr) << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
-				}
+          // Write to the stream as an integer, so that the byte is not interpreted as a character.
+          (*strstr) << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
+        }
 
-				return make_secure_string(strstr->str());
-			}
-			
-			/// Converts a string of hexadecimal text to a string containing the original bytes
-			inline secure_string_ptr from_hexadecimal_string(const secure_string& hextext)
-			{
-				// Create an input stream and output string
-				secure_stringstream_ptr strstr = make_secure_stringstream(hextext);
-				secure_string_ptr plaintext = make_secure_string();
-				secure_string_ptr byte_string = make_secure_string();
+        return make_secure_string(strstr->str());
+      }
+      
+      /// Converts a string of hexadecimal text to a string containing the original bytes
+      inline secure_string_ptr from_hexadecimal_string(const secure_string& hextext)
+      {
+        // Create an input stream and output string
+        secure_stringstream_ptr strstr = make_secure_stringstream(hextext);
+        secure_string_ptr plaintext = make_secure_string();
+        secure_string_ptr byte_string = make_secure_string();
 
-				// Read two characters from the stream
-				while ((*strstr) >> std::setw(2) >> (*byte_string))
-				{
-					// Create a new stringstream with the two characters
-					secure_stringstream_ptr byte_stream = make_secure_stringstream(*byte_string);
-					// Read the integer value (to avoid interpreting the hexadecimal characters byte as two characters)
-					int byte; (*byte_stream) >> std::hex >> byte;
-					// Convert to a character
-					std::uint8_t character = static_cast<std::uint8_t>(byte);
-					// And append to the string
-					combine_secure_string(plaintext, static_cast<char>(character));
-				}
+        // Read two characters from the stream
+        while ((*strstr) >> std::setw(2) >> (*byte_string))
+        {
+          // Create a new stringstream with the two characters
+          secure_stringstream_ptr byte_stream = make_secure_stringstream(*byte_string);
+          // Read the integer value (to avoid interpreting the hexadecimal characters byte as two characters)
+          int byte; (*byte_stream) >> std::hex >> byte;
+          // Convert to a character
+          std::uint8_t character = static_cast<std::uint8_t>(byte);
+          // And append to the string
+          combine_secure_string(plaintext, static_cast<char>(character));
+        }
 
-				return plaintext;
-			}
-		}
-	}
+        return plaintext;
+      }
+    }
+  }
 }
 
 #endif

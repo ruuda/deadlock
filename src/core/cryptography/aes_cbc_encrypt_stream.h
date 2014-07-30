@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -24,87 +24,87 @@
 
 extern "C"
 {
-	#include <tomcrypt.h>
+  #include <tomcrypt.h>
 }
 
 #include "key.h"
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace cryptography
-		{
-			namespace detail
-			{
-				/// The encryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
-				class aes_cbc_encrypt_streambuffer : public std::basic_streambuf<char>
-				{
-				protected:
+  namespace core
+  {
+    namespace cryptography
+    {
+      namespace detail
+      {
+        /// The encryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
+        class aes_cbc_encrypt_streambuffer : public std::basic_streambuf<char>
+        {
+        protected:
 
-					/// The stream that all compressed data will be streamed to
-					std::basic_ostream<char>& output_stream;
+          /// The stream that all compressed data will be streamed to
+          std::basic_ostream<char>& output_stream;
 
-					/// AES has a block size of 16 bytes
-					static const size_t block_size = 16;
+          /// AES has a block size of 16 bytes
+          static const size_t block_size = 16;
 
-					/// Buffer for the initialisation vector, or previous block when initialisation is done
-					/// Should be of block size (16 bytes)
-					char iv[block_size];
+          /// Buffer for the initialisation vector, or previous block when initialisation is done
+          /// Should be of block size (16 bytes)
+          char iv[block_size];
 
-					/// Buffer for non-encrypted data
-					char plaintext[block_size];
+          /// Buffer for non-encrypted data
+          char plaintext[block_size];
 
-					/// The key used for encryption
-					const cryptography::key& key;
+          /// The key used for encryption
+          const cryptography::key& key;
 
-					/// Whether the initialisation vector has been written already
-					bool iv_written;
+          /// Whether the initialisation vector has been written already
+          bool iv_written;
 
-					/// The LibTomCrypt scheduled key
-					symmetric_key skey;
+          /// The LibTomCrypt scheduled key
+          symmetric_key skey;
 
-				public:
+        public:
 
-					/// Creates a streambuffer that streams its output to the given stream,
-					/// and encrypts with the given key and initialisation vector
-					aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
+          /// Creates a streambuffer that streams its output to the given stream,
+          /// and encrypts with the given key and initialisation vector
+          aes_cbc_encrypt_streambuffer(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
 
-					/// Zeroes the buffers
-					virtual ~aes_cbc_encrypt_streambuffer();
+          /// Zeroes the buffers
+          virtual ~aes_cbc_encrypt_streambuffer();
 
-					/// Adds padding to the current block and encrypts and writes that block
-					virtual void finalise();
+          /// Adds padding to the current block and encrypts and writes that block
+          virtual void finalise();
 
-				protected:
+        protected:
 
-					/// Once the buffer (one block) is full, encrypts the data and writes it to the underlying buffer
-					virtual int_type overflow(int_type new_char = traits_type::eof());
-				};
-			}
+          /// Once the buffer (one block) is full, encrypts the data and writes it to the underlying buffer
+          virtual int_type overflow(int_type new_char = traits_type::eof());
+        };
+      }
 
-			/// A stream that encrypts the data written to it, and writes that data to the underlying stream
-			/// The stream uses 256-bit key AES in CBC mode with a random initialisation vector
-			class aes_cbc_encrypt_stream : public std::basic_ostream<char>
-			{
-			protected:
+      /// A stream that encrypts the data written to it, and writes that data to the underlying stream
+      /// The stream uses 256-bit key AES in CBC mode with a random initialisation vector
+      class aes_cbc_encrypt_stream : public std::basic_ostream<char>
+      {
+      protected:
 
-				/// The streambuffer responsible for the actual encryption
-				detail::aes_cbc_encrypt_streambuffer streambuffer;
+        /// The streambuffer responsible for the actual encryption
+        detail::aes_cbc_encrypt_streambuffer streambuffer;
 
-			public:
+      public:
 
-				/// Creates a compression stream that streams its output to the given stream,
-				/// with the given key. The key must outlive the stream object.
-				aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
+        /// Creates a compression stream that streams its output to the given stream,
+        /// with the given key. The key must outlive the stream object.
+        aes_cbc_encrypt_stream(std::basic_ostream<char>& ostr, const cryptography::key& dkey);
 
-				~aes_cbc_encrypt_stream();
+        ~aes_cbc_encrypt_stream();
 
-				/// Adds padding, and flushes the remaining block(s)
-				void close();
-			};
-		}
-	}
+        /// Adds padding, and flushes the remaining block(s)
+        void close();
+      };
+    }
+  }
 }
 
 #endif

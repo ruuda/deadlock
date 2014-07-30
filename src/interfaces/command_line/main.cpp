@@ -18,6 +18,6 @@
 
 int main(int argc, char** argv)
 {
-	deadlock::interfaces::command_line::cli program;
-	return program.run(argc, argv);
+  deadlock::interfaces::command_line::cli program;
+  return program.run(argc, argv);
 }

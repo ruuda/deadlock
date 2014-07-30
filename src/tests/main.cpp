@@ -27,52 +27,52 @@ using namespace deadlock::tests;
 
 int main(int, char**)
 {
-	// Create a list of things to test
-	test* unit_tests[] =
-	{
-		new import_export_test(),
-		new compression_stream_test(),
-		new cryptography_stream_test(),
-		new save_load_test()
-	};
+  // Create a list of things to test
+  test* unit_tests[] =
+  {
+    new import_export_test(),
+    new compression_stream_test(),
+    new cryptography_stream_test(),
+    new save_load_test()
+  };
 
-	const size_t number_of_tests = sizeof(unit_tests) / sizeof(test*);
-	size_t failed_tests = 0;
+  const size_t number_of_tests = sizeof(unit_tests) / sizeof(test*);
+  size_t failed_tests = 0;
 
-	std::cout << "Deadlock unit tests" << std::endl << std::endl;
+  std::cout << "Deadlock unit tests" << std::endl << std::endl;
 
-	for (size_t i = 0; i < number_of_tests; i++)
-	{
-		std::cout << "testing " << unit_tests[i]->get_name() << std::endl;
-		try
-		{
-			unit_tests[i]->run();
+  for (size_t i = 0; i < number_of_tests; i++)
+  {
+    std::cout << "testing " << unit_tests[i]->get_name() << std::endl;
+    try
+    {
+      unit_tests[i]->run();
 
-			std::cout << "test passed" << std::endl << std::endl;
-		}
-		catch (std::exception& ex)
-		{
-			failed_tests++;
-			std::cout << "test failed: " << ex.what() << std::endl << std::endl;
-		}
-		catch (...)
-		{
-			failed_tests++;
-			std::cout << "test failed for unknown reasons" << std::endl << std::endl;
-		}
+      std::cout << "test passed" << std::endl << std::endl;
+    }
+    catch (std::exception& ex)
+    {
+      failed_tests++;
+      std::cout << "test failed: " << ex.what() << std::endl << std::endl;
+    }
+    catch (...)
+    {
+      failed_tests++;
+      std::cout << "test failed for unknown reasons" << std::endl << std::endl;
+    }
 
-		// Immediately clean up the test
-		delete unit_tests[i];
-	}
+    // Immediately clean up the test
+    delete unit_tests[i];
+  }
 
-	if (failed_tests)
-	{
-		std::cout << failed_tests << "/" << number_of_tests << " failed" << std::endl;
-	}
-	else
-	{
-		std::cout << "all tests passed succesfully" << std::endl;
-	}
+  if (failed_tests)
+  {
+    std::cout << failed_tests << "/" << number_of_tests << " failed" << std::endl;
+  }
+  else
+  {
+    std::cout << "all tests passed succesfully" << std::endl;
+  }
 
-	return 0;
+  return 0;
 }

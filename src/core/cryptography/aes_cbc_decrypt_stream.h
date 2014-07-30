@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -24,86 +24,86 @@
 
 extern "C"
 {
-	#include <tomcrypt.h>
+  #include <tomcrypt.h>
 }
 
 #include "key.h"
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace cryptography
-		{
-			namespace detail
-			{
-				/// The decryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
-				class aes_cbc_decrypt_streambuffer : public std::basic_streambuf<char>
-				{
-				protected:
+  namespace core
+  {
+    namespace cryptography
+    {
+      namespace detail
+      {
+        /// The decryption streamuffer that encrypts data using 256-bit key AES in CBC mode with PKCS7 padding
+        class aes_cbc_decrypt_streambuffer : public std::basic_streambuf<char>
+        {
+        protected:
 
-					/// The stream that all encrypted data will be read from
-					std::basic_istream<char>& input_stream;
+          /// The stream that all encrypted data will be read from
+          std::basic_istream<char>& input_stream;
 
-					/// AES has a block size of 16 bytes
-					static const size_t block_size = 16;
+          /// AES has a block size of 16 bytes
+          static const size_t block_size = 16;
 
-					/// Buffer for the initialisation vector, or previous block when initialisation is done
-					char iv[block_size];
+          /// Buffer for the initialisation vector, or previous block when initialisation is done
+          char iv[block_size];
 
-					/// Buffer for non-encrypted data
-					char plaintext[block_size];
+          /// Buffer for non-encrypted data
+          char plaintext[block_size];
 
-					/// Holds one block of ciphertext
-					char ciphertext[block_size];
+          /// Holds one block of ciphertext
+          char ciphertext[block_size];
 
-					/// A buffer of one block in advance, to detected EOF
-					char buffer[block_size];
+          /// A buffer of one block in advance, to detected EOF
+          char buffer[block_size];
 
-					/// The key used for encryption
-					const cryptography::key& key;
+          /// The key used for encryption
+          const cryptography::key& key;
 
-					/// Whether the initialisation vector has been read already
-					bool iv_read;
+          /// Whether the initialisation vector has been read already
+          bool iv_read;
 
-					/// The LibTomCrypt scheduled key
-					symmetric_key skey;
+          /// The LibTomCrypt scheduled key
+          symmetric_key skey;
 
-				public:
+        public:
 
-					/// Creates a streambuffer that reads its input from to the given stream,
-					/// and decrypts with the given key
-					aes_cbc_decrypt_streambuffer(std::basic_istream<char>& istr, const cryptography::key& key);
+          /// Creates a streambuffer that reads its input from to the given stream,
+          /// and decrypts with the given key
+          aes_cbc_decrypt_streambuffer(std::basic_istream<char>& istr, const cryptography::key& key);
 
-					/// Zeroes the buffers
-					virtual ~aes_cbc_decrypt_streambuffer();
+          /// Zeroes the buffers
+          virtual ~aes_cbc_decrypt_streambuffer();
 
-				protected:
+        protected:
 
-					/// Once the buffer (one block) is empty, reads a new block and decrypts the data
-					virtual int_type underflow();
-				};
-			}
+          /// Once the buffer (one block) is empty, reads a new block and decrypts the data
+          virtual int_type underflow();
+        };
+      }
 
-			/// A stream that decrypts the data read from it, and reads the encrypted data from the underlying stream
-			/// The stream uses 256-bit key AES in CBC mode.
-			class aes_cbc_decrypt_stream : public std::basic_istream<char>
-			{
-			protected:
+      /// A stream that decrypts the data read from it, and reads the encrypted data from the underlying stream
+      /// The stream uses 256-bit key AES in CBC mode.
+      class aes_cbc_decrypt_stream : public std::basic_istream<char>
+      {
+      protected:
 
-				/// The streambuffer responsible for the actual decryption
-				detail::aes_cbc_decrypt_streambuffer streambuffer;
+        /// The streambuffer responsible for the actual decryption
+        detail::aes_cbc_decrypt_streambuffer streambuffer;
 
-			public:
+      public:
 
-				/// Creates a compression stream that reads it input from the given stream,
-				/// with the given key. The key must outlive the stream object.
-				aes_cbc_decrypt_stream(std::basic_istream<char>& istr, const cryptography::key& key);
+        /// Creates a compression stream that reads it input from the given stream,
+        /// with the given key. The key must outlive the stream object.
+        aes_cbc_decrypt_stream(std::basic_istream<char>& istr, const cryptography::key& key);
 
-				~aes_cbc_decrypt_stream();
-			};
-		}
-	}
+        ~aes_cbc_decrypt_stream();
+      };
+    }
+  }
 }
 
 #endif

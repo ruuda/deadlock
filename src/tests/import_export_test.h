@@ -21,20 +21,20 @@
 
 namespace deadlock
 {
-	namespace tests
-	{
-		/// Tests JSON import / export functionality
-		class import_export_test : public test
-		{
-			public:
+  namespace tests
+  {
+    /// Tests JSON import / export functionality
+    class import_export_test : public test
+    {
+      public:
 
-				/// Runs the test
-				void run();
+        /// Runs the test
+        void run();
 
-				/// Returns the name of the test
-				std::string get_name();
-		};
-	}
+        /// Returns the name of the test
+        std::string get_name();
+    };
+  }
 }
 
 #endif

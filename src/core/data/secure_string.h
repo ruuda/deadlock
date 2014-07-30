@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -28,89 +28,89 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			/// A string that zeroes its memory upon deallocation
-			typedef std::basic_string<char, std::char_traits<char>, detail::secure_allocator<char>> secure_string;
+  namespace core
+  {
+    namespace data
+    {
+      /// A string that zeroes its memory upon deallocation
+      typedef std::basic_string<char, std::char_traits<char>, detail::secure_allocator<char>> secure_string;
 
-			/// A stringstream that zeroes its memory upon deallocation
-			typedef std::basic_stringstream<char, std::char_traits<char>, detail::secure_allocator<char>> secure_stringstream;
+      /// A stringstream that zeroes its memory upon deallocation
+      typedef std::basic_stringstream<char, std::char_traits<char>, detail::secure_allocator<char>> secure_stringstream;
 
-			/// Shared pointer to a secure string
-			typedef std::shared_ptr<secure_string> secure_string_ptr;
+      /// Shared pointer to a secure string
+      typedef std::shared_ptr<secure_string> secure_string_ptr;
 
-			/// Shared pointer to a secure stringstream
-			typedef std::shared_ptr<secure_stringstream> secure_stringstream_ptr;
+      /// Shared pointer to a secure stringstream
+      typedef std::shared_ptr<secure_stringstream> secure_stringstream_ptr;
 
-			/// Vector of secure strings
-			typedef std::vector<secure_string, detail::secure_allocator<secure_string>> secure_string_vector;
+      /// Vector of secure strings
+      typedef std::vector<secure_string, detail::secure_allocator<secure_string>> secure_string_vector;
 
-			/// Constructs an empty secure string
-			inline secure_string_ptr make_secure_string()
-			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>());
-			}
+      /// Constructs an empty secure string
+      inline secure_string_ptr make_secure_string()
+      {
+        return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>());
+      }
 
-			/// Constructs a secure string from a character array
-			inline secure_string_ptr make_secure_string(const char* ptr)
-			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), ptr);
-			}
+      /// Constructs a secure string from a character array
+      inline secure_string_ptr make_secure_string(const char* ptr)
+      {
+        return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), ptr);
+      }
 
-			/// Creates a shared pointer that points to a copy of the secure string
-			inline secure_string_ptr make_secure_string(const secure_string& str)
-			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str);
-			}
+      /// Creates a shared pointer that points to a copy of the secure string
+      inline secure_string_ptr make_secure_string(const secure_string& str)
+      {
+        return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str);
+      }
 
-			/// Creates a secure string that contains one character
-			inline secure_string_ptr make_secure_string(char c)
-			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), 1, c);
-			}
+      /// Creates a secure string that contains one character
+      inline secure_string_ptr make_secure_string(char c)
+      {
+        return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), 1, c);
+      }
 
-			/// Creates a secure string from an insecure string
-			inline secure_string_ptr make_secure_string(const std::string& str)
-			{
-				return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str.begin(), str.end());
-			}
+      /// Creates a secure string from an insecure string
+      inline secure_string_ptr make_secure_string(const std::string& str)
+      {
+        return std::allocate_shared<secure_string>(detail::secure_allocator<secure_string>(), str.begin(), str.end());
+      }
 
-			/// Prepends the character to the string and returns the shared pointer to the string
-			/// This modifies the stored string; it does not act on a copy
-			inline secure_string_ptr combine_secure_string(char c, secure_string_ptr str)
-			{
-				str->insert(str->begin(), c); return str;
-			}
+      /// Prepends the character to the string and returns the shared pointer to the string
+      /// This modifies the stored string; it does not act on a copy
+      inline secure_string_ptr combine_secure_string(char c, secure_string_ptr str)
+      {
+        str->insert(str->begin(), c); return str;
+      }
 
-			/// Appends the character to the string and returns the shared pointer to the string
-			/// This modifies the stored string; it does not act on a copy
-			inline secure_string_ptr combine_secure_string(secure_string_ptr str, char c)
-			{
-				str->push_back(c); return str;
-			}
+      /// Appends the character to the string and returns the shared pointer to the string
+      /// This modifies the stored string; it does not act on a copy
+      inline secure_string_ptr combine_secure_string(secure_string_ptr str, char c)
+      {
+        str->push_back(c); return str;
+      }
 
-			/// Constructs an empty secure stringstream
-			inline secure_stringstream_ptr make_secure_stringstream()
-			{
-				return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>());
-			}
+      /// Constructs an empty secure stringstream
+      inline secure_stringstream_ptr make_secure_stringstream()
+      {
+        return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>());
+      }
 
-			/// Constructs a secure stringstream with the specified contents
-			inline secure_stringstream_ptr make_secure_stringstream(const secure_string& str)
-			{
-				return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>(), str);
-			}
+      /// Constructs a secure stringstream with the specified contents
+      inline secure_stringstream_ptr make_secure_stringstream(const secure_string& str)
+      {
+        return std::allocate_shared<secure_stringstream>(detail::secure_allocator<secure_stringstream>(), str);
+      }
 
-			/// Returns whether two strings of diffent string type are equal
-			template <typename A1, typename A2>
-			inline bool string_equals(const A1& str1, const A2& str2)
-			{
-				return (str1.length() != str2.length()) ? false : std::equal(str1.begin(), str1.end(), str2.begin());
-			}
-		}
-	}
+      /// Returns whether two strings of diffent string type are equal
+      template <typename A1, typename A2>
+      inline bool string_equals(const A1& str1, const A2& str2)
+      {
+        return (str1.length() != str2.length()) ? false : std::equal(str1.begin(), str1.end(), str2.begin());
+      }
+    }
+  }
 }
 
 #endif

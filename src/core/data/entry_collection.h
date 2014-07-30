@@ -27,51 +27,51 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			/// A container that stores all entries.
-			/// It also contains an acceleration structure, used to do fast searches,
-			/// and it handles finding possible matches for a given search string.
-			class entry_collection
-			{
-			protected:
+  namespace core
+  {
+    namespace data
+    {
+      /// A container that stores all entries.
+      /// It also contains an acceleration structure, used to do fast searches,
+      /// and it handles finding possible matches for a given search string.
+      class entry_collection
+      {
+      protected:
 
-				/// The list of entries
-				std::vector<std::shared_ptr<entry>> entries;
+        /// The list of entries
+        std::vector<std::shared_ptr<entry>> entries;
 
-			public:
+      public:
 
-				typedef std::shared_ptr<entry> entry_ptr;
-				typedef std::vector<entry_ptr>::iterator entry_iterator;
-				typedef std::vector<entry_ptr>::const_iterator const_entry_iterator;
+        typedef std::shared_ptr<entry> entry_ptr;
+        typedef std::vector<entry_ptr>::iterator entry_iterator;
+        typedef std::vector<entry_ptr>::const_iterator const_entry_iterator;
 
-				/// Reconstructs the entries given the JSON data
-				void deserialise(const serialisation::json_value::array_t& json_data);
+        /// Reconstructs the entries given the JSON data
+        void deserialise(const serialisation::json_value::array_t& json_data);
 
-				/// Writes the entries to the serialiser as array of objects
-				/// If obfuscation is true, this will write the passwords as hexadecimal strings of of the password bytes.
-				/// Otherwise, it will write the passwords as-is.
-				void serialise(serialisation::serialiser& serialiser, bool obfuscation);
+        /// Writes the entries to the serialiser as array of objects
+        /// If obfuscation is true, this will write the passwords as hexadecimal strings of of the password bytes.
+        /// Otherwise, it will write the passwords as-is.
+        void serialise(serialisation::serialiser& serialiser, bool obfuscation);
 
-				/// Adds a new entry to the collection
-				void push_back(entry_ptr entry);
+        /// Adds a new entry to the collection
+        void push_back(entry_ptr entry);
 
-				/// Returns an iterator to the first entry
-				inline entry_iterator begin() { return entries.begin(); }
+        /// Returns an iterator to the first entry
+        inline entry_iterator begin() { return entries.begin(); }
 
-				/// Returns an iterator past the last entry
-				inline entry_iterator end() { return entries.end(); }
+        /// Returns an iterator past the last entry
+        inline entry_iterator end() { return entries.end(); }
 
-				/// Returns an iterator to the first entry
-				inline const_entry_iterator begin() const { return entries.begin(); }
+        /// Returns an iterator to the first entry
+        inline const_entry_iterator begin() const { return entries.begin(); }
 
-				/// Returns an iterator past the last entry
-				inline const_entry_iterator end() const { return entries.end(); }
-			};
-		}
-	}
+        /// Returns an iterator past the last entry
+        inline const_entry_iterator end() const { return entries.end(); }
+      };
+    }
+  }
 }
 
 #endif

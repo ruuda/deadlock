@@ -23,35 +23,35 @@ using namespace deadlock::core::data;
 
 void entry_collection::push_back(entry_ptr new_entry)
 {
-	entries.push_back(new_entry);
+  entries.push_back(new_entry);
 
-	// TODO: update acceleration structure
+  // TODO: update acceleration structure
 }
 
 void entry_collection::deserialise(const serialisation::json_value::array_t& json_data)
 {
-	// Loop through the data and read entries
-	for (size_t i = 0; i < json_data.size(); i++)
-	{
-		// Add a new, blank entry to the collection
-		entries.push_back(make_entry());
-		// Load the correct data into it
-		entries.back()->deserialise(json_data[i]);
-	}
+  // Loop through the data and read entries
+  for (size_t i = 0; i < json_data.size(); i++)
+  {
+    // Add a new, blank entry to the collection
+    entries.push_back(make_entry());
+    // Load the correct data into it
+    entries.back()->deserialise(json_data[i]);
+  }
 
-	// TODO: generate acceleration structure
+  // TODO: generate acceleration structure
 }
 
 void entry_collection::serialise(serialisation::serialiser& serialiser, bool obfuscation)
 {
-	// Write the collection as an array
-	serialiser.write_begin_array();
-	{
-		// Loop through the entries and write them
-		for (size_t i = 0; i < entries.size(); i++)
-		{
-			entries[i]->serialise(serialiser, obfuscation);
-		}
-	}
-	serialiser.write_end_array();
+  // Write the collection as an array
+  serialiser.write_begin_array();
+  {
+    // Loop through the entries and write them
+    for (size_t i = 0; i < entries.size(); i++)
+    {
+      entries[i]->serialise(serialiser, obfuscation);
+    }
+  }
+  serialiser.write_end_array();
 }

@@ -1,5 +1,5 @@
-// Deadlock – fast search-based password manager
-// Copyright (C) 2012–2013 Ruud van Asseldonk
+// Deadlock â€“ fast search-based password manager
+// Copyright (C) 2012â€“2013 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,51 +25,51 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			namespace detail
-			{
-				#ifdef _WIN32
-				/// Zeroes a block of memory
-				inline void secure_memzero(void* buffer, size_t n)
-				{
-					SecureZeroMemory(buffer, n);
-				}
-				#else
-				/// Zeroes a block of memory
-				inline void secure_memzero(void* buffer, size_t n)
-				{
-					// TODO: use a secure vairant on other platforms as well?
-					std::memset(buffer, 0, n);
-				}
-				#endif
+  namespace core
+  {
+    namespace data
+    {
+      namespace detail
+      {
+        #ifdef _WIN32
+        /// Zeroes a block of memory
+        inline void secure_memzero(void* buffer, size_t n)
+        {
+          SecureZeroMemory(buffer, n);
+        }
+        #else
+        /// Zeroes a block of memory
+        inline void secure_memzero(void* buffer, size_t n)
+        {
+          // TODO: use a secure vairant on other platforms as well?
+          std::memset(buffer, 0, n);
+        }
+        #endif
 
-				/// An allocator that zeroes memory upon deallocation
-				/// Based on http://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
-				/// and http://stackoverflow.com/questions/3785582/how-to-write-a-password-safe-class
-				template <typename T> class secure_allocator : public std::allocator<T>
-				{
-					public:
+        /// An allocator that zeroes memory upon deallocation
+        /// Based on http://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
+        /// and http://stackoverflow.com/questions/3785582/how-to-write-a-password-safe-class
+        template <typename T> class secure_allocator : public std::allocator<T>
+        {
+          public:
 
-						typedef typename std::allocator<T>::pointer pointer;
-						typedef typename std::allocator<T>::size_type size_type;
+            typedef typename std::allocator<T>::pointer pointer;
+            typedef typename std::allocator<T>::size_type size_type;
 
-						template<typename U> struct rebind { typedef secure_allocator<U> other; };
-						secure_allocator() throw() {}
-						secure_allocator(const secure_allocator&) throw() {}
-						template <typename U> secure_allocator(const secure_allocator<U>&) throw() {}
+            template<typename U> struct rebind { typedef secure_allocator<U> other; };
+            secure_allocator() throw() {}
+            secure_allocator(const secure_allocator&) throw() {}
+            template <typename U> secure_allocator(const secure_allocator<U>&) throw() {}
 
-						void deallocate(pointer p, size_type num)
-						{
-							secure_memzero(p, sizeof(T) * num);
-							std::allocator<T>::deallocate(p, num);
-						}
-				};
-			}
-		}
-	}
+            void deallocate(pointer p, size_type num)
+            {
+              secure_memzero(p, sizeof(T) * num);
+              std::allocator<T>::deallocate(p, num);
+            }
+        };
+      }
+    }
+  }
 }
 
 #endif

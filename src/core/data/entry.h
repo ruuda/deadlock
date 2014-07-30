@@ -29,103 +29,103 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			class entry;
+  namespace core
+  {
+    namespace data
+    {
+      class entry;
 
-			typedef std::shared_ptr<entry> entry_ptr;
+      typedef std::shared_ptr<entry> entry_ptr;
 
-			/// An entry for the collection, containing a password and username
-			/// This contains one single item for the collection (identified by a key),
-			/// A collection of passwords associated with it,
-			/// a username and additional data
-			class entry
-			{
+      /// An entry for the collection, containing a password and username
+      /// This contains one single item for the collection (identified by a key),
+      /// A collection of passwords associated with it,
+      /// a username and additional data
+      class entry
+      {
 
-			public:
+      public:
 
-				typedef std::vector<password, data::detail::secure_allocator<password>> password_collection;
-				typedef password_collection::const_iterator password_iterator;
+        typedef std::vector<password, data::detail::secure_allocator<password>> password_collection;
+        typedef password_collection::const_iterator password_iterator;
 
-			protected:
+      protected:
 
-				/// The string used to identify this entry.
-				/// This will be the name of a website or service in most cases.
-				/// The identifier need not be unique.
-				secure_string_ptr id;
+        /// The string used to identify this entry.
+        /// This will be the name of a website or service in most cases.
+        /// The identifier need not be unique.
+        secure_string_ptr id;
 
-				/// A list of passwords associated with the key
-				/// The most recent one is the "best" passwords, but older passwords are stored by means of a backup.
-				password_collection passwords;
+        /// A list of passwords associated with the key
+        /// The most recent one is the "best" passwords, but older passwords are stored by means of a backup.
+        password_collection passwords;
 
-				/// The username associated with the password.
-				secure_string_ptr username;
+        /// The username associated with the password.
+        secure_string_ptr username;
 
-				/// Can be used to store additional information with the key.
-				secure_string_ptr additional_data;
+        /// Can be used to store additional information with the key.
+        secure_string_ptr additional_data;
 
-			public:
+      public:
 
-				/// Constructs an entry with empty password and other values.
-				entry();
+        /// Constructs an entry with empty password and other values.
+        entry();
 
-				/// Copy constructor
-				entry(const entry& other);
+        /// Copy constructor
+        entry(const entry& other);
 
-				/// Returns the identifier associated with this entry
-				inline const secure_string& get_id() const { return *id; }
+        /// Returns the identifier associated with this entry
+        inline const secure_string& get_id() const { return *id; }
 
-				/// Modifies the identifier associated with this entry
-				inline void set_id(const secure_string& new_id) { id = make_secure_string(new_id); }
+        /// Modifies the identifier associated with this entry
+        inline void set_id(const secure_string& new_id) { id = make_secure_string(new_id); }
 
-				/// Returns an iterator to the first password
-				inline password_iterator passwords_begin() const { return passwords.begin(); }
+        /// Returns an iterator to the first password
+        inline password_iterator passwords_begin() const { return passwords.begin(); }
 
-				/// Returns an iterator past the last password
-				inline password_iterator passwords_end() const { return passwords.end(); }
+        /// Returns an iterator past the last password
+        inline password_iterator passwords_end() const { return passwords.end(); }
 
-				/// Returns the current (most recent) password
-				const password& get_password() const;
+        /// Returns the current (most recent) password
+        const password& get_password() const;
 
-				/// Appends a new password to the list of passwords, making it the current password
-				void set_password(const secure_string& new_password);
+        /// Appends a new password to the list of passwords, making it the current password
+        void set_password(const secure_string& new_password);
 
-				/// Returns the username associated with the key
-				inline const secure_string& get_username() const { return *username; }
+        /// Returns the username associated with the key
+        inline const secure_string& get_username() const { return *username; }
 
-				/// Mofifies the username associated with the key
-				inline void set_username(const secure_string& new_username) { username = make_secure_string(new_username); }
+        /// Mofifies the username associated with the key
+        inline void set_username(const secure_string& new_username) { username = make_secure_string(new_username); }
 
-				/// Returns additional data associated with the key
-				inline const secure_string& get_additional_data() const { return *additional_data; }
+        /// Returns additional data associated with the key
+        inline const secure_string& get_additional_data() const { return *additional_data; }
 
-				/// Modifies additional data associated with the key
-				inline void set_additional_data(const secure_string& new_data) { additional_data = make_secure_string(new_data); }
+        /// Modifies additional data associated with the key
+        inline void set_additional_data(const secure_string& new_data) { additional_data = make_secure_string(new_data); }
 
-				/// Reconstructs the entries given the JSON data
-				void deserialise(const serialisation::json_value::object_t& json_data);
+        /// Reconstructs the entries given the JSON data
+        void deserialise(const serialisation::json_value::object_t& json_data);
 
-				/// Writes the entry to the serialiser as object.
-				/// If obfuscation is true, this will write the data as hexadecimal strings.
-				/// If it is false, it will write the data "as-is".
-				void serialise(serialisation::serialiser& serialiser, bool obfuscation);
-			};
+        /// Writes the entry to the serialiser as object.
+        /// If obfuscation is true, this will write the data as hexadecimal strings.
+        /// If it is false, it will write the data "as-is".
+        void serialise(serialisation::serialiser& serialiser, bool obfuscation);
+      };
 
-			/// Constructs an empty entry with the secure allocator
-			inline entry_ptr make_entry()
-			{
-				return std::allocate_shared<entry>(detail::secure_allocator<entry>());
-			}
+      /// Constructs an empty entry with the secure allocator
+      inline entry_ptr make_entry()
+      {
+        return std::allocate_shared<entry>(detail::secure_allocator<entry>());
+      }
 
-			/// Copies an entry with the secure allocator
-			inline entry_ptr make_entry(const entry& other)
-			{
-				return std::allocate_shared<entry>(detail::secure_allocator<entry>(), other);
-			}
-		}
-	}
+      /// Copies an entry with the secure allocator
+      inline entry_ptr make_entry(const entry& other)
+      {
+        return std::allocate_shared<entry>(detail::secure_allocator<entry>(), other);
+      }
+    }
+  }
 }
 
 #endif

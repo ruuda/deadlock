@@ -24,29 +24,29 @@ using namespace deadlock::core::data;
 password password::empty_password = password("", 0x0);
 
 password::password(const secure_string& password_str, std::int64_t stored_time) :
-	password_string(make_secure_string(password_str)), store_time(stored_time)
+  password_string(make_secure_string(password_str)), store_time(stored_time)
 {
 
 }
 
 password::password(const secure_string& password_str) :
-	password_string(make_secure_string(password_str))
+  password_string(make_secure_string(password_str))
 {
-	// Store with the current time
-	// TODO: make sure this is GMT time, independent of the local time (for portability)
-	store_time = std::time(nullptr);
+  // Store with the current time
+  // TODO: make sure this is GMT time, independent of the local time (for portability)
+  store_time = std::time(nullptr);
 }
 
 password::password(const password& other)
-	:
-	// Copy the data, because the shared_ptr is only used for secure memory erasing.
-	password_string(make_secure_string(other.get_password())),
-	store_time(other.get_stored_time())
+  :
+  // Copy the data, because the shared_ptr is only used for secure memory erasing.
+  password_string(make_secure_string(other.get_password())),
+  store_time(other.get_stored_time())
 {
 
 }
 
 const password& password::empty()
 {
-	return empty_password;
+  return empty_password;
 }

@@ -28,30 +28,30 @@ build = 0;
 
 version::version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number)
 {
-	major = major_number;
-	minor = minor_number;
-	revision = revision_number;
-	build = build_number;
+  major = major_number;
+  minor = minor_number;
+  revision = revision_number;
+  build = build_number;
 }
 
 bool deadlock::core::operator<(version v1, version v2)
 {
-	if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
-	if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
-	if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
-	if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
+  if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
+  if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
+  if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
+  if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
 
-	// Equality is not less-than
-	return false;
+  // Equality is not less-than
+  return false;
 }
 
 bool deadlock::core::operator<=(version v1, version v2)
 {
-	if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
-	if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
-	if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
-	if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
+  if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
+  if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
+  if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
+  if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
 
-	// Equality is less-than or equal
-	return true;
+  // Equality is less-than or equal
+  return true;
 }

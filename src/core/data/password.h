@@ -23,46 +23,46 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace data
-		{
-			/// Keeps a password and the date-time it was stored
-			class password
-			{
-			protected:
+  namespace core
+  {
+    namespace data
+    {
+      /// Keeps a password and the date-time it was stored
+      class password
+      {
+      protected:
 
-				/// The time the password was stored, as the number of seconds since epoch (1970-01-01 00:00)
-				std::int64_t store_time;
+        /// The time the password was stored, as the number of seconds since epoch (1970-01-01 00:00)
+        std::int64_t store_time;
 
-				/// The actual password data
-				secure_string_ptr password_string;
+        /// The actual password data
+        secure_string_ptr password_string;
 
-				static password empty_password;
+        static password empty_password;
 
-			public:
+      public:
 
-				/// Re-constructs a password based on the given data
-				/// Should be used for loading only
-				password(const secure_string& password_data, std::int64_t stored_time);
+        /// Re-constructs a password based on the given data
+        /// Should be used for loading only
+        password(const secure_string& password_data, std::int64_t stored_time);
 
-				/// Constructs a new password with its store_time set to the current time
-				password(const secure_string& password_data);
+        /// Constructs a new password with its store_time set to the current time
+        password(const secure_string& password_data);
 
-				/// Copy constructor
-				password(const password& other);
+        /// Copy constructor
+        password(const password& other);
 
-				/// Returns the time at which the password was stored
-				inline std::int64_t get_stored_time() const { return store_time; }
+        /// Returns the time at which the password was stored
+        inline std::int64_t get_stored_time() const { return store_time; }
 
-				/// Returns the password
-				inline const secure_string& get_password() const { return *password_string; }
+        /// Returns the password
+        inline const secure_string& get_password() const { return *password_string; }
 
-				/// Returns the empty password
-				static const password& empty();
-			};
-		}
-	}
+        /// Returns the empty password
+        static const password& empty();
+      };
+    }
+  }
 }
 
 #endif

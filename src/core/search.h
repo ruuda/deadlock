@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -27,151 +27,151 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		namespace detail
-		{
-			// A helper structure for the search algorithm
-			struct entry_match
-			{
-				data::entry_ptr entry;
-				int probability;
-			};
+  namespace core
+  {
+    namespace detail
+    {
+      // A helper structure for the search algorithm
+      struct entry_match
+      {
+        data::entry_ptr entry;
+        int probability;
+      };
 
-			// By defining this operator, std::less works, and this allows the priority queue to work
-			inline bool operator<(const entry_match& m1, const entry_match& m2)
-			{
-				return m1.probability < m2.probability;
-			}
-		}
+      // By defining this operator, std::less works, and this allows the priority queue to work
+      inline bool operator<(const entry_match& m1, const entry_match& m2)
+      {
+        return m1.probability < m2.probability;
+      }
+    }
 
-		/// Contains the search logic that intelligently
-		/// identifies entries based on a search string
-		class search
-		{
-			protected:
+    /// Contains the search logic that intelligently
+    /// identifies entries based on a search string
+    class search
+    {
+      protected:
 
-				/// Returns a one-word string that is the acronym of the words provided
-				data::secure_string_ptr make_acronym(const data::secure_string& words) const;
+        /// Returns a one-word string that is the acronym of the words provided
+        data::secure_string_ptr make_acronym(const data::secure_string& words) const;
 
-				/// Returns the lowercase version of the string
-				inline data::secure_string_ptr tolower(const data::secure_string& str) const
-				{
-					data::secure_string_ptr lower = data::make_secure_string(str);
-					// Transform every character to lowercase
-					// TODO: UTF-8 tolower, and what about the locale?
-					// Is there a better way to do this?
-					std::for_each(lower->begin(), lower->end(), [](char& c) { c = std::tolower(c, std::locale()); });
+        /// Returns the lowercase version of the string
+        inline data::secure_string_ptr tolower(const data::secure_string& str) const
+        {
+          data::secure_string_ptr lower = data::make_secure_string(str);
+          // Transform every character to lowercase
+          // TODO: UTF-8 tolower, and what about the locale?
+          // Is there a better way to do this?
+          std::for_each(lower->begin(), lower->end(), [](char& c) { c = std::tolower(c, std::locale()); });
 
-					return lower;
-				}
+          return lower;
+        }
 
-				/// Splits a string into words on whitspace
-				inline data::secure_string_vector get_words(const data::secure_string& str) const
-				{
-					data::secure_string_vector words;
+        /// Splits a string into words on whitspace
+        inline data::secure_string_vector get_words(const data::secure_string& str) const
+        {
+          data::secure_string_vector words;
 
-					data::secure_stringstream_ptr iss = data::make_secure_stringstream(str);
-					std::copy(std::istream_iterator<data::secure_string>(*iss),
-						      std::istream_iterator<data::secure_string>(),
-						      std::back_inserter(words));
+          data::secure_stringstream_ptr iss = data::make_secure_stringstream(str);
+          std::copy(std::istream_iterator<data::secure_string>(*iss),
+                  std::istream_iterator<data::secure_string>(),
+                  std::back_inserter(words));
 
-					return words;
-				}
+          return words;
+        }
 
-				/// Returns how similar the two strings are
-				int match_words(const data::secure_string& needle, const data::secure_string& haystack) const;
+        /// Returns how similar the two strings are
+        int match_words(const data::secure_string& needle, const data::secure_string& haystack) const;
 
-				/// Checks every word against every other word, and accumulates the matches
-				int cross_match_words(const data::secure_string_vector& needles, const data::secure_string_vector& haystacks) const;
+        /// Checks every word against every other word, and accumulates the matches
+        int cross_match_words(const data::secure_string_vector& needles, const data::secure_string_vector& haystacks) const;
 
-				/// Considers all entries and, given the search string, puts all matches in a priority queue.
-				template <typename IndirectIterator> std::priority_queue<detail::entry_match>
-				find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
-				{
-					std::priority_queue<detail::entry_match> matches;
+        /// Considers all entries and, given the search string, puts all matches in a priority queue.
+        template <typename IndirectIterator> std::priority_queue<detail::entry_match>
+        find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
+        {
+          std::priority_queue<detail::entry_match> matches;
 
-					// First of all, make the search string lowercase
-					data::secure_string_ptr query_lower = tolower(query);
+          // First of all, make the search string lowercase
+          data::secure_string_ptr query_lower = tolower(query);
 
-					// Split the query into words
-					data::secure_string_vector query_words = get_words(*query_lower);
+          // Split the query into words
+          data::secure_string_vector query_words = get_words(*query_lower);
 
-					// Now search through the entries
-					for (IndirectIterator i = begin; i != end; i++)
-					{
-						// Start with 0 probability that this is the entry the user meant.
-						int probability = 0;
+          // Now search through the entries
+          for (IndirectIterator i = begin; i != end; i++)
+          {
+            // Start with 0 probability that this is the entry the user meant.
+            int probability = 0;
 
-						// Make the identifier lowercase as well
-						data::secure_string_ptr id_lower = tolower(i->get_id());
+            // Make the identifier lowercase as well
+            data::secure_string_ptr id_lower = tolower(i->get_id());
 
-						// And split it into words too
-						data::secure_string_vector id_words = get_words(*id_lower);
+            // And split it into words too
+            data::secure_string_vector id_words = get_words(*id_lower);
 
-						// If the match is perfect, set a high probability
-						if (*id_lower == *query_lower)
-						{
-							probability += 50;
+            // If the match is perfect, set a high probability
+            if (*id_lower == *query_lower)
+            {
+              probability += 50;
 
-							// If the match is case-sensistive, the probability is even higher
-							if (i->get_id() == query) probability += 50;
-						}
+              // If the match is case-sensistive, the probability is even higher
+              if (i->get_id() == query) probability += 50;
+            }
 
-						// Cross check the words
-						probability += cross_match_words(query_words, id_words);
+            // Cross check the words
+            probability += cross_match_words(query_words, id_words);
 
-						// If a match was found, add it to the queue
-						if (probability > 0)
-						{
-							detail::entry_match match;
-							match.entry = (*i.base());
-							match.probability = probability;
+            // If a match was found, add it to the queue
+            if (probability > 0)
+            {
+              detail::entry_match match;
+              match.entry = (*i.base());
+              match.probability = probability;
 
-							matches.push(match);
-						}
-					}
+              matches.push(match);
+            }
+          }
 
-					return matches;
-				}
+          return matches;
+        }
 
-			public:
+      public:
 
-				/// Creates a new search algorithm
-				search();
+        /// Creates a new search algorithm
+        search();
 
-				/// Scans through the entries defined by begin and end,
-				/// and appends all matches to the output iterator in order of match probability.
-				template <typename IndirectIterator, typename OutputIterator>
-				void find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end, OutputIterator output_iterator) const
-				{
-					// First, find all matches
-					// They are roughly sorted in the priority queue.
-					std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
+        /// Scans through the entries defined by begin and end,
+        /// and appends all matches to the output iterator in order of match probability.
+        template <typename IndirectIterator, typename OutputIterator>
+        void find_matches(const data::secure_string& query, IndirectIterator begin, IndirectIterator end, OutputIterator output_iterator) const
+        {
+          // First, find all matches
+          // They are roughly sorted in the priority queue.
+          std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
 
-					// Copy the found matches in the correct order
-					// This ensures that they are sorted correctly.
-					while (!matches.empty())
-					{
-						output_iterator = matches.top().entry;
-						output_iterator++;
-						matches.pop();
-					}
-				}
+          // Copy the found matches in the correct order
+          // This ensures that they are sorted correctly.
+          while (!matches.empty())
+          {
+            output_iterator = matches.top().entry;
+            output_iterator++;
+            matches.pop();
+          }
+        }
 
-				/// Returns the best match given the query, or nullptr if none was found.
-				template <typename IndirectIterator>
-				data::entry_ptr find_match(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
-				{
-					// First, find all matches
-					// They are roughly sorted in the priority queue, only the top is guaranteed to be sorted correctly.
-					const std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
+        /// Returns the best match given the query, or nullptr if none was found.
+        template <typename IndirectIterator>
+        data::entry_ptr find_match(const data::secure_string& query, IndirectIterator begin, IndirectIterator end) const
+        {
+          // First, find all matches
+          // They are roughly sorted in the priority queue, only the top is guaranteed to be sorted correctly.
+          const std::priority_queue<detail::entry_match> matches = find_matches(query, begin, end);
 
-					// Becayse the top is sorted correctly, the best match is at the top, and the rest need not be sorted.
-					return matches.empty() ? nullptr : matches.top().entry;
-				}
-		};
-	}
+          // Becayse the top is sorted correctly, the best match is at the top, and the rest need not be sorted.
+          return matches.empty() ? nullptr : matches.top().entry;
+        }
+    };
+  }
 }
 
 #endif

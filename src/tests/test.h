@@ -21,20 +21,20 @@
 
 namespace deadlock
 {
-	namespace tests
-	{
-		/// Represents one unit test
-		class test
-		{
-			public:
+  namespace tests
+  {
+    /// Represents one unit test
+    class test
+    {
+      public:
 
-				/// Should run the test
-				virtual void run() = 0;
+        /// Should run the test
+        virtual void run() = 0;
 
-				/// Should return the name of the test
-				virtual std::string get_name() = 0;
-		};
-	}
+        /// Should return the name of the test
+        virtual std::string get_name() = 0;
+    };
+  }
 }
 
 #endif

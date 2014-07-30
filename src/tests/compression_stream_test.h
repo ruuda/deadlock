@@ -1,4 +1,4 @@
-// Deadlock – fast search-based password manager
+// Deadlock â€“ fast search-based password manager
 // Copyright (C) 2012 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
@@ -21,20 +21,20 @@
 
 namespace deadlock
 {
-	namespace tests
-	{
-		/// Tests xz compression / decompression stream functionality
-		class compression_stream_test : public test
-		{
-			public:
+  namespace tests
+  {
+    /// Tests xz compression / decompression stream functionality
+    class compression_stream_test : public test
+    {
+      public:
 
-				/// Runs the test
-				void run();
+        /// Runs the test
+        void run();
 
-				/// Returns the name of the test
-				std::string get_name();
-		};
-	}
+        /// Returns the name of the test
+        std::string get_name();
+    };
+  }
 }
 
 #endif

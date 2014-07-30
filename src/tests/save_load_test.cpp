@@ -25,64 +25,64 @@ using namespace deadlock::tests;
 
 std::string save_load_test::get_name()
 {
-	return "save_load";
+  return "save_load";
 }
 
 void save_load_test::run()
 {
-	// Create a key
-	cryptography::key key;
-	key.set_salt_random();
-	data::secure_string_ptr passphrase = data::make_secure_string("correct horse battery staple");
-	size_t iterations = key.get_required_iterations(passphrase->length(), 0.1);
-	key.generate_key(*passphrase, iterations);
+  // Create a key
+  cryptography::key key;
+  key.set_salt_random();
+  data::secure_string_ptr passphrase = data::make_secure_string("correct horse battery staple");
+  size_t iterations = key.get_required_iterations(passphrase->length(), 0.1);
+  key.generate_key(*passphrase, iterations);
 
-	// Create one vault that saves, one vault that loads
-	vault first, second;
+  // Create one vault that saves, one vault that loads
+  vault first, second;
 
-	// Store two entries in the vault
-	data::entry_ptr etr1 = data::make_entry();
-	etr1->set_username("Guybrush Threepwood");
-	etr1->set_id("Fictional Key 1");
-	etr1->set_password("correct horse battery staple");
-	etr1->set_additional_data("nothing");
-	first.add_entry(etr1);
+  // Store two entries in the vault
+  data::entry_ptr etr1 = data::make_entry();
+  etr1->set_username("Guybrush Threepwood");
+  etr1->set_id("Fictional Key 1");
+  etr1->set_password("correct horse battery staple");
+  etr1->set_additional_data("nothing");
+  first.add_entry(etr1);
 
-	data::entry_ptr etr2 = data::make_entry();
-	etr2->set_username("Gordon Freeman");
-	etr2->set_id("Fictional Key 2");
-	etr2->set_password("the cake is a lie");
-	first.add_entry(etr2);
+  data::entry_ptr etr2 = data::make_entry();
+  etr2->set_username("Gordon Freeman");
+  etr2->set_id("Fictional Key 2");
+  etr2->set_password("the cake is a lie");
+  first.add_entry(etr2);
 
-	// Save
-	first.save("test_save_load.dlk", key);
+  // Save
+  first.save("test_save_load.dlk", key);
 
-	// Load
-	second.load("test_save_load.dlk", key, *passphrase);
-	
-	vault::const_entry_iterator it = second.begin();
+  // Load
+  second.load("test_save_load.dlk", key, *passphrase);
+  
+  vault::const_entry_iterator it = second.begin();
 
-	// Validate the first entry
-	if (it->get_username() != etr1->get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr1->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr1->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr1->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr1->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+  // Validate the first entry
+  if (it->get_username() != etr1->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+  if (it->get_password().get_password() != etr1->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+  if (it->get_password().get_stored_time() != etr1->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+  if (it->get_id() != etr1->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+  if (it->get_additional_data() != etr1->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
+  it++;
 
-	// Validate the second entry
-	if (it->get_username() != etr2->get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr2->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr2->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr2->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr2->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+  // Validate the second entry
+  if (it->get_username() != etr2->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+  if (it->get_password().get_password() != etr2->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+  if (it->get_password().get_stored_time() != etr2->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+  if (it->get_id() != etr2->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+  if (it->get_additional_data() != etr2->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
-	if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");
+  it++;
+  if (it != second.end()) throw std::runtime_error("Incorrect number of entries encountered.");
 
-	// Now try empty vault
-	vault third, fourth;
-	third.save("test_save_load_empty.dlk", key);
-	fourth.load("test_save_load_empty.dlk", key, *passphrase);
+  // Now try empty vault
+  vault third, fourth;
+  third.save("test_save_load_empty.dlk", key);
+  fourth.load("test_save_load_empty.dlk", key, *passphrase);
 }

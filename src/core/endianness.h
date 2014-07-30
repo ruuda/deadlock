@@ -43,46 +43,46 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		/// Converts an integer to big-endian notatation
-		/// On big-endian systems, this does nothing.
-		/// On little-endian systems, this swaps around the bytes.
-		inline std::uint32_t internal_to_portable(std::uint32_t internal_integer)
-		{
-			// TODO: can the run-time check be replaced with compile-time macros?
-			// Optionally integrate with Crypto++ endianness detection as well
-			union
-			{
-				std::uint32_t i;
-				std::uint8_t  c[4];
-			}
-			endianness = { 0x01020304 };
+  namespace core
+  {
+    /// Converts an integer to big-endian notatation
+    /// On big-endian systems, this does nothing.
+    /// On little-endian systems, this swaps around the bytes.
+    inline std::uint32_t internal_to_portable(std::uint32_t internal_integer)
+    {
+      // TODO: can the run-time check be replaced with compile-time macros?
+      // Optionally integrate with Crypto++ endianness detection as well
+      union
+      {
+        std::uint32_t i;
+        std::uint8_t  c[4];
+      }
+      endianness = { 0x01020304 };
 
-			bool big_endian = (endianness.c[0] == 0x01);
+      bool big_endian = (endianness.c[0] == 0x01);
 
-			return big_endian ? internal_integer : DEADLOCK_BYTESWAP_32(internal_integer);
-		}
+      return big_endian ? internal_integer : DEADLOCK_BYTESWAP_32(internal_integer);
+    }
 
-		/// Converts a big-endian integer to internal notatation
-		/// On big-endian systems, this does nothing.
-		/// On little-endian systems, this swaps around the bytes.
-		inline std::uint32_t portable_to_internal(std::uint32_t portable_integer)
-		{
-			// TODO: can the run-time check be replaced with compile-time macros?
-			// Optionally integrate with Crypto++ endianness detection as well
-			union
-			{
-				std::uint32_t i;
-				std::uint8_t  c[4];
-			}
-			endianness = { 0x01020304 };
+    /// Converts a big-endian integer to internal notatation
+    /// On big-endian systems, this does nothing.
+    /// On little-endian systems, this swaps around the bytes.
+    inline std::uint32_t portable_to_internal(std::uint32_t portable_integer)
+    {
+      // TODO: can the run-time check be replaced with compile-time macros?
+      // Optionally integrate with Crypto++ endianness detection as well
+      union
+      {
+        std::uint32_t i;
+        std::uint8_t  c[4];
+      }
+      endianness = { 0x01020304 };
 
-			bool big_endian = (endianness.c[0] == 0x01);
+      bool big_endian = (endianness.c[0] == 0x01);
 
-			return big_endian ? portable_integer : DEADLOCK_BYTESWAP_32(portable_integer);
-		}
-	}
+      return big_endian ? portable_integer : DEADLOCK_BYTESWAP_32(portable_integer);
+    }
+  }
 }
 
 #endif

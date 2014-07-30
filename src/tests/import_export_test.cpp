@@ -25,59 +25,59 @@ using namespace deadlock::tests;
 
 std::string import_export_test::get_name()
 {
-	return "import_export";
+  return "import_export";
 }
 
 void import_export_test::run()
 {
-	// Create two initial vaults
-	vault first, second;
+  // Create two initial vaults
+  vault first, second;
 
-	// Store one entry in each vault
-	data::entry_ptr etr1 = data::make_entry();
-	etr1->set_username("Guybrush Threepwood");
-	etr1->set_id("Fictional Identifier 1");
-	etr1->set_password("correct horse battery staple");
-	etr1->set_additional_data("nothing");
-	first.add_entry(etr1);
+  // Store one entry in each vault
+  data::entry_ptr etr1 = data::make_entry();
+  etr1->set_username("Guybrush Threepwood");
+  etr1->set_id("Fictional Identifier 1");
+  etr1->set_password("correct horse battery staple");
+  etr1->set_additional_data("nothing");
+  first.add_entry(etr1);
 
-	// Store one entry in each vault
-	data::entry_ptr etr2 = data::make_entry();
-	etr2->set_username("Gordon Freeman");
-	etr2->set_id("Fictional Identifier 2");
-	etr2->set_password("the cake is a lie");
-	second.add_entry(etr2);
+  // Store one entry in each vault
+  data::entry_ptr etr2 = data::make_entry();
+  etr2->set_username("Gordon Freeman");
+  etr2->set_id("Fictional Identifier 2");
+  etr2->set_password("the cake is a lie");
+  second.add_entry(etr2);
 
-	// Export both vaults, the first obfuscated, the second plain
-	first.export_json("test_import_export_1.json", true);
-	second.export_json("test_import_export_2.json", false);
+  // Export both vaults, the first obfuscated, the second plain
+  first.export_json("test_import_export_1.json", true);
+  second.export_json("test_import_export_2.json", false);
 
-	// Create a third vault
-	vault third;
+  // Create a third vault
+  vault third;
 
-	// Import both exported vaults into it
-	third.import_json("test_import_export_1.json");
-	third.import_json("test_import_export_2.json");
+  // Import both exported vaults into it
+  third.import_json("test_import_export_1.json");
+  third.import_json("test_import_export_2.json");
 
 
-	vault::const_entry_iterator it = third.begin();
+  vault::const_entry_iterator it = third.begin();
 
-	// Validate the first entry
-	if (it->get_username() != etr1->get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr1->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr1->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr1->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr1->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+  // Validate the first entry
+  if (it->get_username() != etr1->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+  if (it->get_password().get_password() != etr1->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+  if (it->get_password().get_stored_time() != etr1->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+  if (it->get_id() != etr1->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+  if (it->get_additional_data() != etr1->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
+  it++;
 
-	// Validate the second entry
-	if (it->get_username() != etr2->get_username()) throw std::runtime_error("Username not retrieved correctly.");
-	if (it->get_password().get_password() != etr2->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
-	if (it->get_password().get_stored_time() != etr2->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
-	if (it->get_id() != etr2->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
-	if (it->get_additional_data() != etr2->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
+  // Validate the second entry
+  if (it->get_username() != etr2->get_username()) throw std::runtime_error("Username not retrieved correctly.");
+  if (it->get_password().get_password() != etr2->get_password().get_password()) throw std::runtime_error("Password not retrieved correctly.");
+  if (it->get_password().get_stored_time() != etr2->get_password().get_stored_time()) throw std::runtime_error("Password timestamp not retrieved correctly.");
+  if (it->get_id() != etr2->get_id()) throw std::runtime_error("Identifier not retrieved correctly.");
+  if (it->get_additional_data() != etr2->get_additional_data()) throw std::runtime_error("Additional data not retrieved correctly.");
 
-	it++;
-	if (it != third.end()) throw std::runtime_error("Incorrect number of entries encountered.");
+  it++;
+  if (it != third.end()) throw std::runtime_error("Incorrect number of entries encountered.");
 }

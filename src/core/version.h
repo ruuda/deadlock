@@ -23,62 +23,62 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		/// Represents a version as a 32-bit integer
-		/// 8-bits are reserved for the major number, minor number, revision and build number.
-		/// (That means there should not be more than 255 builds of one revision)
-		struct version
-		{
-			std::uint8_t major;
+  namespace core
+  {
+    /// Represents a version as a 32-bit integer
+    /// 8-bits are reserved for the major number, minor number, revision and build number.
+    /// (That means there should not be more than 255 builds of one revision)
+    struct version
+    {
+      std::uint8_t major;
 
-			std::uint8_t minor;
+      std::uint8_t minor;
 
-			std::uint8_t revision;
+      std::uint8_t revision;
 
-			std::uint8_t build;
+      std::uint8_t build;
 
-			/// Empty constructor creates version 1
-			version();
+      /// Empty constructor creates version 1
+      version();
 
-			/// Creates a fully specified version
-			version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number);
+      /// Creates a fully specified version
+      version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number);
 
-			/// Writes a version to a stream
-			inline friend std::ostream& operator<<(std::ostream& ostr, version v)
-			{
-				ostr << static_cast<int>(v.major) << "." << static_cast<int>(v.minor) << "."
-					 << static_cast<int>(v.revision) << "." << static_cast<int>(v.build);
-				return ostr;
-			}
+      /// Writes a version to a stream
+      inline friend std::ostream& operator<<(std::ostream& ostr, version v)
+      {
+        ostr << static_cast<int>(v.major) << "." << static_cast<int>(v.minor) << "."
+           << static_cast<int>(v.revision) << "." << static_cast<int>(v.build);
+        return ostr;
+      }
 
-			/// Reads a version from a stream
-			inline friend std::istream& operator>>(std::istream& istr, version& v)
-			{
-				// Store in int, because we should not deserialise characters, but integers
-				int mjr, mnr, rev, bld;
+      /// Reads a version from a stream
+      inline friend std::istream& operator>>(std::istream& istr, version& v)
+      {
+        // Store in int, because we should not deserialise characters, but integers
+        int mjr, mnr, rev, bld;
 
-				// Read numbers, skip dots in between
-				istr >> mjr; istr.get();
-				istr >> mnr; istr.get();
-				istr >> rev; istr.get();
-				istr >> bld;
+        // Read numbers, skip dots in between
+        istr >> mjr; istr.get();
+        istr >> mnr; istr.get();
+        istr >> rev; istr.get();
+        istr >> bld;
 
-				v.major = mjr;
-				v.minor = mnr;
-				v.revision = rev;
-				v.build = bld;
+        v.major = mjr;
+        v.minor = mnr;
+        v.revision = rev;
+        v.build = bld;
 
-				return istr;
-			}
-		};
+        return istr;
+      }
+    };
 
-		/// Compares two versions
-		bool operator<(version v1, version v2);
+    /// Compares two versions
+    bool operator<(version v1, version v2);
 
-		/// Compares two versions
-		bool operator<=(version v1, version v2);
-	}
+    /// Compares two versions
+    bool operator<=(version v1, version v2);
+  }
 }
 
 #endif

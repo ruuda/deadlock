@@ -21,17 +21,17 @@
 
 namespace deadlock
 {
-	namespace core
-	{
-		/// Provides information about Deadlock
-		class assembly_information
-		{
-		public:
+  namespace core
+  {
+    /// Provides information about Deadlock
+    class assembly_information
+    {
+    public:
 
-			/// Returns the Deadlock core (libdeadlock) version
-			static version get_version();
-		};
-	}
+      /// Returns the Deadlock core (libdeadlock) version
+      static version get_version();
+    };
+  }
 }
 
 #endif
