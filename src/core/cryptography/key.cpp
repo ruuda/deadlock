@@ -45,8 +45,7 @@ void key::set_salt_random()
 {
   // Create a random engine and distribution for generating random bytes
   // TODO: use a cryptographically strong random number generator
-  std::mt19937 random_engine;
-  random_engine.seed(std::time(nullptr));
+  std::random_device random_engine;
   std::uniform_int_distribution<std::uint8_t> random_byte(0x00, 0xff);
 
   // Simply copy the buffer
