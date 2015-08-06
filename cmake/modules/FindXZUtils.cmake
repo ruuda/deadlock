@@ -4,8 +4,8 @@
 # XZUtils_INCLUDE_DIRS - The XZ Utils  include directories
 # XZUtils_LIBRARIES - The libraries needed to use XZ Utils
 
-find_path(XZUtils_INCLUDE_DIR "lzma.h")
-find_library(XZUtils_LIBRARY liblzma)
+find_path(XZUtils_INCLUDE_DIR "lzma.h" PATHS /usr/include)
+find_library(XZUtils_LIBRARY NAMES liblzma liblzma.so PATHS /usr/lib)
 
 set(XZUtils_LIBRARIES ${XZUtils_LIBRARY})
 set(XZUtils_INCLUDE_DIRS ${XZUtils_INCLUDE_DIR})
