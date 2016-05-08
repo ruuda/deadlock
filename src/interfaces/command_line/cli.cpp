@@ -70,7 +70,7 @@ int cli::run(int argc, char** argv)
     ("additional-data", po::value<std::string>(), "set additional data for an entry")
 
     ("list,l", po::value<std::string>(), "list the identifiers of all stored entries, " \
-                                 "or all the entries that match the search criteria")
+                                         "or all the entries that match the search criteria")
 
     ("export", po::value<std::string>(), "export the vault to JSON (removes encryption)")
     ("plain", "save data as plain text instead of hexadecimal representation")

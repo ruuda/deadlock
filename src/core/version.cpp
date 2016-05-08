@@ -20,10 +20,10 @@ using namespace deadlock::core;
 
 version::version()
 {
-major = 1; 
-minor = 0;
-revision = 0;
-build = 0;
+  major = 1;
+  minor = 0;
+  revision = 0;
+  build = 0;
 }
 
 version::version(std::int8_t major_number, std::int8_t minor_number, std::int8_t revision_number, std::int8_t build_number)
