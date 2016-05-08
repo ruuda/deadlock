@@ -28,6 +28,7 @@
 #include <termios.h>
 #endif
 
+#include "../../core/config.h"
 #include "../../core/errors.h"
 #include "../../core/data/secure_string.h"
 #include "../../core/search.h"
@@ -77,28 +78,14 @@ int cli::run(int argc, char** argv)
 
     ("import", po::value<std::vector<std::string>>(), "append unencrypted JSON vault(s) to the vault")
 
-    ("vault", po::value<std::string>()->implicit_value(""), "the vault to operate on");
+    ("vault", po::value<std::string>(), "the vault to operate on")
   ;
-
-  // The file parameter at the end
-  po::positional_options_description p;
-  p.add("vault", 1);
 
   // Parse program options
   po::variables_map vm;
   try
   {
-    po::store(
-      po::command_line_parser(argc, argv).
-      options(desc).positional(p).run(), vm);
-
-    // Fix argument precedence
-    if (!vm.count("vault") && vm.count("list"))
-    {
-      vm.insert(std::make_pair("vault", vm.at("list")));
-      vm.at("list").as<std::string>() = std::string();
-    }
-
+    po::store(po::command_line_parser(argc, argv).options(desc).run(), vm);
     po::notify(vm);
   }
   catch (std::exception& ex)
@@ -242,11 +229,16 @@ bool cli::require_vault_filename(const po::variables_map& vm, bool must_exist)
 {
   if (!vm.count("vault") || vm.at("vault").as<std::string>().empty())
   {
-    std::cerr << "No vault specified." << std::endl;
-    return false;
+    if (!config::get_vault_file(vault_filename))
+    {
+      std::cerr << "No vault specified and none configured in ~/.config/deadlock.conf." << std::endl;
+      return false;
+    }
   }
-
-  vault_filename = vm.at("vault").as<std::string>();
+  else
+  {
+    vault_filename = vm.at("vault").as<std::string>();
+  }
 
   // If file is not requied to exist, only specifying a name is enough.
   if (!must_exist) return true;
@@ -256,7 +248,7 @@ bool cli::require_vault_filename(const po::variables_map& vm, bool must_exist)
   vault_file.open(vault_filename, std::ios_base::in);
   if (!vault_file.good())
   {
-    std::cerr << "The file does not exist." << std::endl;
+    std::cerr << "The file '" << vault_filename << "' does not exist." << std::endl;
     return false;
   }
   vault_file.close();
