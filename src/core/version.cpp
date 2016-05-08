@@ -16,6 +16,8 @@
 
 #include "version.h"
 
+#include <tuple>
+
 using namespace deadlock::core;
 
 version::version()
@@ -36,22 +38,14 @@ version::version(std::int8_t major_number, std::int8_t minor_number, std::int8_t
 
 bool deadlock::core::operator<(version v1, version v2)
 {
-  if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
-  if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
-  if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
-  if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
-
-  // Equality is not less-than
-  return false;
+  auto tv1 = std::tie(v1.major, v1.minor, v1.revision, v1.build);
+  auto tv2 = std::tie(v2.major, v2.minor, v2.revision, v2.build);
+  return tv1 < tv2;
 }
 
 bool deadlock::core::operator<=(version v1, version v2)
 {
-  if (v1.major < v2.major) return true; if (v1.major > v2.major) return false;
-  if (v1.minor < v2.minor) return true; if (v1.minor > v2.minor) return false;
-  if (v1.revision < v2.revision) return true; if (v1.revision > v2.revision) return false;
-  if (v1.build < v2.build) return true; if (v1.build > v2.build) return true;
-
-  // Equality is less-than or equal
-  return true;
+  auto tv1 = std::tie(v1.major, v1.minor, v1.revision, v1.build);
+  auto tv2 = std::tie(v2.major, v2.minor, v2.revision, v2.build);
+  return tv1 <= tv2;
 }
