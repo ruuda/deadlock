@@ -36,7 +36,7 @@ you must redirect the output of the program to a file.
 The following example retrieves your GitHub password
 from the vault `vault.dlk` and stores it in `password.txt`.
 
-    > deadlock -g github vault.dlk > password.txt
+    > deadlock -g github --vault vault.dlk > password.txt
 
 You will not see the `Passphrase: ` prompt or any error
 messages, but you can still type your passphrase,
@@ -49,7 +49,7 @@ If you run MinGW (or a Git Bash,
 or something similar which has an unicode version of `cat`),
 you can use `cat` to display the UTF-8 characters.
 
-    $ deadlock -g github vault.dlk | cat
+    $ deadlock -g github --vault vault.dlk | cat
 
 Windows does **not** send through the input command-line parameters
 correctly, so you cannot correctly pass non-ASCII characters
