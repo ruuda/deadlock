@@ -17,17 +17,11 @@ point, it is stored in memory.
 
 Zeroing memory
 --------------
-When memory is no longer used, the program gives it back to
-the operating system. After a while, the operating system
-can give this memory to a different program. By default,
-memory is never cleared, so the new program receives ‘garbadge’
-that is actually the data from the previous program.
-If that data happens to be unencrypted sensitive data,
-the other program could easily read the sensitive data.
-Fortunately, there is a simple solution to this problem.
-Before giving memory back to the operating system,
-Deadlock overwrites the data with zeroes, erasing the
-unencrypted data from the system.
+Some processes on your system can peek into Deadlock’s memory.
+If that memory happens to contain unencrypted sensitive data, the
+other process could steal the sensitive data. To mitigate the
+risk, Deadlock overwrites memory that containes sensitive data
+with zeroes as soon as the data is not needed any more.
 
 Swapping and paging
 -------------------
@@ -64,7 +58,7 @@ Best practices
 --------------
  1. Do not use Deadlock within a virtual machine,
     as it does not allow sufficient control of the hardware.
- 2. Do **not** use hibernate when a vault is open.
+ 2. Do not use hibernate when a vault is open.
 	The hibernate functionality writes all memory to the disk
 	regardless of whether swapping is prevented or not.
  3. If possible, use full disk encryption, especially for the swap
