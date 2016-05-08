@@ -1,5 +1,5 @@
 // Deadlock – fast search-based password manager
-// Copyright (C) 2012 Ruud van Asseldonk
+// Copyright (C) 2012, 2016 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ namespace deadlock
 
         /// Should return the name of the test
         virtual std::string get_name() = 0;
+
+        virtual ~test() = default;
     };
   }
 }
