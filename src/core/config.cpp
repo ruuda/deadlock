@@ -17,6 +17,7 @@
 #include "config.h"
 
 #include <cstdlib>
+#include <fstream>
 
 using namespace deadlock::core;
 
@@ -45,3 +46,20 @@ std::string config::get_config_file()
 }
 
 #endif
+
+bool config::get_vault_file(std::string& filename)
+{
+  std::string config_file = get_config_file();
+  if (config_file.empty()) return false;
+
+  std::ifstream file(config_file);
+  if (!file.good()) return false;
+
+  std::string contents;
+  std::getline(file, contents);
+
+  if (contents.empty()) return false;
+
+  filename = contents;
+  return true;
+}
