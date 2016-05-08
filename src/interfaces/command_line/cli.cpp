@@ -766,7 +766,8 @@ int cli::handle_show(const po::variables_map& vm)
   {
 
     // Write the identifier first
-    std::cout << result->get_id() << std::endl;
+    std::cout << std::endl << "Entry ID: " << result->get_id() << std::endl;
+
     // Followed by the username if it is set
     if (!result->get_username().empty())
     {
