@@ -1,5 +1,5 @@
 // Deadlock – fast search-based password manager
-// Copyright (C) 2012, 2014 Ruud van Asseldonk
+// Copyright (C) 2012, 2014, 2017 Ruud van Asseldonk
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -807,6 +807,15 @@ int cli::handle_show(const po::variables_map& vm)
     else // Only the most recent password
     {
       std::cout << "Password: " << result->get_password().get_password() << std::endl;
+
+      int64_t current_time = std::time(nullptr);
+      int64_t timestamp = result->get_password().get_stored_time();
+      int64_t month = 3600 * 24 * 30;
+
+      if (current_time - timestamp > 18 * month)
+      {
+        std::cout << "This password is older than 18 months, consider rotating it." << std::endl;
+      }
     }
     
     // Followed by additional data (if set)
