@@ -66,15 +66,34 @@ namespace deadlock
           return lower;
         }
 
-        /// Splits a string into words on whitspace
+        /// Splits a string into words on whitespace or periods.
         inline data::secure_string_vector get_words(const data::secure_string& str) const
         {
           data::secure_string_vector words;
 
-          data::secure_stringstream_ptr iss = data::make_secure_stringstream(str);
-          std::copy(std::istream_iterator<data::secure_string>(*iss),
-                  std::istream_iterator<data::secure_string>(),
-                  std::back_inserter(words));
+          const auto end = str.cend();
+          auto from = str.cbegin();
+          auto to = from;
+
+          while (to != end)
+          {
+            const char ch = *to;
+            if (std::isspace(ch) || ch == '.')
+            {
+              if (from < to)
+              {
+                words.push_back(data::secure_string(from, to));
+              }
+              from = to + 1;
+            }
+
+            to++;
+          }
+
+          if (from < to)
+          {
+            words.push_back(data::secure_string(from, to));
+          }
 
           return words;
         }
